@@ -13,6 +13,7 @@ interface AnswerBoxProps {
   imageTitle?: string;
   draggableProps: DraggableProvidedDraggableProps | null;
   dragHandleProps: DraggableProvidedDragHandleProps | null;
+  style: any;
   variant: "unsubmitted" | "correct" | "incorrect";
 }
 
@@ -22,6 +23,7 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
     imageTitle,
     draggableProps,
     dragHandleProps,
+    style,
     variant,
 }: AnswerBoxProps, ref) => {
   return (
@@ -34,6 +36,7 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
         )}
       ref={ref}
       {...draggableProps}
+      style={style}
     >
       <div
         className={cn(

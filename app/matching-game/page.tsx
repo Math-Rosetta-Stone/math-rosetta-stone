@@ -1,3 +1,4 @@
+import { shuffle } from "@/lib/utils";
 import { Matching } from "./_components/matching";
 
 const termToDefinition = {
@@ -20,7 +21,7 @@ const MatchingGame = () => {
         rounded-lg shadow-md border border-neutral-200 pb-2"
       >
         <div
-          className="flex flex-row justify-between w-full
+          className="flex flex-row rounded-lg justify-between w-full
           border-b border-neutral-200 py-2 px-3 bg-slate-50"
         >
           <div>Level #</div>
@@ -35,8 +36,8 @@ const MatchingGame = () => {
         </div>
 
         <Matching
-          terms={Object.keys(termToDefinition)}
-          definitions={Object.values(termToDefinition)}
+          terms={shuffle(Object.keys(termToDefinition))}
+          definitions={shuffle(Object.values(termToDefinition))}
           answerKey={termToDefinition}
         />
 
