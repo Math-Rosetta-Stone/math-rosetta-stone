@@ -7,7 +7,8 @@ export const QuestionBox = ({
 }: QuestionBoxProps) => {
   return (
     <div
-      className="rounded-lg shadow-md border border-neutral-50 p-5 m-5"
+      className="rounded shadow-md border border-neutral-300 p-3
+      w-32 text-wrap"
     >
       {term}
     </div>

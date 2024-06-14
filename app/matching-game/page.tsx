@@ -1,50 +1,46 @@
-import { QuestionBox } from "./_components/question-box";
-import { AnswersList } from "./_components/answers-list";
+import { Matching } from "./_components/matching";
 
-import { Button } from "@/components/ui/button";
-
-const terms = ["derivative", "integral", "limit", "function"];
-const definitions = ["rate of change", "area under the curve", "approaching a value", "relation between inputs and outputs"];
+const termToDefinition = {
+  "derivative": "rate of change",
+  "integral": "area under the curve",
+  "limit": "approaching a value",
+  "function": "relation between inputs and outputs",
+};
 
 const MatchingGame = () => {
   return (
-    <div
-      className="flex flex-col
-      rounded-lg shadow-md border border-neutral-50
-      mx-20 mt-20 p-2"
-    >
-      <div
-        className="flex flex-row justify-between
-        w-full border border-red-500"
-      >
-        <div>Level #</div>
-        <div>Timer</div>
+    <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+
+      <div className="text-4xl">
+        Matching Game
       </div>
 
       <div
-        className="flex flex-row justify-between
-        w-full border border-red-500"
-      >
-        Instructions
-      </div>
-
-      <div
-        className="flex flex-row justify-between
-        w-full border border-blue-500"
+        className="flex flex-col
+        rounded-lg shadow-md border border-neutral-200 pb-2"
       >
         <div
-          className="flex flex-col"
+          className="flex flex-row justify-between w-full
+          border-b border-neutral-200 py-2 px-3 bg-slate-50"
         >
-          {terms.map((term) => {
-            return <QuestionBox term={term} />
-          })}
+          <div>Level #</div>
+          <div>Timer</div>
         </div>
 
-        <AnswersList definitions={definitions} />
+        <div
+          className="flex flex-row justify-between w-full
+          py-2 px-3 bg-slate-50"
+        >
+          Instructions
+        </div>
+
+        <Matching
+          terms={Object.keys(termToDefinition)}
+          definitions={Object.values(termToDefinition)}
+          answerKey={termToDefinition}
+        />
+
       </div>
-
-      <Button>Submit</Button>
-
     </div>
   );
 };
