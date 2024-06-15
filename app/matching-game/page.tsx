@@ -1,7 +1,12 @@
+"use client";
+
 import { shuffle } from "@/lib/utils";
 import { Matching } from "./_components/matching";
+import { useEffect, useState } from "react";
 
-const termToDefinition = {
+const timeLimit = 15; // 5 minutes
+
+const termToDefinition: {[key: string]: string} = {
   "derivative": "rate of change",
   "integral": "area under the curve",
   "limit": "approaching a value",
@@ -9,36 +14,76 @@ const termToDefinition = {
 };
 
 const MatchingGame = () => {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [timerStopped, setTimerStopped] = useState(false);
+  const [randomizedTerms, setRandomizedTerms] = useState<string[]>(shuffle(Object.keys(termToDefinition)));
+  const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)));
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
-      <div className="text-4xl">
+  const handleSubmit = () => {
+    setTimerStopped(true);
+    setFormSubmitted(true);
+  };
+
+  const handleResetTimer = () => {
+    setTimeLeft(timeLimit);
+    setTimerStopped(false);
+    setFormSubmitted(false);
+  };
+
+  const handleShuffle = (shuffledTerms: string[], shuffledDefinitions: string[]) => {
+    setRandomizedTerms(shuffledTerms);
+    setRandomizedDefinitions(shuffledDefinitions);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (timeLeft > 0 && !timerStopped) {
+        setTimeLeft((prevTime) => prevTime - 1);
+      } else if (timeLeft === 0 && !formSubmitted) {
+        handleSubmit(); // Automatically submit when the timer reaches 0
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerStopped, timeLeft]);
+
+  return (
+    <div className="flex flex-col items-center justify-around min-h-screen">
+
+      <div className="text-4xl font-black">
         Matching Game
       </div>
 
       <div
         className="flex flex-col
-        rounded-lg shadow-md border border-neutral-200 pb-2"
+        rounded-lg shadow-md border border-neutral-200 pb-5"
       >
         <div
           className="flex flex-row rounded-lg justify-between w-full
-          border-b border-neutral-200 py-2 px-3 bg-slate-50"
+          border-b border-neutral-200 py-2 px-3 bg-slate-50
+          text-xl font-medium"
         >
           <div>Level #</div>
-          <div>Timer</div>
+          <div>{new Date(timeLeft * 1000).toISOString().substring(14, 19)}</div>
         </div>
 
         <div
           className="flex flex-row justify-between w-full
-          py-2 px-3 bg-slate-50"
+          py-2 px-3 bg-slate-50
+          text-sm"
         >
-          Instructions
+          Match the terms to their definitions
         </div>
 
         <Matching
-          terms={shuffle(Object.keys(termToDefinition))}
-          definitions={shuffle(Object.values(termToDefinition))}
+          terms={randomizedTerms}
+          definitions={randomizedDefinitions}
           answerKey={termToDefinition}
+          handleResetTimer={handleResetTimer}
+          handleSubmit={handleSubmit}
+          handleShuffle={handleShuffle}
+          formSubmitted={formSubmitted}
         />
 
       </div>

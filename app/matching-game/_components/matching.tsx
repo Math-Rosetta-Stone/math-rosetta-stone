@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn, shuffle } from "@/lib/utils";
 
 import { QuestionBox } from "./question-box";
@@ -9,8 +9,6 @@ import { AnswerBox } from "./answer-box";
 import {
   DragDropContext,
   Draggable,
-  DraggableStateSnapshot,
-  DraggableStyle,
   Droppable,
 } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
@@ -23,94 +21,103 @@ interface MatchingProps {
   answerKey: {
     [key: string]: string
   };
+  handleResetTimer: () => void;
+  handleSubmit: () => void;
+  handleShuffle: (shuffledTerms: string[], shuffledDefinitions: string[]) => void;
+  formSubmitted: boolean;
 }
 
 export const Matching = ({
   terms,
   definitions,
   answerKey,
+  handleResetTimer,
+  handleSubmit,
+  handleShuffle,
+  formSubmitted,
 }: MatchingProps) => {
+  const [questions, setQuestions] = useState(terms);
   const [answers, setAnswers] = useState(definitions);
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [minHeights, setMinHeights] = useState<number[]>([]);
+  const [shuffleKey, setShuffleKey] = useState(0);
+  const refs = useRef<HTMLDivElement[]>([]);
 
   const onDragEnd = (result: any) => {
-    console.log(result);
-
     if (!result.destination) return;
 
-    // SOURCE: https://codesandbox.io/p/devbox/albertogandarillas-react-todo-hellopangea-dnd-rvmm4v?file=%2Fsrc%2FApp.jsx%3A47%2C16-47%2C21
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
     const copyAnswers = [...answers];
-    const [reorderAnswer] = copyAnswers.splice(startIndex, 1);
-    copyAnswers.splice(endIndex, 0, reorderAnswer);
+
+    // Swap the source and destination answers
+    const temp = copyAnswers[startIndex];
+    copyAnswers[startIndex] = copyAnswers[endIndex];
+    copyAnswers[endIndex] = temp;
     setAnswers(copyAnswers);
   };
 
-  const getSkipDropAnimationStyle = (
-    style: DraggableStyle | undefined,
-    snapshot: DraggableStateSnapshot
-  ) => {
-    if (!snapshot.isDropAnimating) {
-      return style;
-    }
-    return {
-      ...style,
-      // cannot be 0, but has to be super tiny
-      transitionDuration: `0.001s`,
-    };
-  };
-
   const onSubmit = () => {
-    setFormSubmitted(true);
+    handleSubmit();
   };
 
   const onReset = () => {
-    setFormSubmitted(false);
+    handleResetTimer();
   };
 
   const onShuffle = () => {
-    console.log("Before:", answers);
-    setAnswers(shuffle(answers));
-    console.log("After:", answers);
+    const shuffledTerms = shuffle(terms);
+    const shuffledDefinitions = shuffle(definitions);
+
+    setQuestions(shuffledTerms);
+    setAnswers(shuffledDefinitions);
+    setShuffleKey((prev) => 1 - prev);
+    handleResetTimer();
+    handleShuffle(shuffledTerms, shuffledDefinitions);
   };
+
+  useEffect(() => {
+    const heights = refs.current.map(ref => ref?.clientHeight || 0);
+    setMinHeights(heights);
+  }, [answers]);
 
   return (
     <DragDropContext
       onDragEnd={onDragEnd}
     >
-      {/* Outermost box */}
       <div className="flex flex-col items-center">
         {answers.map((answer, index) => (
           <div
+            key={`${shuffleKey}-${index}`}
             className="flex flex-row justify-center items-center w-full m-5"
           >
             <QuestionBox term={terms[index]} />
 
             <div className="border border-black h-0 min-w-24"></div>
 
-            <Droppable droppableId={`answer-${index}`}>
+            <Droppable
+              droppableId={`answer-${index}`}
+              direction="horizontal">
               {(droppableProvided) => (
                 <div
                   ref={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
-                  className={cn(
-                    "flex flex-col items-center rounded w-64",
-                    !formSubmitted && "active:ring-2 active:ring-slate-700"
-                  )}
+                  className="flex flex-col items-center justify-center rounded w-64"
+                  style={{ minHeight: Math.max(...minHeights) || 'auto' }} // Set min-height to prevent jumping
                 >
                   <Draggable
                     key={`answer-${index}`}
                     index={index}
                     draggableId={`answer-${index}`}
                   >
-                    {(draggableProvided, snapshot) => (
+                    {(draggableProvided) => (
                       <AnswerBox
                         definition={answer}
-                        ref={!formSubmitted ? draggableProvided.innerRef: null}
+                        ref={!formSubmitted ? (el) => {
+                          draggableProvided.innerRef(el);
+                          if (el) refs.current[index] = el; // Store the ref to measure height
+                        } : null}
                         draggableProps={!formSubmitted ? draggableProvided.draggableProps : null}
                         dragHandleProps={!formSubmitted ? draggableProvided.dragHandleProps : null}
-                        style={getSkipDropAnimationStyle(draggableProvided.draggableProps.style, snapshot)}
                         variant={!formSubmitted
                           ? "unsubmitted"
                           : (answerKey[terms[index]] === answer)
@@ -128,7 +135,7 @@ export const Matching = ({
         <div className="flex flex-row justify-between items-center gap-5">
           <Button
             className="border hover:bg-slate-50 hover:text-slate-900
-            hover:border-slate-300 ease-in duration-100
+            hover:border-slate-300 ease-in duration-150
             disabled:bg-slate-300 disabled:text-slate-900"
             disabled={formSubmitted}
             variant="default"
@@ -139,19 +146,21 @@ export const Matching = ({
 
           <RotateCcw
             className={cn(
-              "text-slate-300",
-              formSubmitted && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+              "text-slate-300 ease-in duration-150",
+              formSubmitted && "text-slate-900 hover:cursor-pointer\
+              hover:bg-slate-50"
             )}
             onClick={onReset}
           />
 
-          {/* <Shuffle
+          <Shuffle
             className={cn(
-              "text-slate-300",
-              formSubmitted && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+              "text-slate-300 ease-in duration-150",
+              !formSubmitted && "text-slate-900 hover:cursor-pointer\
+              hover:bg-slate-50"
             )}
             onClick={onShuffle}
-          /> */}
+          />
         </div>
       </div>
     </DragDropContext>
