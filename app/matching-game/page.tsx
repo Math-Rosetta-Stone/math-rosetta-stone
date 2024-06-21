@@ -4,7 +4,7 @@ import { shuffle } from "@/lib/utils";
 import { Matching } from "./_components/matching";
 import { useEffect, useState } from "react";
 
-const timeLimit = 15; // 5 minutes
+const timeLimit = 20; // 20 seconds
 
 const termToDefinition: {[key: string]: string} = {
   "derivative": "rate of change",
@@ -19,6 +19,7 @@ const MatchingGame = () => {
   const [randomizedTerms, setRandomizedTerms] = useState<string[]>(shuffle(Object.keys(termToDefinition)));
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)));
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   const handleSubmit = () => {
     setTimerStopped(true);
@@ -37,6 +38,7 @@ const MatchingGame = () => {
   };
 
   useEffect(() => {
+    setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft((prevTime) => prevTime - 1);
@@ -48,6 +50,9 @@ const MatchingGame = () => {
     return () => clearInterval(interval);
   }, [timerStopped, timeLeft]);
 
+  if (!hydrated) {
+    return null;
+  }
   return (
     <div className="flex flex-col items-center justify-around min-h-screen">
 
