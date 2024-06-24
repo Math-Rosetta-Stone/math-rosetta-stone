@@ -16,28 +16,28 @@ import { RotateCcw, Shuffle } from "lucide-react";
 
 
 interface MatchingProps {
-  terms: string[];
-  definitions: string[];
+  questions: string[];
+  answers: string[];
   answerKey: {
     [key: string]: string
   };
   handleResetTimer: () => void;
   handleSubmit: () => void;
-  handleShuffle: (shuffledTerms: string[], shuffledDefinitions: string[]) => void;
+  handleShuffle: (shuffledQuestions: string[], shuffledAnswers: string[]) => void;
   formSubmitted: boolean;
 }
 
 export const Matching = ({
-  terms,
-  definitions,
+  questions,
+  answers,
   answerKey,
   handleResetTimer,
   handleSubmit,
   handleShuffle,
   formSubmitted,
 }: MatchingProps) => {
-  const [questions, setQuestions] = useState(terms);
-  const [answers, setAnswers] = useState(definitions);
+  const [formQuestions, setQuestions] = useState(questions);
+  const [formAnswers, setAnswers] = useState(answers);
   const [minHeights, setMinHeights] = useState<number[]>([]);
   const [shuffleKey, setShuffleKey] = useState(0);
   const refs = useRef<HTMLDivElement[]>([]);
@@ -47,7 +47,7 @@ export const Matching = ({
 
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
-    const copyAnswers = [...answers];
+    const copyAnswers = [...formAnswers];
 
     // Swap the source and destination answers
     const temp = copyAnswers[startIndex];
@@ -65,32 +65,32 @@ export const Matching = ({
   };
 
   const onShuffle = () => {
-    const shuffledTerms = shuffle(terms);
-    const shuffledDefinitions = shuffle(definitions);
+    const shuffledQuestions = shuffle(formQuestions);
+    const shuffledAnswers = shuffle(formAnswers);
 
-    setQuestions(shuffledTerms);
-    setAnswers(shuffledDefinitions);
+    setQuestions(shuffledQuestions);
+    setAnswers(shuffledAnswers);
     setShuffleKey((prev) => 1 - prev);
     handleResetTimer();
-    handleShuffle(shuffledTerms, shuffledDefinitions);
+    handleShuffle(shuffledQuestions, shuffledAnswers);
   };
 
   useEffect(() => {
     const heights = refs.current.map(ref => ref?.clientHeight || 0);
     setMinHeights(heights);
-  }, [answers]);
+  }, [formAnswers]);
 
   return (
     <DragDropContext
       onDragEnd={onDragEnd}
     >
       <div className="flex flex-col items-center">
-        {answers.map((answer, index) => (
+        {formAnswers.map((answer, index) => (
           <div
             key={`${shuffleKey}-${index}`}
             className="flex flex-row justify-center items-center w-full m-5"
           >
-            <QuestionBox term={terms[index]} />
+            <QuestionBox question={formQuestions[index]} />
 
             <div className="border border-black h-0 min-w-24"></div>
 
@@ -111,7 +111,7 @@ export const Matching = ({
                   >
                     {(draggableProvided) => (
                       <AnswerBox
-                        definition={answer}
+                        answer={answer}
                         ref={!formSubmitted ? (el) => {
                           draggableProvided.innerRef(el);
                           if (el) refs.current[index] = el; // Store the ref to measure height
@@ -120,7 +120,7 @@ export const Matching = ({
                         dragHandleProps={!formSubmitted ? draggableProvided.dragHandleProps : null}
                         variant={!formSubmitted
                           ? "unsubmitted"
-                          : (answerKey[terms[index]] === answer)
+                          : (answerKey[formQuestions[index]] === answer)
                             ? "correct"
                             : "incorrect"}
                       />

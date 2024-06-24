@@ -4,7 +4,7 @@ import { shuffle } from "@/lib/utils";
 import { Matching } from "./_components/matching";
 import { useEffect, useState } from "react";
 
-const timeLimit = 20; // 20 seconds
+const TIME_LIMIT = 20; // 20 seconds
 
 const termToDefinition: {[key: string]: string} = {
   "derivative": "rate of change",
@@ -14,12 +14,12 @@ const termToDefinition: {[key: string]: string} = {
 };
 
 const MatchingGame = () => {
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [hydrated, setHydrated] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [randomizedTerms, setRandomizedTerms] = useState<string[]>(shuffle(Object.keys(termToDefinition)));
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)));
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
 
   const handleSubmit = () => {
     setTimerStopped(true);
@@ -27,7 +27,7 @@ const MatchingGame = () => {
   };
 
   const handleResetTimer = () => {
-    setTimeLeft(timeLimit);
+    setTimeLeft(TIME_LIMIT);
     setTimerStopped(false);
     setFormSubmitted(false);
   };
@@ -78,12 +78,12 @@ const MatchingGame = () => {
           py-2 px-3 bg-slate-50
           text-sm"
         >
-          Match the terms to their definitions
+          Match the terms to their definitions.
         </div>
 
         <Matching
-          terms={randomizedTerms}
-          definitions={randomizedDefinitions}
+          questions={randomizedTerms}
+          answers={randomizedDefinitions}
           answerKey={termToDefinition}
           handleResetTimer={handleResetTimer}
           handleSubmit={handleSubmit}
