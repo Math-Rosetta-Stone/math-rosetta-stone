@@ -59,7 +59,7 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
           {answer}
         </div>
       ) : (imageUrl && imageTitle) ? (
-        <Image src={imageUrl} alt={imageTitle} />
+        <Image src={imageUrl} alt={imageTitle} height={120} width={120} />
       ) : (
         <CircleAlert color="red" />
       )}

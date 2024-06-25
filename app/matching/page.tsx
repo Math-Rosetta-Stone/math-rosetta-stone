@@ -5,7 +5,7 @@ import { shuffle } from "@/lib/utils";
 
 import { Matching } from "./_components/matching";
 
-const TIME_LIMIT = 20; // 20 seconds
+const TIME_LIMIT = 20; // in seconds
 
 const termToDefinition: {[key: string]: string} = {
   "derivative": "rate of change",

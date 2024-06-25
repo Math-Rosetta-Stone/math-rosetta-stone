@@ -36,7 +36,7 @@ export const ChoiceBox = ({
         (variant === "correct") && "border-green-600 bg-green-50 shadow-green-50",
         (variant === "incorrect") && "border-red-400 bg-red-50 shadow-red-50"
       )}
-      onClick={onClick}
+      onClick={() => {if (!disabled) onClick()}}
     >
       <div
         className={cn(
@@ -56,10 +56,7 @@ export const ChoiceBox = ({
           choiceType === PromptType.DEF ? (
             choice.definition
           ) : (
-            <Image
-            src={choice.image.url}
-            alt={choice.image.title}
-            />
+            <Image src={choice.image.url} alt={choice.image.title} height={120} width={120} />
         ))}
       </div>
     </div>

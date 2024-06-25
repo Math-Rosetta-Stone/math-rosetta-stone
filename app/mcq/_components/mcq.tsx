@@ -25,10 +25,10 @@ export const Mcq = ({
   formSubmitted,
   updateScore,
 }: McqProps) => {
-  const [chosenChoice, setChosenChoice] = useState<number | null>(null);
+  const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
 
-  const choose = (index: number) => {
-    setChosenChoice(index);
+  const select = (index: number) => {
+    setSelectedChoice(index);
 
     if (isCorrectChoice(choices[index])) updateScore();
 
@@ -73,12 +73,11 @@ export const Mcq = ({
 
       {choices.map((choice, index) => (
         <ChoiceBox
-          key={`${choice}-${index}`}
           choiceId={index}
           choice={choice}
           choiceType={choiceType}
           variant={formSubmitted ? (
-            (index === chosenChoice) ? (
+            (index === selectedChoice) ? (
               isCorrectChoice(choice) ? ("correct") : ("incorrect")
             ) : (
               isCorrectChoice(choice) ? ("correct") : ("notPicked")
@@ -86,9 +85,7 @@ export const Mcq = ({
           ) : (
             "notPicked"
           )}
-          onClick={() => {
-            if (!formSubmitted) choose(index)
-          }}
+          onClick={() => {select(index)}}
           disabled={formSubmitted}
         />
       ))}

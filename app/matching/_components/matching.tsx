@@ -142,7 +142,7 @@ export const Matching = ({
               formSubmitted && "text-slate-900 hover:cursor-pointer\
               hover:bg-slate-50"
             )}
-            onClick={handleResetTimer}
+            onClick={() => {if (formSubmitted) handleResetTimer()}}
           />
 
           <Shuffle
@@ -151,7 +151,7 @@ export const Matching = ({
               !formSubmitted && "text-slate-900 hover:cursor-pointer\
               hover:bg-slate-50"
             )}
-            onClick={onShuffle}
+            onClick={() => {if (!formSubmitted) onShuffle()}}
           />
         </div>
       </div>

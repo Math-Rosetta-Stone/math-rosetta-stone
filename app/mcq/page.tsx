@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { PromptType, TermItem } from "@/types/mcq";
-import { getOneRandom, shuffle } from "@/lib/utils";
+import { cn, getOneRandom, shuffle } from "@/lib/utils";
 
 import { Mcq } from "./_components/mcq";
+import { ArrowRight } from 'lucide-react';
 
-const TIME_LIMIT = 20; // 20 seconds
+const TIME_LIMIT = 5; // in seconds
 
 const mockDb: TermItem[] = [
   {
@@ -14,7 +15,7 @@ const mockDb: TermItem[] = [
     definition: "rate of change",
     image: {
       title: "Derivative",
-      url: "/images/derivative.png",
+      url: "/derivative.jpg",
     },
   },
   {
@@ -22,16 +23,15 @@ const mockDb: TermItem[] = [
     definition: "area under the curve",
     image: {
       title: "Integral",
-      url: "/images/integral.png",
+      url: "/integral.jpg",
     },
   },
-  //give me 6 more such objects
   {
     term: "limit",
     definition: "approaching a value",
     image: {
       title: "Limit",
-      url: "/images/limit.png",
+      url: "/limit.png",
     },
   },
   {
@@ -39,7 +39,7 @@ const mockDb: TermItem[] = [
     definition: "relation between inputs and outputs",
     image: {
       title: "Function",
-      url: "/images/function.png",
+      url: "/function.jpg",
     },
   },
   {
@@ -47,7 +47,7 @@ const mockDb: TermItem[] = [
     definition: "steepness of a line",
     image: {
       title: "Slope",
-      url: "/images/slope.png",
+      url: "/slope.jpg",
     },
   },
   {
@@ -55,15 +55,7 @@ const mockDb: TermItem[] = [
     definition: "line that touches a curve",
     image: {
       title: "Tangent",
-      url: "/images/tangent.png",
-    },
-  },
-  {
-    term: "normal",
-    definition: "line perpendicular to a tangent",
-    image: {
-      title: "Normal",
-      url: "/images/normal.png",
+      url: "/tangent.png",
     },
   },
 ];
@@ -77,31 +69,22 @@ const McqGame = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
-  // Returns array of random choices including the correct answer
-  const getChoices = () => {
-    const wrongChoices = shuffle(mockDb.filter((item) => item.term !== currQuestion.term)).slice(0, 3);
-    return shuffle([currQuestion, ...wrongChoices]);
+  const getChoices = (question: TermItem) => {
+    const wrongChoices = shuffle(mockDb.filter((item) => item.term !== question.term)).slice(0, 3);
+    return shuffle([question, ...wrongChoices]);
   };
-  const [currChoices, setCurrChoices] = useState<TermItem[]>(getChoices()); // [choice1, choice2, choice3, choice4
+  const [currChoices, setCurrChoices] = useState<TermItem[]>(getChoices(currQuestion));
 
-  // Returns array [question type, choice type]
   const getGameType = () => {
-    // let possibleQATypes = [PromptType.TERM, PromptType.DEF, PromptType.IMG];
-    // const typeToRemove = getOneRandom([PromptType.TERM, PromptType.DEF, PromptType.IMG]);
-    // return possibleQATypes.filter((type) => type !== typeToRemove);
-    return shuffle([PromptType.TERM, PromptType.DEF]);
+    let possibleQATypes = [PromptType.TERM, PromptType.DEF, PromptType.IMG];
+    const typeToRemove = getOneRandom(possibleQATypes);
+    return shuffle(possibleQATypes.filter((type) => type !== typeToRemove));
   };
   const [currGameType, setCurrGameType] = useState<PromptType[]>(getGameType()); // [question type, choice type]
-
 
   const handleSubmit = () => {
     setTimerStopped(true);
     setFormSubmitted(true);
-    // delay of 2 seconds before shuffling
-    setTimeout(() => {
-      handleShuffle();
-      setFormSubmitted(false);
-    }, 2000);
   };
 
   const handleResetTimer = () => {
@@ -109,16 +92,36 @@ const McqGame = () => {
     setTimerStopped(false);
   };
 
-  const handleShuffle = () => {
-    if (availableQuestions.length === 0) {
-      // setAvailableQuestions(mockDb);
-      return;
+  const handleNext = () => {
+    if (availableQuestions.length === 0) {  // if no more questions, stop the game
+      // to mark no more questions left
+      setCurrQuestion({...currQuestion, term: ""});
+
+      // stop the timer and set time left to 0 (purely aesthetic)
+      setTimerStopped(true);
+      setTimeLeft(0);
+    } else {
+      // get a new question from available questions
+      const newQuestion = getOneRandom(availableQuestions);
+      setCurrQuestion(newQuestion);
+
+      // get new choices for the new question
+      setCurrChoices(getChoices(newQuestion));
+
+      // get new game type
+      setCurrGameType(getGameType());
+
+      // update available questions
+      setAvailableQuestions(prevAvailableQuestions =>
+        prevAvailableQuestions.filter((item) => item.term !== newQuestion.term)
+      );
+
+      // reset timer
+      handleResetTimer();
     }
-    setCurrQuestion(getOneRandom(availableQuestions));
-    setAvailableQuestions(availableQuestions.filter((item) => item.term !== currQuestion.term));
-    setCurrChoices(getChoices());
-    setCurrGameType(getGameType());
-    handleResetTimer();
+
+    // reset form submitted
+    setFormSubmitted(false);
   };
 
   useEffect(() => {
@@ -147,7 +150,7 @@ const McqGame = () => {
 
       <div
         className="flex flex-col
-        rounded-lg shadow-md border border-neutral-200 pb-5 w-1/3"
+        rounded-lg shadow-md border border-neutral-200 w-1/3 pb-2"
       >
         <div
           className="flex flex-row rounded-t-lg justify-between w-full
@@ -155,7 +158,6 @@ const McqGame = () => {
           text-xl font-medium"
         >
           <div>Level #</div>
-          <div>{`${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
           <div>{new Date(timeLeft * 1000).toISOString().substring(14, 19)}</div>
         </div>
 
@@ -167,19 +169,38 @@ const McqGame = () => {
           Match the term/definition/image corresponding to the term/definition/image.
         </div>
 
-        {availableQuestions.length > 0 ? (
-          <Mcq
-            question={currQuestion}
-            questionType={currGameType[0]}
-            choices={currChoices}
-            choiceType={currGameType[1]}
-            handleSubmit={handleSubmit}
-            formSubmitted={formSubmitted}
-            updateScore={() => setScore(score + 1)}
-          />) : (
+        {currQuestion.term !== "" ? (
+          <>
+            <div className="flex flex-row justify-between w-full pt-2 px-5">
+              <div className="flex flex-row justify-start gap-2">
+                <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
+                <div>{`Score: ${score}`}</div>
+              </div>
+
+              <ArrowRight
+                className={cn(
+                  "text-slate-300 ease-in duration-150",
+                  formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer\
+                  hover:bg-slate-50"
+                )}
+                onClick={() => {if (formSubmitted && currQuestion.term !== "") handleNext()}}
+              />
+            </div>
+
+            <Mcq
+              key={availableQuestions.length % 2 === 0 ? 0 : 1} /* In order to reset selected choice state after each round */
+              question={currQuestion}
+              questionType={currGameType[0]}
+              choices={currChoices}
+              choiceType={currGameType[1]}
+              handleSubmit={handleSubmit}
+              formSubmitted={formSubmitted}
+              updateScore={() => setScore(score + 1)}
+            />
+          </>) : (
             <div className="text-center text-xl font-semibold p-3">
               Congratulations! You have completed the game.
-              {` Your score is ${score}/${mockDb.length}`}
+              {` You scored ${score}/${mockDb.length}`}
             </div>
         )}
       </div>

@@ -14,7 +14,7 @@ export const QuestionBox = ({
   questionType,
   answerType,
 }: QuestionBoxProps) => {
-  const getQuestionText = () => {
+  const getQuestionContent = () => {
     switch (questionType) {
       case PromptType.TERM:
         return question.term;
@@ -25,6 +25,7 @@ export const QuestionBox = ({
           <Image
             src={question.image.url}
             alt={question.image.title}
+            height={120} width={120}
           />
         );
       default:
@@ -41,7 +42,7 @@ export const QuestionBox = ({
       <div>
         <span className="font-semibold underline underline-offset-2">
           {questionType === PromptType.TERM ? "Term" : questionType === PromptType.DEF ? "Definition" : "Image"}
-        </span>: {questionType !== PromptType.IMG ? getQuestionText() : null}.
+        </span>: {getQuestionContent()}.
       </div>
 
       <div>
