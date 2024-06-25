@@ -211,7 +211,7 @@ const McqGame = () => {
               transition={{ duration: 0.3 }}
             >
               <Mcq
-                key={availableQuestions.length % 2 === 0 ? 0 : 1} /* In order to reset selected choice state after each round */
+                key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
                 question={currQuestion}
                 questionType={currGameType[0]}
                 choices={currChoices}
@@ -253,52 +253,3 @@ const McqGame = () => {
 };
 
 export default McqGame;
-
-
-// {currQuestion.term !== "" ? (
-//   <>
-//     <div className="flex flex-row justify-between w-full pt-2 px-5">
-//       <div className="flex flex-row justify-start gap-2">
-//         <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
-//         <div>{`Score: ${score}`}</div>
-//       </div>
-
-//       <ArrowRight
-//         className={cn(
-//           "text-slate-300 ease-in duration-150",
-//           formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer\
-//           hover:bg-slate-50"
-//         )}
-//         onClick={() => {if (formSubmitted && currQuestion.term !== "") handleNext()}}
-//       />
-//     </div>
-
-//     <Mcq
-//       key={availableQuestions.length % 2 === 0 ? 0 : 1} /* In order to reset selected choice state after each round */
-//       question={currQuestion}
-//       questionType={currGameType[0]}
-//       choices={currChoices}
-//       choiceType={currGameType[1]}
-//       handleSubmit={handleSubmit}
-//       formSubmitted={formSubmitted}
-//       updateScore={() => setScore(score + 1)}
-//     />
-//   </>) : (
-//     <div className="flex flex-col items-center  justify-center">
-//       <div className="text-center text-xl font-semibold p-3">
-//         Congratulations! You have completed the game.
-//         {` You scored ${score}/${mockDb.length}`}
-//       </div>
-
-//       <Button
-//         className="border hover:bg-slate-50 hover:text-slate-900
-//         hover:border-slate-300 ease-in duration-150
-//         disabled:bg-slate-300 disabled:text-slate-900"
-//         variant="default"
-//         onClick={handleRestart}
-//       >
-//         <RotateCcw className="mr-2" />
-//         Restart
-//       </Button>
-//     </div>
-// )}
