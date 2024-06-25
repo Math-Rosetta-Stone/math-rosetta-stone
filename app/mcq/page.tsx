@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { PromptType, TermItem } from "@/types/mcq";
 import { cn, getOneRandom, shuffle } from "@/lib/utils";
 
+import { ArrowRight, RotateCcw } from 'lucide-react';
+import { AnimatePresence, motion } from "framer-motion";
+
 import { Mcq } from "./_components/mcq";
-import { ArrowRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 const TIME_LIMIT = 5; // in seconds
 
@@ -124,6 +127,18 @@ const McqGame = () => {
     setFormSubmitted(false);
   };
 
+  const handleRestart = () => {
+    // reset all states
+    handleResetTimer();
+    const newQuestion = getOneRandom(mockDb);
+    setCurrQuestion(newQuestion);
+    setAvailableQuestions(mockDb.filter((item) => item.term !== newQuestion.term));
+    setFormSubmitted(false);
+    setScore(0);
+    setCurrChoices(getChoices(newQuestion));
+    setCurrGameType(getGameType());
+  };
+
   useEffect(() => {
     setHydrated(true);
     const interval = setInterval(() => {
@@ -169,43 +184,121 @@ const McqGame = () => {
           Match the term/definition/image corresponding to the term/definition/image.
         </div>
 
-        {currQuestion.term !== "" ? (
-          <>
-            <div className="flex flex-row justify-between w-full pt-2 px-5">
-              <div className="flex flex-row justify-start gap-2">
-                <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
-                <div>{`Score: ${score}`}</div>
+        {currQuestion.term !== "" && (
+          <div className="flex flex-row justify-between w-full pt-2 px-5">
+            <div className="flex flex-row justify-start gap-2">
+              <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
+              <div>{`Score: ${score}`}</div>
+            </div>
+
+            <ArrowRight
+              className={cn(
+                "text-slate-300 ease-in duration-150",
+                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+              )}
+              onClick={() => { if (formSubmitted && currQuestion.term !== "") handleNext() }}
+            />
+          </div>
+        )}
+
+        <AnimatePresence mode="wait">
+          {currQuestion.term !== "" ? (
+            <motion.div
+              key={currQuestion.term}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Mcq
+                key={availableQuestions.length % 2 === 0 ? 0 : 1} /* In order to reset selected choice state after each round */
+                question={currQuestion}
+                questionType={currGameType[0]}
+                choices={currChoices}
+                choiceType={currGameType[1]}
+                handleSubmit={handleSubmit}
+                formSubmitted={formSubmitted}
+                updateScore={() => setScore(score + 1)}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="end"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center  justify-center"
+            >
+              <div className="text-center text-xl font-semibold p-3">
+                Congratulations! You have completed the game.
+                {` You scored ${score}/${mockDb.length}`}
               </div>
 
-              <ArrowRight
-                className={cn(
-                  "text-slate-300 ease-in duration-150",
-                  formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer\
-                  hover:bg-slate-50"
-                )}
-                onClick={() => {if (formSubmitted && currQuestion.term !== "") handleNext()}}
-              />
-            </div>
+              <Button
+                className="border hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
+                variant="default"
+                onClick={handleRestart}
+              >
+                <RotateCcw className="mr-2" />
+                Restart
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            <Mcq
-              key={availableQuestions.length % 2 === 0 ? 0 : 1} /* In order to reset selected choice state after each round */
-              question={currQuestion}
-              questionType={currGameType[0]}
-              choices={currChoices}
-              choiceType={currGameType[1]}
-              handleSubmit={handleSubmit}
-              formSubmitted={formSubmitted}
-              updateScore={() => setScore(score + 1)}
-            />
-          </>) : (
-            <div className="text-center text-xl font-semibold p-3">
-              Congratulations! You have completed the game.
-              {` You scored ${score}/${mockDb.length}`}
-            </div>
-        )}
       </div>
     </div>
   );
 };
 
 export default McqGame;
+
+
+// {currQuestion.term !== "" ? (
+//   <>
+//     <div className="flex flex-row justify-between w-full pt-2 px-5">
+//       <div className="flex flex-row justify-start gap-2">
+//         <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
+//         <div>{`Score: ${score}`}</div>
+//       </div>
+
+//       <ArrowRight
+//         className={cn(
+//           "text-slate-300 ease-in duration-150",
+//           formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer\
+//           hover:bg-slate-50"
+//         )}
+//         onClick={() => {if (formSubmitted && currQuestion.term !== "") handleNext()}}
+//       />
+//     </div>
+
+//     <Mcq
+//       key={availableQuestions.length % 2 === 0 ? 0 : 1} /* In order to reset selected choice state after each round */
+//       question={currQuestion}
+//       questionType={currGameType[0]}
+//       choices={currChoices}
+//       choiceType={currGameType[1]}
+//       handleSubmit={handleSubmit}
+//       formSubmitted={formSubmitted}
+//       updateScore={() => setScore(score + 1)}
+//     />
+//   </>) : (
+//     <div className="flex flex-col items-center  justify-center">
+//       <div className="text-center text-xl font-semibold p-3">
+//         Congratulations! You have completed the game.
+//         {` You scored ${score}/${mockDb.length}`}
+//       </div>
+
+//       <Button
+//         className="border hover:bg-slate-50 hover:text-slate-900
+//         hover:border-slate-300 ease-in duration-150
+//         disabled:bg-slate-300 disabled:text-slate-900"
+//         variant="default"
+//         onClick={handleRestart}
+//       >
+//         <RotateCcw className="mr-2" />
+//         Restart
+//       </Button>
+//     </div>
+// )}
