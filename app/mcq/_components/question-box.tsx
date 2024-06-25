@@ -41,18 +41,18 @@ export const QuestionBox = ({
       <div>
         <span className="font-semibold underline underline-offset-2">
           {questionType === PromptType.TERM ? "Term" : questionType === PromptType.DEF ? "Definition" : "Image"}
-        </span>: {questionType !== PromptType.IMG ? getQuestionText() : null}
+        </span>: {questionType !== PromptType.IMG ? getQuestionText() : null}.
       </div>
 
       <div>
         Choose the correct <span className="font-medium underline underline-offset-2">
           {answerType === PromptType.TERM ? (
-            "term.") : (
+            "term") : (
               answerType === PromptType.DEF ? (
-                "definition.") : (
-                  "image."
+                "definition") : (
+                  "image"
           ))}
-        </span>
+        </span>:
       </div>
     </div>
   );

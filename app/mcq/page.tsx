@@ -72,43 +72,54 @@ const McqGame = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
-  // const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb));
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.term !== currQuestion.term));
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [score, setScore] = useState(0);
 
   // Returns array of random choices including the correct answer
   const getChoices = () => {
     const wrongChoices = shuffle(mockDb.filter((item) => item.term !== currQuestion.term)).slice(0, 3);
     return shuffle([currQuestion, ...wrongChoices]);
   };
-
   const [currChoices, setCurrChoices] = useState<TermItem[]>(getChoices()); // [choice1, choice2, choice3, choice4
 
   // Returns array [question type, choice type]
   const getGameType = () => {
-    let possibleQATypes = [PromptType.TERM, PromptType.DEF, PromptType.IMG];
-    const typeToRemove = getOneRandom([PromptType.TERM, PromptType.DEF, PromptType.IMG]);
-    return possibleQATypes.filter((type) => type !== typeToRemove);
+    // let possibleQATypes = [PromptType.TERM, PromptType.DEF, PromptType.IMG];
+    // const typeToRemove = getOneRandom([PromptType.TERM, PromptType.DEF, PromptType.IMG]);
+    // return possibleQATypes.filter((type) => type !== typeToRemove);
+    return shuffle([PromptType.TERM, PromptType.DEF]);
   };
-
   const [currGameType, setCurrGameType] = useState<PromptType[]>(getGameType()); // [question type, choice type]
+
 
   const handleSubmit = () => {
     setTimerStopped(true);
     setFormSubmitted(true);
+    // delay of 2 seconds before shuffling
+    setTimeout(() => {
+      handleShuffle();
+      setFormSubmitted(false);
+    }, 2000);
   };
 
-  /* const handleResetTimer = () => {
+  const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
     setTimerStopped(false);
   };
 
   const handleShuffle = () => {
+    if (availableQuestions.length === 0) {
+      // setAvailableQuestions(mockDb);
+      return;
+    }
     setCurrQuestion(getOneRandom(availableQuestions));
+    setAvailableQuestions(availableQuestions.filter((item) => item.term !== currQuestion.term));
     setCurrChoices(getChoices());
     setCurrGameType(getGameType());
     handleResetTimer();
-  }; */
+  };
 
   useEffect(() => {
     setHydrated(true);
@@ -126,6 +137,7 @@ const McqGame = () => {
   if (!hydrated) {
     return null;
   }
+
   return (
     <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
 
@@ -143,6 +155,7 @@ const McqGame = () => {
           text-xl font-medium"
         >
           <div>Level #</div>
+          <div>{`${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
           <div>{new Date(timeLeft * 1000).toISOString().substring(14, 19)}</div>
         </div>
 
@@ -154,15 +167,21 @@ const McqGame = () => {
           Match the term/definition/image corresponding to the term/definition/image.
         </div>
 
-        <Mcq
-          question={currQuestion}
-          questionType={PromptType.DEF}//{currGameType[0]}
-          choices={currChoices}
-          choiceType={PromptType.TERM}//{currGameType[1]}
-          handleSubmit={handleSubmit}
-          formSubmitted={formSubmitted}
-        />
-
+        {availableQuestions.length > 0 ? (
+          <Mcq
+            question={currQuestion}
+            questionType={currGameType[0]}
+            choices={currChoices}
+            choiceType={currGameType[1]}
+            handleSubmit={handleSubmit}
+            formSubmitted={formSubmitted}
+            updateScore={() => setScore(score + 1)}
+          />) : (
+            <div className="text-center text-xl font-semibold p-3">
+              Congratulations! You have completed the game.
+              {` Your score is ${score}/${mockDb.length}`}
+            </div>
+        )}
       </div>
     </div>
   );

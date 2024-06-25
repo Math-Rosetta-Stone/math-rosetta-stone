@@ -13,6 +13,7 @@ interface McqProps {
   choiceType: PromptType;
   handleSubmit: () => void;
   formSubmitted: boolean;
+  updateScore: () => void;
 }
 
 export const Mcq = ({
@@ -22,11 +23,15 @@ export const Mcq = ({
   choiceType,
   handleSubmit,
   formSubmitted,
+  updateScore,
 }: McqProps) => {
   const [chosenChoice, setChosenChoice] = useState<number | null>(null);
 
   const choose = (index: number) => {
     setChosenChoice(index);
+
+    if (isCorrectChoice(choices[index])) updateScore();
+
     handleSubmit();
   };
 
