@@ -1,19 +1,59 @@
 "use client";
 
+import { TermItem, PromptType } from "@/types/mcq";
+import Image from "next/image";
+
 interface QuestionBoxProps {
-  question: string;
+  question: TermItem;
+  questionType: PromptType;
+  answerType: PromptType;
 }
 
 export const QuestionBox = ({
-  question
+  question,
+  questionType,
+  answerType,
 }: QuestionBoxProps) => {
+  const getQuestionText = () => {
+    switch (questionType) {
+      case PromptType.TERM:
+        return question.term;
+      case PromptType.DEF:
+        return question.definition;
+      case PromptType.IMG:
+        return (
+          <Image
+            src={question.image.url}
+            alt={question.image.title}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div
       className="rounded shadow-sm border border-neutral-300 p-3
       w-full text-wrap
-      text-base font-medium"
+      text-base font-normal"
     >
-      {question}
+      <div>
+        <span className="font-semibold underline underline-offset-2">
+          {questionType === PromptType.TERM ? "Term" : questionType === PromptType.DEF ? "Definition" : "Image"}
+        </span>: {questionType !== PromptType.IMG ? getQuestionText() : null}
+      </div>
+
+      <div>
+        Choose the correct <span className="font-medium underline underline-offset-2">
+          {answerType === PromptType.TERM ? (
+            "term.") : (
+              answerType === PromptType.DEF ? (
+                "definition.") : (
+                  "image."
+          ))}
+        </span>
+      </div>
     </div>
   );
 };

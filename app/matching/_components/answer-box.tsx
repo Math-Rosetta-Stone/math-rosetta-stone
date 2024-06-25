@@ -33,7 +33,7 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
           "rounded shadow-md flex flex-row w-64 text-wrap border ease-in duration-100\
           text-base font-medium",
           (variant === "unsubmitted") &&
-            "border-neutral-300 hover:ring-2 hover:ring-slate-300 \
+            "border-neutral-300 hover:ring-1 hover:ring-slate-300 \
             active:ring-2 active:ring-slate-900",
           (variant === "correct") && "border-green-600 bg-green-50 shadow-green-50",
           (variant === "incorrect") && "border-red-400 bg-red-50 shadow-red-50"

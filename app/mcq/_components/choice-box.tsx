@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { PromptType, TermItem } from "@/types/mcq";
 
 import { CircleAlert } from "lucide-react";
 import Image from "next/image";
@@ -9,44 +10,58 @@ const choiceIds = ["A.", "B.", "C.", "D."];
 
 interface ChoiceBoxProps {
   choiceId: number;
-  choice?: string;
-  imageUrl?: string;
-  imageTitle?: string;
+  choice: TermItem;
+  choiceType: PromptType;
   variant: "notPicked" | "correct" | "incorrect";
+  onClick: () => void;
+  disabled: boolean;
 }
 
 export const ChoiceBox = ({
   choiceId,
   choice,
-  imageUrl,
-  imageTitle,
-  variant
+  choiceType,
+  variant,
+  onClick,
+  disabled = false,
 }: ChoiceBoxProps) => {
   return (
     <div
       className={cn(
-        "rounded shadow-sm flex flex-row w-full text-wrap border ease-in duration-100\
-        text-base font-medium",
-        (variant === "notPicked") &&
-          "border-neutral-300 hover:ring-1 hover:ring-slate-300 \
+        "rounded shadow-sm flex flex-row w-full h-full text-wrap\
+        border ease-in duration-100 text-base font-medium",
+        (variant === "notPicked" && !disabled) &&
+          "border-neutral-300 hover:ring-1 hover:ring-slate-300 hover:cursor-pointer \
           active:ring-1 active:ring-slate-900",
         (variant === "correct") && "border-green-600 bg-green-50 shadow-green-50",
         (variant === "incorrect") && "border-red-400 bg-red-50 shadow-red-50"
       )}
+      onClick={onClick}
     >
+      <div
+        className={cn(
+          "rounded-l flex flex-col justify-center\
+          bg-slate-100 px-2 border-r border-r-neutral-300 ease-in duration-100",
+          (variant === "correct") && "border-green-600",
+          (variant === "incorrect") && "border-red-400"
+        )}
+      >
+        {choiceIds[choiceId]}
+      </div>
 
-      {choice ? (
-        <div className="m-3">
-          {choiceIds[choiceId] + " " + choice}
-        </div>
-      ) : (imageUrl && imageTitle) ? (
-        <div className="flex flex-row gap-2">
-          {choiceIds[choiceId]}
-          <Image src={imageUrl} alt={imageTitle} />
-        </div>
-      ) : (
-        <CircleAlert color="red" />
-      )}
+      <div className="m-3 flex flex-col justify-center">
+        {choiceType === PromptType.TERM ? (
+          choice.term
+        ) : (
+          choiceType === PromptType.DEF ? (
+            choice.definition
+          ) : (
+            <Image
+            src={choice.image.url}
+            alt={choice.image.title}
+            />
+        ))}
+      </div>
     </div>
   );
 };

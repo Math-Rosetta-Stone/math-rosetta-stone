@@ -56,14 +56,6 @@ export const Matching = ({
     setAnswers(copyAnswers);
   };
 
-  const onSubmit = () => {
-    handleSubmit();
-  };
-
-  const onReset = () => {
-    handleResetTimer();
-  };
-
   const onShuffle = () => {
     const shuffledQuestions = shuffle(formQuestions);
     const shuffledAnswers = shuffle(formAnswers);
@@ -139,7 +131,7 @@ export const Matching = ({
             disabled:bg-slate-300 disabled:text-slate-900"
             disabled={formSubmitted}
             variant="default"
-            onClick={onSubmit}
+            onClick={handleSubmit}
           >
             Submit
           </Button>
@@ -150,7 +142,7 @@ export const Matching = ({
               formSubmitted && "text-slate-900 hover:cursor-pointer\
               hover:bg-slate-50"
             )}
-            onClick={onReset}
+            onClick={handleResetTimer}
           />
 
           <Shuffle

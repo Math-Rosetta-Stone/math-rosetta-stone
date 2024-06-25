@@ -1,8 +1,9 @@
 "use client";
 
-import { shuffle } from "@/lib/utils";
-import { Matching } from "./_components/matching";
 import { useEffect, useState } from "react";
+import { shuffle } from "@/lib/utils";
+
+import { Matching } from "./_components/matching";
 
 const TIME_LIMIT = 20; // 20 seconds
 
@@ -54,7 +55,7 @@ const MatchingGame = () => {
     return null;
   }
   return (
-    <div className="flex flex-col items-center justify-around min-h-screen">
+    <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
 
       <div className="text-4xl font-black">
         Matching Game
@@ -65,7 +66,7 @@ const MatchingGame = () => {
         rounded-lg shadow-md border border-neutral-200 pb-5"
       >
         <div
-          className="flex flex-row rounded-lg justify-between w-full
+          className="flex flex-row rounded-t-lg justify-between w-full
           border-b border-neutral-200 py-2 px-3 bg-slate-50
           text-xl font-medium"
         >
@@ -76,7 +77,7 @@ const MatchingGame = () => {
         <div
           className="flex flex-row justify-between w-full
           py-2 px-3 bg-slate-50
-          text-sm"
+          text-sm font-medium"
         >
           Match the terms to their definitions.
         </div>
