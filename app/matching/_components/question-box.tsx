@@ -1,11 +1,11 @@
 "use client";
 
 interface QuestionBoxProps {
-  term: string;
+  question: string;
 }
 
 export const QuestionBox = ({
-  term
+  question
 }: QuestionBoxProps) => {
   return (
     <div
@@ -13,7 +13,7 @@ export const QuestionBox = ({
       w-32 text-wrap
       text-base font-medium"
     >
-      {term}
+      {question}
     </div>
   );
 }

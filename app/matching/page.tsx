@@ -1,10 +1,11 @@
 "use client";
 
-import { shuffle } from "@/lib/utils";
-import { Matching } from "./_components/matching";
 import { useEffect, useState } from "react";
+import { shuffle } from "@/lib/utils";
 
-const timeLimit = 20; // 20 seconds
+import { Matching } from "./_components/matching";
+
+const TIME_LIMIT = 20; // in seconds
 
 const termToDefinition: {[key: string]: string} = {
   "derivative": "rate of change",
@@ -14,12 +15,12 @@ const termToDefinition: {[key: string]: string} = {
 };
 
 const MatchingGame = () => {
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [hydrated, setHydrated] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [randomizedTerms, setRandomizedTerms] = useState<string[]>(shuffle(Object.keys(termToDefinition)));
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)));
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
 
   const handleSubmit = () => {
     setTimerStopped(true);
@@ -27,7 +28,7 @@ const MatchingGame = () => {
   };
 
   const handleResetTimer = () => {
-    setTimeLeft(timeLimit);
+    setTimeLeft(TIME_LIMIT);
     setTimerStopped(false);
     setFormSubmitted(false);
   };
@@ -54,7 +55,7 @@ const MatchingGame = () => {
     return null;
   }
   return (
-    <div className="flex flex-col items-center justify-around min-h-screen">
+    <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
 
       <div className="text-4xl font-black">
         Matching Game
@@ -65,7 +66,7 @@ const MatchingGame = () => {
         rounded-lg shadow-md border border-neutral-200 pb-5"
       >
         <div
-          className="flex flex-row rounded-lg justify-between w-full
+          className="flex flex-row rounded-t-lg justify-between w-full
           border-b border-neutral-200 py-2 px-3 bg-slate-50
           text-xl font-medium"
         >
@@ -76,14 +77,14 @@ const MatchingGame = () => {
         <div
           className="flex flex-row justify-between w-full
           py-2 px-3 bg-slate-50
-          text-sm"
+          text-sm font-medium"
         >
-          Match the terms to their definitions
+          Match the terms to their definitions.
         </div>
 
         <Matching
-          terms={randomizedTerms}
-          definitions={randomizedDefinitions}
+          questions={randomizedTerms}
+          answers={randomizedDefinitions}
           answerKey={termToDefinition}
           handleResetTimer={handleResetTimer}
           handleSubmit={handleSubmit}

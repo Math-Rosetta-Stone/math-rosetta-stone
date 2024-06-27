@@ -1,16 +1,17 @@
 "use client";
 
 import React from "react";
+import { cn } from "@/lib/utils";
+
 import { DraggableProvidedDragHandleProps, DraggableProvidedDraggableProps } from "@hello-pangea/dnd";
 import {
   Equal,
   CircleAlert,
 } from "lucide-react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 
 interface AnswerBoxProps {
-  definition?: string;
+  answer?: string;
   imageUrl?: string;
   imageTitle?: string;
   draggableProps: DraggableProvidedDraggableProps | null;
@@ -19,7 +20,7 @@ interface AnswerBoxProps {
 }
 
 export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
-    definition,
+    answer,
     imageUrl,
     imageTitle,
     draggableProps,
@@ -32,7 +33,7 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
           "rounded shadow-md flex flex-row w-64 text-wrap border ease-in duration-100\
           text-base font-medium",
           (variant === "unsubmitted") &&
-            "border-neutral-300 hover:ring-2 hover:ring-slate-300 \
+            "border-neutral-300 hover:ring-1 hover:ring-slate-300 \
             active:ring-2 active:ring-slate-900",
           (variant === "correct") && "border-green-600 bg-green-50 shadow-green-50",
           (variant === "incorrect") && "border-red-400 bg-red-50 shadow-red-50"
@@ -53,12 +54,12 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
         <Equal color="black" />
       </div>
 
-      {definition ? (
+      {answer ? (
         <div className="m-3">
-          {definition}
+          {answer}
         </div>
       ) : (imageUrl && imageTitle) ? (
-        <Image src={imageUrl} alt={imageTitle} />
+        <Image src={imageUrl} alt={imageTitle} height={120} width={120} />
       ) : (
         <CircleAlert color="red" />
       )}

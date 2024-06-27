@@ -19,3 +19,7 @@ export const shuffle = (array: any[]) => {
 
   return array;
 };
+
+export const getOneRandom = (array: any[]) => {
+  return array[Math.floor(Math.random() * array.length)];
+}
