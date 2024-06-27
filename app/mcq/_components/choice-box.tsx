@@ -12,7 +12,7 @@ interface ChoiceBoxProps {
   choiceId: number;
   choice: TermItem;
   choiceType: PromptType;
-  variant: "notPicked" | "correct" | "incorrect";
+  variant: "notPicked" | "correct" | "incorrect" | "timeoutCorrect";
   onClick: () => void;
   disabled: boolean;
 }
@@ -34,7 +34,8 @@ export const ChoiceBox = ({
           "border-neutral-300 hover:ring-1 hover:ring-slate-300 hover:cursor-pointer \
           active:ring-1 active:ring-slate-900",
         (variant === "correct") && "border-green-600 bg-green-50 shadow-green-50",
-        (variant === "incorrect") && "border-red-400 bg-red-50 shadow-red-50"
+        (variant === "incorrect") && "border-red-400 bg-red-50 shadow-red-50",
+        (variant === "timeoutCorrect") && "border-orange-400 bg-orange-50 shadow-orange-50"
       )}
       onClick={() => {if (!disabled) onClick()}}
     >
@@ -43,7 +44,8 @@ export const ChoiceBox = ({
           "rounded-l flex flex-col justify-center\
           bg-slate-100 px-2 border-r border-r-neutral-300 ease-in duration-100",
           (variant === "correct") && "border-green-600",
-          (variant === "incorrect") && "border-red-400"
+          (variant === "incorrect") && "border-red-400",
+          (variant === "timeoutCorrect") && "border-orange-400"
         )}
       >
         {choiceIds[choiceId]}

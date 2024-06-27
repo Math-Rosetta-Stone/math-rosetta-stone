@@ -80,7 +80,11 @@ export const Mcq = ({
             (index === selectedChoice) ? (
               isCorrectChoice(choice) ? ("correct") : ("incorrect")
             ) : (
-              isCorrectChoice(choice) ? ("correct") : ("notPicked")
+              (selectedChoice === null) ? (
+                isCorrectChoice(choice) ? ("timeoutCorrect") : ("notPicked")
+              ) : (
+                isCorrectChoice(choice) ? ("correct") : ("notPicked")
+              )
             )
           ) : (
             "notPicked"
