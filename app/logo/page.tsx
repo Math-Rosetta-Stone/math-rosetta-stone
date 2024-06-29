@@ -76,7 +76,7 @@ const LogoQuizGame = () => {
   const [inputColor, setInputColor] = useState<string>("");
 
   const handleSubmit = () => {
-    
+
     setTimerStopped(true);
     setFormSubmitted(true);
       if (userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()) {
@@ -137,7 +137,7 @@ const LogoQuizGame = () => {
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft((prevTime) => prevTime - 1);
-      } else if (timeLeft === 0 && !formSubmitted) {
+      } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
         handleSubmit(); // Automatically submit when the timer reaches 0
         setInputColor("orange");
       }
@@ -204,7 +204,7 @@ const LogoQuizGame = () => {
               transition={{ duration: 0.3 }}
             >
               <div className="flex flex-col items-center justify-center w-full p-5">
-              
+
                 <div className="flex flex-col items-center justify-center w-full">
                   <img src={currQuestion.image.url} alt={currQuestion.image.title} className="w-1/2 h-auto" />
                 </div>
@@ -263,4 +263,3 @@ const LogoQuizGame = () => {
 };
 
 export default LogoQuizGame;
-

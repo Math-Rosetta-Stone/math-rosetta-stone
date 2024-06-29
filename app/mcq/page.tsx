@@ -144,7 +144,7 @@ const McqGame = () => {
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft((prevTime) => prevTime - 1);
-      } else if (timeLeft === 0 && !formSubmitted) {
+      } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
         handleSubmit(); // Automatically submit when the timer reaches 0
       }
     }, 1000);
