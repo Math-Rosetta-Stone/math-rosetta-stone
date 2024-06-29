@@ -62,8 +62,6 @@ const mockDb: TermItem[] = [
   },
 ];
 
-
-
 const LogoQuizGame = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
@@ -74,29 +72,32 @@ const LogoQuizGame = () => {
   const [score, setScore] = useState(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [inputColor, setInputColor] = useState<string>("");
+  const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("");
 
   const handleSubmit = () => {
-
     setTimerStopped(true);
     setFormSubmitted(true);
-      if (userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()) {
-        setScore(score + 1);
-        setInputColor("green");
-      } else {
-        setInputColor("red");
-      }
+    if (userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()) {
+      setScore(score + 1);
+      setInputColor("green");
+      setShowCorrectAnswer("");
+    } else {
+      setInputColor("red");
+      setShowCorrectAnswer(currQuestion.term);
+    }
   };
 
   const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
     setTimerStopped(false);
     setInputColor("");
+    setShowCorrectAnswer("");
   };
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {  // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({...currQuestion, term: ""});
+      setCurrQuestion({ ...currQuestion, term: "" });
 
       // stop the timer and set time left to 0 (purely aesthetic)
       setTimerStopped(true);
@@ -140,6 +141,7 @@ const LogoQuizGame = () => {
       } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
         handleSubmit(); // Automatically submit when the timer reaches 0
         setInputColor("orange");
+        setShowCorrectAnswer(currQuestion.term);
       }
     }, 1000);
 
@@ -222,6 +224,15 @@ const LogoQuizGame = () => {
                     placeholder="Type your answer here"
                   />
                 </div>
+                {formSubmitted && showCorrectAnswer && (
+                  <div className={cn(
+                    "mt-2",
+                    inputColor === "red" && "text-red-500",
+                    inputColor === "orange" && "text-orange-500"
+                  )}>
+                    Correct Answer: {showCorrectAnswer}
+                  </div>
+                )}
                 <Button
                   className="mt-5"
                   variant="default"
@@ -239,7 +250,7 @@ const LogoQuizGame = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-center  justify-center"
+              className="flex flex-col items-center justify-center"
             >
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
