@@ -1,26 +1,16 @@
-.map-wrapper {
-  width: 100vw;
-  height: 100vh;
-  overflow: scroll;
-  position: relative;
-}
-
 .map-container {
   position: absolute;
-  width: 200%; /* Scale the map to 200% of its original size */
-  height: 200%; /* Scale the map to 200% of its original size */
-  cursor: grab;
-}
-
-.map-container:active {
-  cursor: grabbing;
+  width: 100%; 
+  height: 100%; 
 }
 
 .map-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute;
+  max-width: none; /* Ensure the image isn't constrained by its container */
+  width: auto;
+  height: auto;
 }
+
 
 .map-highlight {
   position: absolute;
