@@ -1,35 +1,36 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import useHighlightStyle from './helpers/gamehighlight';
 import './map.css';
 
 const Map: React.FC = () => {
   const router = useRouter();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const highlightStyle = useHighlightStyle('minigame1');
 
   return (
-    <div className="mapContainer">
-      <img
-        src='../../public/map.jpg'
-        alt="Game Map"
-        className="mapImage"
-        useMap="#game-map"
-      />
-      <map name="game-map">
-        <area
-          shape="rect"
-          coords="34,44,270,350"
-          alt="MiniGame1"
-          onClick={() => router.push('/Hangman')}
+    <div className="map-wrapper">
+      <div className="map-container" ref={mapContainerRef}>
+        <img
+          src='/map.jpg'
+          alt="Game Map"
+          className="map-image"
+          useMap="#game-map"
         />
-        <area
-          shape="rect"
-          coords="290,172,333,250"
-          alt="MiniGame2"
-          onClick={() => router.push('/MatchingGame')}
-        />
-        {/* Add more areas as needed */}
-      </map>
+        
+        <div className="map-highlight" style={highlightStyle}></div>
+        <map name="game-map">
+          <area 
+            id="minigame1"
+            shape="circle"
+            coords="150,200,50"  
+            alt="MiniGame1"
+            onClick={() => router.push('/hangman')}
+          />
+        </map>
+      </div>
     </div>
   );
 };

@@ -1,12 +1,29 @@
-.mapContainer {
-    width: 100%;
-    height: 100vh;
-    overflow: scroll;
-    position: relative;
-  }
-  
-  .mapImage {
-    width: 200%;
-    height: auto;
-  }
-  
+.map-wrapper {
+  width: 100vw;
+  height: 100vh;
+  overflow: scroll;
+  position: relative;
+}
+
+.map-container {
+  position: absolute;
+  width: 200%; /* Scale the map to 200% of its original size */
+  height: 200%; /* Scale the map to 200% of its original size */
+  cursor: grab;
+}
+
+.map-container:active {
+  cursor: grabbing;
+}
+
+.map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.map-highlight {
+  position: absolute;
+  border: 2px solid red; /* Adjust the style as needed */
+  pointer-events: none; /* Ensures the highlight does not block clicks */
+}
