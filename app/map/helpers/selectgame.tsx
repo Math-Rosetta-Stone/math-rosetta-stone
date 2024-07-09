@@ -1,10 +1,8 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+export type SelectGameMethod = () => "hangman" | "mcq" | "matching" | "logo"
 
-const selectRandomGame = (router: AppRouterInstance) => {
-    const games: readonly string[] = ["hangman", "mcq", "matching", "logo"];
+export const selectRandomGame: SelectGameMethod = () => {
+    const games: readonly ("hangman" | "mcq" | "matching" | "logo")[] = ["hangman", "mcq", "matching", "logo"];
     
     const randomIndex = Math.floor(Math.random() * games.length);
-    router.push('/' + games[randomIndex]);
+    return games[randomIndex];
 };
-
-export default selectRandomGame;
