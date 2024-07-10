@@ -1,105 +1,61 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useState, useRef } from 'react';
 import classNames from 'classnames';
+import { FaChevronDown } from 'react-icons/fa';
 import useOutsideClick from '../hooks/useOutsideClick';
 
 export type DropdownItem = {
-  id: number
-  name: string
-}
+  id: number;
+  name: string;
+};
 
 type DropdownProps = {
-  id: string
-  title?: string
-  data: DropdownItem[]
-  selectedId?: number
-  position?: "top" | "buttom";
+  id: string;
+  title?: string;
+  data: DropdownItem[];
+  selectedId?: number;
+  position?: "top" | "bottom";
   onSelect?: (id: number) => void;
-}
+};
 
-const Dropdown = ({
-  id,
-  title,
-  data,
-  selectedId,
-  position = "top",
-  onSelect = () => { }
-}: DropdownProps) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+const Dropdown: React.FC<DropdownProps> = ({ id, title, data, selectedId, position = "bottom", onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const [selectedItem, setSelectedItem] = useState<DropdownItem | undefined>(
-    selectedId ? data?.find((item) => item.id === selectedId) : undefined
-  );
+  useOutsideClick(ref, () => setIsOpen(false));
 
-  const handleChange = (item: DropdownItem) => {
-    setSelectedItem(item);
-    onSelect && onSelect(item.id);
+  const handleSelect = (id: number) => {
+    if (onSelect) onSelect(id);
     setIsOpen(false);
   };
 
-  useEffect(() => {
-    if (selectedId && data) {
-      const newSelectedItem = data.find((item) => item.id === selectedId);
-      newSelectedItem && setSelectedItem(newSelectedItem);
-    } else {
-      setSelectedItem(undefined);
-    }
-  }, [selectedId, data]);
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  useOutsideClick({
-    ref: dropdownRef,
-    handler: () => setIsOpen(false),
-  });
-
-  const dropdownClass = classNames(
-    'absolute bg-gray-100 w-max max-h-52 overflow-y-auto py-3 rounded shadow-md z-10',
-    {
-      'top-full mt-2': position === 'top',
-      'bottom-full mt-2': position === 'buttom'
-    }
-  );
+  const selectedName = data.find(item => item.id === selectedId)?.name || title || "Select a term";
 
   return (
-    <div ref={dropdownRef} className='relative'>
-      <button
-        aria-label='Toggle dropdown'
-        aria-haspopup='true'
-        aria-expanded={isOpen}
-        type='button'
+    <div className="relative inline-block w-full" ref={ref}>
+      <div
+        id={id}
+        className="flex justify-between items-center bg-blue-200 bg-opacity-50 p-2 rounded cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
-        className=
-        'flex justify-between items-center gap-5 rounded w-full py-2 px-4 bg-blue-500 text-white'
       >
-        <span>{selectedItem?.name || title}</span>
-        {/* <GoChevronDown
-          size={20}
-          className={classNames('transform duration-500 ease-in-out', {
-            'rotate-180': isOpen,
-          })}
-        /> */}
-      </button>
-      {/* Open */}
+        <span className="mx-auto">{selectedName}</span>
+        <FaChevronDown className="ml-2" />
+      </div>
       {isOpen && (
-        <div aria-label='Dropdown menu' className={dropdownClass}>
-          <ul
-            role='menu'
-            aria-labelledby={id}
-            aria-orientation='vertical'
-            className='leading-10'
-          >
-            {data?.map((item) => (
-              <li
+        <div className={classNames(
+          "absolute w-full bg-white border border-gray-300 rounded mt-1 z-10",
+          position === "bottom" ? "top-full" : "bottom-full"
+        )}>
+          <div className="grid grid-cols-4 gap-2 p-2">
+            {data.map(item => (
+              <div
                 key={item.id}
-                onClick={() => handleChange(item)}
-                className={classNames(
-                  'flex items-center cursor-pointer hover:bg-gray-200 px-3',
-                  { 'bg-gray-300': selectedItem?.id === item.id }
-                )}
+                className="p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelect(item.id)}
               >
-                <span>{item.name}</span>
-              </li>
+                {item.name}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>

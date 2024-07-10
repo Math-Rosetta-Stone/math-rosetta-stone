@@ -1,11 +1,6 @@
 import { useEffect } from 'react';
 
-interface OutsideClickHandlerProps {
-  ref: React.RefObject<HTMLElement>;
-  handler: () => void;
-}
-
-const useOutsideClick = ({ ref, handler }: OutsideClickHandlerProps) => {
+const useOutsideClick = (ref: React.RefObject<HTMLElement>, handler: () => void) => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -14,7 +9,6 @@ const useOutsideClick = ({ ref, handler }: OutsideClickHandlerProps) => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
