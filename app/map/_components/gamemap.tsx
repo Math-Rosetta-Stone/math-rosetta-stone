@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import MiniGameArea from './minigame';
 import { selectRandomGame } from '../helpers/selectgame';
-import HighlightCircles from '../_components/highlightcircle';
 
 const GameMap: React.FC = () => {
     // prevent drag for the map
@@ -20,20 +19,22 @@ const GameMap: React.FC = () => {
         };
     }, []);
 
-    const locations: number[][] = [
-        [415, 310], [535, 490], [780, 445]
+    // relative percentage of the map
+    const locations: { x: number, y: number }[] = [
+        { x: 26.6, y: 26 }, 
+        { x: 34.2, y: 41 }  
     ];
-    const radius = 35
+
+    const radius = 2.1; // Use percentage-based radius
 
     return (
-        <div>
+        <div className='relative'>
             <img
                 src='/map.png'
                 alt="Game Map"
-                className="map-image"
-                useMap="#game-map"
+                className="map-image w-full"
             />
-            <map name="game-map">
+            <svg className='absolute top-0 left-0 w-full h-full'>
                 {locations.map((location, index) => (
                     <MiniGameArea
                         key={index}
@@ -43,8 +44,7 @@ const GameMap: React.FC = () => {
                         index={index}
                     />
                 ))}
-            </map>
-            <HighlightCircles locations={locations} radius={radius}/>
+            </svg>
         </div>
     );
 };
