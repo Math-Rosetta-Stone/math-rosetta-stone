@@ -16,4 +16,33 @@
   position: absolute;
   border: 2px solid red; /* Adjust the style as needed */
   pointer-events: none; /* Ensures the highlight does not block clicks */
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-button {
+  background: #333;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+}
+.dropdown-menu {
+  position: absolute;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background: #f0f0f0;
 }
