@@ -188,7 +188,7 @@ const FibGame = () => {
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb));
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.term !== currQuestion.term));
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.definition !== currQuestion.definition));
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
@@ -211,7 +211,7 @@ const FibGame = () => {
   const handleNext = () => {
     if (availableQuestions.length === 0) {  // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({...currQuestion, term: ""});
+      setCurrQuestion({...currQuestion, definition: ""});
 
       // stop the timer and set time left to 0 (purely aesthetic)
       setTimerStopped(true);
@@ -226,7 +226,7 @@ const FibGame = () => {
 
       // update available questions
       setAvailableQuestions(prevAvailableQuestions =>
-        prevAvailableQuestions.filter((item) => item.term !== newQuestion.term)
+        prevAvailableQuestions.filter((item) => item.definition !== newQuestion.definition)
       );
 
       // reset timer
@@ -242,7 +242,7 @@ const FibGame = () => {
     handleResetTimer();
     const newQuestion = getOneRandom(mockDb);
     setCurrQuestion(newQuestion);
-    setAvailableQuestions(mockDb.filter((item) => item.term !== newQuestion.term));
+    setAvailableQuestions(mockDb.filter((item) => item.definition !== newQuestion.definition));
     setFormSubmitted(false);
     setScore(0);
     setCurrGameType(getGameType());
@@ -290,10 +290,10 @@ const FibGame = () => {
           border-b border-neutral-100 py-2 px-3 bg-slate-100
           text-sm font-medium"
         >
-          Match the term/definition/image corresponding to the term/definition/image.
+          Complete the definition given the term/image.
         </div>
 
-        {currQuestion.term !== "" && (
+        {currQuestion.definition !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
               <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
@@ -303,17 +303,17 @@ const FibGame = () => {
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-100"
+                formSubmitted && currQuestion.definition !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
-              onClick={() => { if (formSubmitted && currQuestion.term !== "") handleNext() }}
+              onClick={() => { if (formSubmitted && currQuestion.definition !== "") handleNext() }}
             />
           </div>
         )}
 
         <AnimatePresence mode="wait">
-          {currQuestion.term !== "" ? (
+          {currQuestion.definition !== "" ? (
             <motion.div
-              key={currQuestion.term}
+              key={currQuestion.definition}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -322,8 +322,8 @@ const FibGame = () => {
               <Fib
                 key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
                 question={currQuestion}
-                // questionType={currGameType[0]}
-                answerWithBlank={currQuestion.definition}
+                questionType={currGameType}
+                // answerWithBlank={currQuestion.definition}
                 handleSubmit={handleSubmit}
                 formSubmitted={formSubmitted}
                 updateScore={() => setScore(score + 1)}

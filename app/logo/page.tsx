@@ -189,7 +189,7 @@ const LogoQuizGame = () => {
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-100"
+                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
               onClick={() => { if (formSubmitted && currQuestion.term !== "") handleNext() }}
             />

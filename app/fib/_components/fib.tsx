@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PromptType, TermItem } from "@/types/mcq";
 
-import { Input } from "@/components/ui/input";
+import { BlankInput } from "./blank-input";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { Response } from "./response";
 
 interface FibProps {
   question: TermItem;
-  // questionType: PromptType;
-  answerWithBlank: string;
+  questionType: PromptType;
+  // answerWithBlank: string;
   handleSubmit: () => void;
   formSubmitted: boolean;
   updateScore: () => void;
@@ -17,17 +19,57 @@ interface FibProps {
 
 export const Fib = ({
   question,
-  // questionType,
-  answerWithBlank,
+  questionType,
+  // answerWithBlank,
   handleSubmit,
   formSubmitted,
   updateScore,
 }: FibProps) => {
-  const [answer, setAnswer] = useState<string>("");
+  const [filledAnswer, setFilledAnswer] = useState<string>("");
+  const [beforeBlank, setBeforeBlank] = useState<string>("");
+  const [afterBlank, setAfterBlank] = useState<string>("");
+  const [correctAnswer, setCorrectAnswer] = useState<string>("");
 
-  const fill = () => {
-
+  const getQuestionContent = () => {
+    switch (questionType) {
+      case PromptType.TERM:
+        return question.term;
+      case PromptType.IMG:
+        return (
+          <Image
+            src={question.image.url}
+            alt={question.image.title}
+            height={120} width={120}
+          />
+        );
+      default:
+        return null;
+    }
   };
+
+  const getParsedDefinition = () => {
+    const words = question.definition.split(" ");
+
+    // Assume definition doesn't contain period at the end
+    for (let i = 0; i < words.length; i++) {
+      if (words[i][0] == "$" && words[i][words[i].length - 1] == "$") {
+        setBeforeBlank(words.slice(0, i).join(" "));
+        setAfterBlank(words.slice(i + 1).join(" "));
+        setCorrectAnswer(words[i].slice(1, words[i].length - 1));
+        return;
+      }
+    }
+  };
+
+  const handleFill = () => {
+    if (filledAnswer.toLowerCase() === correctAnswer.toLowerCase()) updateScore();
+
+    handleSubmit();
+  };
+
+  useEffect(() => {
+    getParsedDefinition();
+  });
 
   return (
     <div className="flex flex-col items-center gap-5 p-5">
@@ -36,23 +78,44 @@ export const Fib = ({
         w-full text-wrap
         text-base font-normal"
       >
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-        <Input
-          className="inline ml-1 py-0 px-2 w-24
-          border-t-0 border-x-0 border-b-2 border-b-slate-900 rounded-none rounded-t-md
-          ease-in duration-200 transition-[background-color] hover:bg-slate-100 focus-visible:bg-slate-100
-          focus-visible:ring-transparent focus-visible:ring-offset-0"
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
+        <div className="mb-1">
+          <span className="font-semibold underline underline-offset-2">
+            {questionType === PromptType.TERM ? "Term" : "Image"}
+          </span>: {getQuestionContent()}
+        </div>
+
+
+        <span className="font-semibold underline underline-offset-2">
+          Definition
+        </span>: {beforeBlank}
+
+        <BlankInput
+          value={filledAnswer}
+          onChange={(e) => setFilledAnswer(e.target.value)}
+          variant={formSubmitted ? "submitted" : "unsubmitted"}
         />
+
+        {afterBlank}.
       </div>
+
+      {formSubmitted && (
+        <Response
+          correctAnswer={beforeBlank.charAt(0).toUpperCase() + beforeBlank.slice(1) + " " + correctAnswer + " " + afterBlank + "."}
+          variant={filledAnswer.length > 0 ? (
+            filledAnswer.toLowerCase() === correctAnswer.toLowerCase() ? ("correct") : ("incorrect")
+          ) : (
+            "timeout"
+          )}
+        />
+      )}
+
       <Button
         className="border hover:bg-slate-100 hover:text-slate-900
         hover:border-slate-300 ease-in duration-150
         disabled:bg-slate-300 disabled:text-slate-900"
-        disabled={formSubmitted}
+        disabled={formSubmitted || filledAnswer.length <= 0}
         variant="default"
-        onClick={fill}
+        onClick={handleFill}
       >
         Submit
       </Button>
