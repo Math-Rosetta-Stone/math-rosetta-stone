@@ -164,7 +164,7 @@ const LogoQuizGame = () => {
       >
         <div
           className="flex flex-row rounded-t-lg justify-between w-full
-          border-b border-neutral-200 py-2 px-3 bg-slate-50
+          border-b border-neutral-200 py-2 px-3 bg-slate-100
           text-xl font-medium"
         >
           <div>Level #</div>
@@ -173,7 +173,7 @@ const LogoQuizGame = () => {
 
         <div
           className="flex flex-row justify-between w-full
-          py-2 px-3 bg-slate-50
+          py-2 px-3 bg-slate-100
           text-sm font-medium"
         >
           Identify the term corresponding to the image.
@@ -189,7 +189,7 @@ const LogoQuizGame = () => {
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-100"
               )}
               onClick={() => { if (formSubmitted && currQuestion.term !== "") handleNext() }}
             />
@@ -258,7 +258,7 @@ const LogoQuizGame = () => {
               </div>
 
               <Button
-                className="border hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
+                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
                 onClick={handleRestart}
               >
