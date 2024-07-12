@@ -126,7 +126,7 @@ export const Matching = ({
 
         <div className="flex flex-row justify-between items-center gap-5">
           <Button
-            className="border hover:bg-slate-50 hover:text-slate-900
+            className="border hover:bg-slate-100 hover:text-slate-900
             hover:border-slate-300 ease-in duration-150
             disabled:bg-slate-300 disabled:text-slate-900"
             disabled={formSubmitted}
@@ -140,7 +140,7 @@ export const Matching = ({
             className={cn(
               "text-slate-300 ease-in duration-150",
               formSubmitted && "text-slate-900 hover:cursor-pointer\
-              hover:bg-slate-50"
+              hover:bg-slate-100"
             )}
             onClick={() => {if (formSubmitted) handleResetTimer()}}
           />
@@ -149,7 +149,7 @@ export const Matching = ({
             className={cn(
               "text-slate-300 ease-in duration-150",
               !formSubmitted && "text-slate-900 hover:cursor-pointer\
-              hover:bg-slate-50"
+              hover:bg-slate-100"
             )}
             onClick={() => {if (!formSubmitted) onShuffle()}}
           />

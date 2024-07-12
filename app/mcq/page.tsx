@@ -160,7 +160,7 @@ const McqGame = () => {
     <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
 
       <div className="text-4xl font-black">
-        MCQ Game
+        Multiple Choice Questions
       </div>
 
       <div
@@ -169,7 +169,7 @@ const McqGame = () => {
       >
         <div
           className="flex flex-row rounded-t-lg justify-between w-full
-          border-b border-neutral-200 py-2 px-3 bg-slate-50
+          border-b border-neutral-200 py-2 px-3 bg-slate-100
           text-xl font-medium"
         >
           <div>Level #</div>
@@ -178,7 +178,7 @@ const McqGame = () => {
 
         <div
           className="flex flex-row justify-between w-full
-          py-2 px-3 bg-slate-50
+          border-b border-neutral-100 py-2 px-3 bg-slate-100
           text-sm font-medium"
         >
           Match the term/definition/image corresponding to the term/definition/image.
@@ -236,7 +236,7 @@ const McqGame = () => {
               </div>
 
               <Button
-                className="border hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
+                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
                 onClick={handleRestart}
               >

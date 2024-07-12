@@ -1,20 +1,77 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TermItem } from "@/types/mcq";
-import { cn, getOneRandom } from "@/lib/utils";
+import { PromptType, TermItem } from "@/types/mcq";
+import { cn, getOneRandom, shuffle } from "@/lib/utils";
 
 import { ArrowRight, RotateCcw } from 'lucide-react';
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
+import { Fib } from "./_components/fib";
 
-const TIME_LIMIT = 10; // in seconds
+const TIME_LIMIT = 5; // in seconds
+
+// const mockDb: TermDefBlankItem[] = [
+//   {
+//     term: "derivative",
+//     blankDefinitions: [
+//       "rate of $change$",
+//       "$rate$ of change",
+//     ]
+//   },
+//   {
+//     term: "integral",
+//     blankDefinitions: [
+//       "area under the $curve$",
+//       "area $under$ the curve",
+//       "$area$ under the curve",
+//     ]
+//   },
+//   {
+//     term: "limit",
+//     blankDefinitions: [
+//       "approaching a $value$",
+//       "$approaching$ a value",
+//     ]
+//   },
+//   {
+//     term: "function",
+//     blankDefinitions: [
+//       "relation between $inputs$ and outputs",
+//       "relation between inputs and $outputs$",
+//       "$relation$ between inputs and outputs",
+//     ]
+//   },
+//   {
+//     term: "slope",
+//     blankDefinitions: [
+//       "steepness of a $line$",
+//       "$steepness$ of a line",
+//     ]
+//   },
+//   {
+//     term: "tangent",
+//     blankDefinitions: [
+//       "line that touches a $curve$",
+//       "$line$ that touches a curve",
+//       "line that $touches$ a curve",
+//     ]
+//   },
+// ];
 
 const mockDb: TermItem[] = [
   {
     term: "derivative",
-    definition: "rate of change",
+    definition: "$rate$ of change",
+    image: {
+      title: "Derivative",
+      url: "/derivative.jpg",
+    },
+  },
+  {
+    term: "derivative",
+    definition: "rate of $change$",
     image: {
       title: "Derivative",
       url: "/derivative.jpg",
@@ -22,7 +79,23 @@ const mockDb: TermItem[] = [
   },
   {
     term: "integral",
-    definition: "area under the curve",
+    definition: "area under the $curve$",
+    image: {
+      title: "Integral",
+      url: "/integral.jpg",
+    },
+  },
+  {
+    term: "integral",
+    definition: "area $under$ the curve",
+    image: {
+      title: "Integral",
+      url: "/integral.jpg",
+    },
+  },
+  {
+    term: "integral",
+    definition: "$area$ under the curve",
     image: {
       title: "Integral",
       url: "/integral.jpg",
@@ -30,7 +103,15 @@ const mockDb: TermItem[] = [
   },
   {
     term: "limit",
-    definition: "approaching a value",
+    definition: "approaching a $value$",
+    image: {
+      title: "Limit",
+      url: "/limit.png",
+    },
+  },
+  {
+    term: "limit",
+    definition: "$approaching$ a value",
     image: {
       title: "Limit",
       url: "/limit.png",
@@ -38,7 +119,23 @@ const mockDb: TermItem[] = [
   },
   {
     term: "function",
-    definition: "relation between inputs and outputs",
+    definition: "relation between $inputs$ and outputs",
+    image: {
+      title: "Function",
+      url: "/function.jpg",
+    },
+  },
+  {
+    term: "function",
+    definition: "relation between inputs and $outputs$",
+    image: {
+      title: "Function",
+      url: "/function.jpg",
+    },
+  },
+  {
+    term: "function",
+    definition: "$relation$ between inputs and outputs",
     image: {
       title: "Function",
       url: "/function.jpg",
@@ -46,7 +143,15 @@ const mockDb: TermItem[] = [
   },
   {
     term: "slope",
-    definition: "steepness of a line",
+    definition: "steepness of a $line$",
+    image: {
+      title: "Slope",
+      url: "/slope.jpg",
+    },
+  },
+  {
+    term: "slope",
+    definition: "$steepness$ of a line",
     image: {
       title: "Slope",
       url: "/slope.jpg",
@@ -54,7 +159,23 @@ const mockDb: TermItem[] = [
   },
   {
     term: "tangent",
-    definition: "line that touches a curve",
+    definition: "line that touches a $curve$",
+    image: {
+      title: "Tangent",
+      url: "/tangent.png",
+    },
+  },
+  {
+    term: "tangent",
+    definition: "$line$ that touches a curve",
+    image: {
+      title: "Tangent",
+      url: "/tangent.png",
+    },
+  },
+  {
+    term: "tangent",
+    definition: "line that $touches$ a curve",
     image: {
       title: "Tangent",
       url: "/tangent.png",
@@ -62,42 +183,35 @@ const mockDb: TermItem[] = [
   },
 ];
 
-const LogoQuizGame = () => {
+const FibGame = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb));
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.term !== currQuestion.term));
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.definition !== currQuestion.definition));
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
-  const [userAnswer, setUserAnswer] = useState<string>("");
-  const [inputColor, setInputColor] = useState<string>("");
-  const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("");
+
+  const getGameType = () => {
+    let possibleQTypes = [PromptType.TERM, PromptType.IMG]; // answer type always the definition
+    return getOneRandom(possibleQTypes);
+  };
+  const [currGameType, setCurrGameType] = useState<PromptType>(getGameType()); // question type
 
   const handleSubmit = () => {
     setTimerStopped(true);
     setFormSubmitted(true);
-    if (userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()) {
-      setScore(score + 1);
-      setInputColor("green");
-      setShowCorrectAnswer("");
-    } else {
-      setInputColor("red");
-      setShowCorrectAnswer(currQuestion.term);
-    }
   };
 
   const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
     setTimerStopped(false);
-    setInputColor("");
-    setShowCorrectAnswer("");
   };
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {  // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({ ...currQuestion, term: "" });
+      setCurrQuestion({...currQuestion, definition: ""});
 
       // stop the timer and set time left to 0 (purely aesthetic)
       setTimerStopped(true);
@@ -107,9 +221,12 @@ const LogoQuizGame = () => {
       const newQuestion = getOneRandom(availableQuestions);
       setCurrQuestion(newQuestion);
 
+      // get new game type
+      setCurrGameType(getGameType());
+
       // update available questions
       setAvailableQuestions(prevAvailableQuestions =>
-        prevAvailableQuestions.filter((item) => item.term !== newQuestion.term)
+        prevAvailableQuestions.filter((item) => item.definition !== newQuestion.definition)
       );
 
       // reset timer
@@ -118,8 +235,6 @@ const LogoQuizGame = () => {
 
     // reset form submitted
     setFormSubmitted(false);
-    // reset user answer
-    setUserAnswer("");
   };
 
   const handleRestart = () => {
@@ -127,10 +242,10 @@ const LogoQuizGame = () => {
     handleResetTimer();
     const newQuestion = getOneRandom(mockDb);
     setCurrQuestion(newQuestion);
-    setAvailableQuestions(mockDb.filter((item) => item.term !== newQuestion.term));
+    setAvailableQuestions(mockDb.filter((item) => item.definition !== newQuestion.definition));
     setFormSubmitted(false);
     setScore(0);
-    setUserAnswer("");
+    setCurrGameType(getGameType());
   };
 
   useEffect(() => {
@@ -140,8 +255,6 @@ const LogoQuizGame = () => {
         setTimeLeft((prevTime) => prevTime - 1);
       } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
         handleSubmit(); // Automatically submit when the timer reaches 0
-        setInputColor("orange");
-        setShowCorrectAnswer(currQuestion.term);
       }
     }, 1000);
 
@@ -154,8 +267,9 @@ const LogoQuizGame = () => {
 
   return (
     <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
+
       <div className="text-4xl font-black">
-        Logo Quiz Game
+        Fill in the blanks
       </div>
 
       <div
@@ -173,13 +287,13 @@ const LogoQuizGame = () => {
 
         <div
           className="flex flex-row justify-between w-full
-          py-2 px-3 bg-slate-100
+          border-b border-neutral-100 py-2 px-3 bg-slate-100
           text-sm font-medium"
         >
-          Identify the term corresponding to the image.
+          Complete the definition given the term/image.
         </div>
 
-        {currQuestion.term !== "" && (
+        {currQuestion.definition !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
               <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
@@ -189,59 +303,31 @@ const LogoQuizGame = () => {
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+                formSubmitted && currQuestion.definition !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
-              onClick={() => { if (formSubmitted && currQuestion.term !== "") handleNext() }}
+              onClick={() => { if (formSubmitted && currQuestion.definition !== "") handleNext() }}
             />
           </div>
         )}
 
         <AnimatePresence mode="wait">
-          {currQuestion.term !== "" ? (
+          {currQuestion.definition !== "" ? (
             <motion.div
-              key={currQuestion.term}
+              key={currQuestion.definition}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex flex-col items-center justify-center w-full p-5">
-
-                <div className="flex flex-col items-center justify-center w-full">
-                  <img src={currQuestion.image.url} alt={currQuestion.image.title} className="w-1/2 h-auto" />
-                </div>
-                <div className="mt-5 w-full">
-                  <input
-                    type="text"
-                    value={userAnswer}
-                    onChange={(e) => setUserAnswer(e.target.value)}
-                    className={cn(
-                      "w-full px-3 py-2 border rounded-lg",
-                      inputColor === "red" && "border-red-500",
-                      inputColor === "green" && "border-green-500",
-                      inputColor === "orange" && "border-orange-500"
-                    )}
-                    placeholder="Type your answer here"
-                  />
-                </div>
-                {formSubmitted && showCorrectAnswer && (
-                  <div className={cn(
-                    "mt-2",
-                    inputColor === "red" && "text-red-500",
-                    inputColor === "orange" && "text-orange-500"
-                  )}>
-                    Correct Answer: {showCorrectAnswer}
-                  </div>
-                )}
-                <Button
-                  className="mt-5"
-                  variant="default"
-                  onClick={handleSubmit}
-                  disabled={formSubmitted}
-                >
-                  Submit
-                </Button>
-              </div>
+              <Fib
+                key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
+                question={currQuestion}
+                questionType={currGameType}
+                // answerWithBlank={currQuestion.definition}
+                handleSubmit={handleSubmit}
+                formSubmitted={formSubmitted}
+                updateScore={() => setScore(score + 1)}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -250,7 +336,7 @@ const LogoQuizGame = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center"
+              className="flex flex-col items-center  justify-center"
             >
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
@@ -258,7 +344,8 @@ const LogoQuizGame = () => {
               </div>
 
               <Button
-                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
+                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
+                ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
                 onClick={handleRestart}
               >
@@ -268,9 +355,10 @@ const LogoQuizGame = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
       </div>
     </div>
   );
 };
 
-export default LogoQuizGame;
+export default FibGame;

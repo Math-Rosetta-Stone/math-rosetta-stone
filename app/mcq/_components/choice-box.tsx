@@ -31,7 +31,7 @@ export const ChoiceBox = ({
         "rounded shadow-sm flex flex-row w-full h-full text-wrap\
         border ease-in duration-100 text-base font-medium",
         (variant === "notPicked" && !disabled) &&
-          "border-neutral-300 hover:ring-1 hover:ring-slate-300 hover:cursor-pointer \
+          "border-neutral-300 hover:ring-1 hover:ring-slate-300 hover:cursor-pointer\
           active:ring-1 active:ring-slate-900",
         (variant === "correct") && "border-green-600 bg-green-50 shadow-green-50",
         (variant === "incorrect") && "border-red-400 bg-red-50 shadow-red-50",
