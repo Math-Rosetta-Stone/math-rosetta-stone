@@ -62,16 +62,24 @@ export const Mcq = ({
             Choose the correct <span className="font-medium underline underline-offset-2">term/definition</span>
           </div>
           <div>
-            <Button onClick={() => speakWord(question.term)}>Listen to the term</Button>
+            <Button onClick={() => speakWord("The term is:"+question.term)}>Listen to the term</Button>
+            {choiceType === PromptType.DEF && (
+              <Button onClick={() => {
+                  speakWord("The choices are: ");
+                  choices.forEach((choice, index) => {
+                  const label = String.fromCharCode(65 + index); 
+                  //seperated so there is a pause 
+                  speakWord(`${label}.`); 
+                  speakWord(`${choice.definition}`);
+                });
+              }}>Listen to the choices</Button>
+            )}
           </div>
         </div>
       </div>
 
       {choices.map((choice, index) => (
         <div key={index} className="flex items-center gap-2">
-          {choiceType === PromptType.DEF && (
-            <Button onClick={() => speakWord(choice.definition)}>L</Button>
-          )}
           <ChoiceBox
             choiceId={index}
             choice={choice}

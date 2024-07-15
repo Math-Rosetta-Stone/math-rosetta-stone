@@ -72,6 +72,7 @@ const McqGame = () => {
   
   const speakWord = (word: string) => {
     const utterance = new SpeechSynthesisUtterance(word);
+    utterance.rate = 0.7; 
     speechSynthesis.speak(utterance);
   };
 
@@ -174,7 +175,7 @@ const McqGame = () => {
           <div>{new Date(timeLeft * 1000).toISOString().substring(14, 19)}</div>
         </div>
         <div className="flex flex-row justify-between w-full py-2 px-3 bg-slate-50 text-sm font-medium">
-          Match the term corresponding to the term spoken.
+          Match the term/definition corresponding to the term spoken.
         </div>
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
