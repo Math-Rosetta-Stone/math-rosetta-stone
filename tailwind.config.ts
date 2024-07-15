@@ -72,6 +72,12 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      maxHeight: {
+        '104': '32rem',
+      },
+      maxWidth: {
+        '5.5xl': '68rem',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

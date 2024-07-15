@@ -1,29 +1,32 @@
 'use client';
 
+import React, { useEffect } from 'react';
 import GameMap from './_components/gamemap';
-import Dropdown, { DropdownItem } from './_components/dropdowndict';
-import PracticeBadge from './_components/practicebadge';
 
 const Map: React.FC = () => {
-  const data: DropdownItem[] = [
-    { id: 1, name: "function" }, { id: 2, name: "derivative" },
-    { id: 3, name: "integral" }, { id: 4, name: "limit" },
-    { id: 5, name: "slope" }, { id: 6, name: "tangent" }
-  ];
+  useEffect(() => {
+    document.body.classList.add('overflow-hidden');
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, []);
 
   return (
-    <>
-      <div className="absolute top-0 left-1/4 w-1/2 p-4 z-20">
-        <Dropdown id='dictionary' data={data} />
-      </div>
-      <div className='rounded-lg bg-blue-500 p-4 z-10'>
-        <GameMap />
-        <div className='absolute right-12 top-12'>
-          <PracticeBadge/>
+    <div className="w-screen h-screen bg-blue-900 flex flex-col">
+      <div className="flex-1 flex">
+        <div className="w-36 h-full bg-gray-200 p-4 flex items-center justify-center">
+          {/* Left controller content */}
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center bg-blue-500 relative">
+          <div className="relative w-full h-full max-w-6xl max-h-104 overflow-hidden bg-blue-500 pl-4 pr-4">
+            <GameMap />
+          </div>
+        </div>
+        <div className="w-36 h-full bg-gray-200 p-4 flex items-center justify-center">
+          {/* Right controller content */}
         </div>
       </div>
-      
-    </>
+    </div>
   );
 };
 
