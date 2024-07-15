@@ -1,132 +1,84 @@
-import React, { useEffect, useRef, useState } from 'react';
-import MiniGameArea from './minigame';
+import React, { useEffect } from 'react';
+import { MapContainer, ImageOverlay, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import MiniGameMarker from './minigame';
 import { selectRandomGame } from '../helpers/selectgame';
+import L from 'leaflet';
 
-const GameMap: React.FC = () => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [mapDimensions, setMapDimensions] = useState({ width: 0, height: 0 });
-  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [dragging, setDragging] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+type LatLngBounds = [[number, number], [number, number]];
 
-  const handleResize = () => {
-    if (mapRef.current && containerRef.current) {
-      const containerWidth = containerRef.current.clientWidth;
-      const containerHeight = containerRef.current.clientHeight;
-      const mapWidth = mapRef.current.scrollWidth;
-      const mapHeight = mapRef.current.scrollHeight;
+interface MapComponentProps {
+  bounds: LatLngBounds;
+}
 
-      // Calculate scale to fit the map within the container
-      const widthScale = containerWidth / mapWidth;
-      const heightScale = containerHeight / mapHeight;
-      const newScale = Math.max(widthScale, heightScale);
-
-      setMapDimensions({ width: mapWidth, height: mapHeight });
-      setContainerDimensions({ width: containerWidth, height: containerHeight });
-      setScale(newScale);
-
-      // Adjust position to ensure it stays within the boundaries
-      const minX = containerWidth - mapWidth * newScale;
-      const minY = containerHeight - mapHeight * newScale;
-
-      setPosition((prevPosition) => ({
-        x: Math.max(Math.min(prevPosition.x, 0), minX),
-        y: Math.max(Math.min(prevPosition.y, 0), minY),
-      }));
-    }
-  };
+const MapComponent: React.FC<MapComponentProps> = ({ bounds }) => {
+  const map = useMap();
 
   useEffect(() => {
+    const handleResize = () => {
+      map.invalidateSize();
+
+      // Calculate the minimum zoom level to fit the map
+      const containerWidth = map.getSize().x;
+      const containerHeight = map.getSize().y;
+      const mapWidth = bounds[1][1] - bounds[0][1];
+      const mapHeight = bounds[1][0] - bounds[0][0];
+
+      const widthScale = containerWidth / mapWidth;
+      const heightScale = containerHeight / mapHeight;
+      const newMinZoom = Math.log2(Math.max(widthScale, heightScale));
+
+      map.setMinZoom(newMinZoom);
+      map.fitBounds(bounds);
+
+      // Set max bounds to prevent dragging outside
+      map.setMaxBounds(bounds);
+    };
+
     handleResize();
     window.addEventListener('resize', handleResize);
-
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [map, bounds]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setDragging(true);
-    setStartPosition({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    });
-    e.preventDefault(); // Prevent default behavior for text selection
-  };
+  return null;
+};
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (dragging && mapRef.current && containerRef.current) {
-      const newX = e.clientX - startPosition.x;
-      const newY = e.clientY - startPosition.y;
-
-      // Calculate boundaries
-      const minX = containerDimensions.width - mapDimensions.width * scale;
-      const minY = containerDimensions.height - mapDimensions.height * scale;
-
-      // Ensure the map stays within boundaries
-      setPosition({
-        x: Math.max(Math.min(newX, 0), minX),
-        y: Math.max(Math.min(newY, 0), minY),
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setDragging(false);
-  };
-
-  const getTransformOrigin = () => {
-    const offsetX = (position.x / containerDimensions.width) * 100;
-    const offsetY = (position.y / containerDimensions.height) * 100;
-    return `${-offsetX}% ${-offsetY}%`;
-  };
+const GameMap: React.FC = () => {
+  const bounds: LatLngBounds = [
+    [0, 0],
+    [1000, 1000],
+  ]; // Define bounds according to your image dimensions
 
   const locations: { x: number, y: number }[] = [
-    { x: 26.6, y: 26 },
-    { x: 34.2, y: 41 },
+    { x: 193, y: 29 },
+    { x: -133, y: 100}
   ];
 
-  const radius = 2.1; // Use percentage-based radius
-
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-full overflow-hidden no-select"
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-    >
-      <div
-        ref={mapRef}
-        className="absolute"
-        style={{
-          transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-          transformOrigin: getTransformOrigin(),
-          cursor: dragging ? 'grabbing' : 'grab',
-        }}
-        onMouseDown={handleMouseDown}
+    <div className="relative w-full h-full overflow-hidden no-select">
+      <MapContainer
+        center={[500, 500]}
+        zoom={1}
+        className="w-full h-full"
+        crs={L.CRS.Simple} // Use Simple CRS for flat images
+        maxBounds={bounds}
+        maxBoundsViscosity={1.0} // Ensure the map stays within bounds
       >
-        <img
-          src="/map.png"
-          alt="Game Map"
-          className="w-full h-auto object-cover"
-          onMouseDown={(e) => e.preventDefault()} // Prevent default image drag behavior
+        <MapComponent bounds={bounds} />
+        <ImageOverlay
+          url="/map.png" // Use the custom map image path
+          bounds={bounds}
         />
-        <svg className="absolute top-0 left-0 w-full h-full">
-          {locations.map((location, index) => (
-            <MiniGameArea
-              key={index}
-              location={location}
-              radius={radius}
-              selectGame={selectRandomGame}
-              index={index}
-            />
-          ))}
-        </svg>
-      </div>
+        {locations.map((location, index) => (
+          <MiniGameMarker
+            key={index}
+            location={location}
+            selectGame={selectRandomGame}
+          />
+        ))}
+      </MapContainer>
     </div>
   );
 };
