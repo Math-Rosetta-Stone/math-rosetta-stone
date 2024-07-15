@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import GameMap from './_components/gamemap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import './map.css';
 
 const Map: React.FC = () => {
@@ -32,16 +34,17 @@ const Map: React.FC = () => {
         </div>
         <div className="flex-1 flex flex-col items-center justify-center bg-blue-500 relative">
           <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-blue-500 pl-4 pr-4 pt-8 pb-8">
-            <GameMap markerPositions={markerPositions} onMarkerDrag={updateMarkerPosition} />
+            <GameMap markerPositions={markerPositions} onMarkerDrag={updateMarkerPosition}/>
           </div>
         </div>
         <div className="w-36 h-full bg-gray-200 p-4 flex flex-col items-center justify-center">
           <button
             onClick={addMarker}
-            className="mb-4 p-2 bg-blue-500 text-white z-10"
+            className="absolute top-4 right-4 p-2 bg-blue-500 text-white z-10 rounded-full w-12 h-12"
           >
-            Add Marker
+            <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
+          {/* GamePanel could be used for other purposes */}
         </div>
       </div>
     </div>
