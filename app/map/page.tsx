@@ -34,7 +34,7 @@ const Map: React.FC = () => {
         </div>
         <div className="flex-1 flex flex-col items-center justify-center bg-blue-500 relative">
           <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-blue-500 pl-4 pr-4 pt-8 pb-8">
-            <GameMap markerPositions={markerPositions} onMarkerDrag={updateMarkerPosition}/>
+            <GameMap markerPositions={markerPositions} onMarkerDrag={updateMarkerPosition} />
           </div>
         </div>
         <div className="w-36 h-full bg-gray-200 p-4 flex flex-col items-center justify-center">
@@ -44,7 +44,6 @@ const Map: React.FC = () => {
           >
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
-          {/* GamePanel could be used for other purposes */}
         </div>
       </div>
     </div>

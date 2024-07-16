@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapContainer, ImageOverlay } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import MiniGameMarker from './minigame';
+import MiniGameMarker from './marker/minigamemarker';
 import MapComponent from './mapcomponent';
 import { selectRandomGame } from '../helpers/selectgame';
+import { IntRange } from 'type-fest'; //for chapter
+import ChapterMarker from './marker/chapmarker';
 
 type LatLngBounds = [[number, number], [number, number]];
 
-interface GameMapProps {
+type GameMapProps = {
   markerPositions: { x: number, y: number }[];
   onMarkerDrag: (index: number, position: { x: number, y: number }) => void;
 }
+
+type Chapter = IntRange<1, 4>
+// temperary array for now
+const chapMaps: readonly ("map.png")[] = ["map.png", "map.png", "map.png", "map.png"];
 
 const GameMap: React.FC<GameMapProps> = ({ markerPositions, onMarkerDrag }) => {
   const bounds: LatLngBounds = [
@@ -23,6 +29,9 @@ const GameMap: React.FC<GameMapProps> = ({ markerPositions, onMarkerDrag }) => {
     onMarkerDrag(index, position);
   };
 
+  const [chapter, setChapter] = useState<Chapter>(1);
+  const [mapPath, setMapPath] = useState<string>(chapMaps[chapter]);
+  
   return (
     <div className="relative w-full h-full overflow-hidden no-select">
       <MapContainer
@@ -35,7 +44,7 @@ const GameMap: React.FC<GameMapProps> = ({ markerPositions, onMarkerDrag }) => {
       >
         <MapComponent bounds={bounds} />
         <ImageOverlay
-          url="/map.png" // Use the custom map image path
+          url={`/${mapPath}`} 
           bounds={bounds}
         />
         {markerPositions.map((position, index) => (
@@ -46,6 +55,10 @@ const GameMap: React.FC<GameMapProps> = ({ markerPositions, onMarkerDrag }) => {
             selectGame={selectRandomGame}
           />
         ))}
+        <ChapterMarker 
+          location={{x: 150, y: 550}} 
+          setMapPath={setMapPath}
+          />
       </MapContainer>
     </div>
   );

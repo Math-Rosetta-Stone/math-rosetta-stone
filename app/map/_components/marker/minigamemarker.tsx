@@ -2,11 +2,12 @@ import React from 'react';
 import { Marker } from 'react-leaflet';
 import { useRouter } from 'next/navigation';
 import { DivIcon, LatLngExpression } from 'leaflet';
+import { SelectGameMethod } from '../../helpers/selectgame';
 
 interface MiniGameMarkerProps {
   location: { x: number, y: number };
   onDragEnd: (position: { x: number, y: number }) => void;
-  selectGame: () => string;
+  selectGame: SelectGameMethod;
 }
 
 const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ location, onDragEnd, selectGame }) => {
