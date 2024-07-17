@@ -6,8 +6,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import './map.css';
 
+type Position = {x: number, y:number}
+type Marker = {
+  type: "chapter" | "minigame"
+  position: Position
+}
+
 const Map: React.FC = () => {
-  const [markerPositions, setMarkerPositions] = useState<{ x: number, y: number }[]>([]);
+  const [markerPositions, setMarkerPositions] = useState<Position[]>([]);
 
   useEffect(() => {
     document.body.classList.add('overflow-hidden');
@@ -17,11 +23,11 @@ const Map: React.FC = () => {
   }, []);
 
   const addMarker = () => {
-    const newMarker = { x: 500, y: 500 }; // Default position
+    const newMarker = { x: 500, y: 500}; // Default position
     setMarkerPositions([...markerPositions, newMarker]);
   };
 
-  const updateMarkerPosition = (index: number, position: { x: number, y: number }) => {
+  const updateMarkerPosition = (index: number, position: Position) => {
     const updatedMarkers = markerPositions.map((marker, i) => (i === index ? position : marker));
     setMarkerPositions(updatedMarkers);
   };

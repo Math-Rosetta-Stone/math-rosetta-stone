@@ -56,7 +56,7 @@ const GameMap: React.FC<GameMapProps> = ({ markerPositions, onMarkerDrag }) => {
           />
         ))}
         <ChapterMarker 
-          location={{x: 150, y: 550}} 
+          location={{x: 260, y: 750}} 
           setMapPath={setMapPath}
           />
       </MapContainer>
