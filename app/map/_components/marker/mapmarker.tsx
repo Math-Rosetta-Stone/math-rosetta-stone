@@ -1,15 +1,16 @@
 import React from 'react';
 import { Marker } from 'react-leaflet';
 import { DivIcon, LatLngExpression } from 'leaflet';
-import { Position } from '../../types'
+import { GameMapManager, Position } from '../../types'
 
 interface MapMarkerProps {
     location: { x: number, y: number };
     setMapPath: (path: string) => void
     onDragEnd: (position: Position) => void;
+    gameMapManager: GameMapManager
 }
 
-const MapMarker: React.FC<MapMarkerProps> = ({location, setMapPath, onDragEnd}) => {
+const MapMarker: React.FC<MapMarkerProps> = ({location, setMapPath, onDragEnd, gameMapManager}) => {
     const icon = new DivIcon({
         className: 'custom-div-icon',
         html: `<div class="custom-marker" style="background-color: yellow; width: 20px; height: 20px; border-radius: 50%; cursor: pointer;"></div>`,

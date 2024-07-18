@@ -5,33 +5,22 @@ import 'leaflet/dist/leaflet.css';
 import MiniGameMarker from './marker/minigamemarker';
 import MapComponent from './mapcomponent';
 import { selectRandomGame } from '../helpers/selectgame';
-import { IntRange } from 'type-fest'; //for chapter
-import MapMarker from './marker/mapmarker';
-import { Marker, Position } from '../types'
 
-type LatLngBounds = [[number, number], [number, number]];
+import MapMarker from './marker/mapmarker';
+import { Marker, Position, Chapter, Land, GameMapManager} from '../types'
+import { MAP_BOUNDS, LAND_MAPS_PATHS } from '../constants'
 
 type GameMapProps = {
-  markers: Marker[];
-  onMarkerDrag: (index: number, position: { x: number, y: number }) => void;
+  gameMapManager: GameMapManager
 }
 
-type Chapter = IntRange<1, 4>
-// temperary array for now
-const chapMaps: readonly ("map.png")[] = ["map.png", "map.png", "map.png", "map.png"];
-
-const GameMap: React.FC<GameMapProps> = ({ markers, onMarkerDrag }) => {
-  const bounds: LatLngBounds = [
-    [0, 0],
-    [1000, 1000],
-  ]; // Define bounds according to your image dimensions
+const GameMap: React.FC<GameMapProps> = ({ gameMapManager }) => {
 
   const handleMarkerDrag = (index: number, position: Position) => {
-    onMarkerDrag(index, position);
+    gameMapManager.updateMarkers(index, position);
   };
 
-  const [chapter, setChapter] = useState<Chapter>(1);
-  const [mapPath, setMapPath] = useState<string>(chapMaps[chapter]);
+  const [currMapPath, setCurrMapPath] = useState<string>(LAND_MAPS_PATHS[gameMapManager.currLand]);
 
   return (
     <div className="relative w-full h-full overflow-hidden no-select">
@@ -40,28 +29,29 @@ const GameMap: React.FC<GameMapProps> = ({ markers, onMarkerDrag }) => {
         zoom={1}
         className="w-full h-full"
         crs={L.CRS.Simple} // Use Simple CRS for flat images
-        maxBounds={bounds}
+        maxBounds={MAP_BOUNDS}
         maxBoundsViscosity={1.0} // Ensure the map stays within bounds
       >
-        <MapComponent bounds={bounds} />
+        <MapComponent bounds={MAP_BOUNDS} />
         <ImageOverlay
-          url={`/${mapPath}`}
-          bounds={bounds}
+          url={`/${currMapPath}`}
+          bounds={MAP_BOUNDS}
         />
-        {markers.map((marker, index) => (
+        {gameMapManager.markers.map((marker, index) => (
           marker.type === "minigame" ? (
             <MiniGameMarker
               key={index}
               location={marker.position}
-              onDragEnd={(newPosition) => handleMarkerDrag(index, newPosition)}
+              onDragEnd={(newPosition) => gameMapManager.updateMarkers(index, newPosition)}
               selectGame={selectRandomGame}
             />
           ) : (
             <MapMarker
               key={index}
               location={marker.position}
-              onDragEnd={(newPosition) => handleMarkerDrag(index, newPosition)}
-              setMapPath={setMapPath}
+              onDragEnd={(newPosition) => gameMapManager.updateMarkers(index, newPosition)}
+              setMapPath={setCurrMapPath}
+              gameMapManager={gameMapManager}
             />
           )
         ))}
