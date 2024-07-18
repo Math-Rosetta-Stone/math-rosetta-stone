@@ -157,7 +157,7 @@ const McqGame = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
+    <div className="flex flex-col items-center justify-start gap-2 min-h-screen mt-[8vh]">
 
       <div className="text-4xl font-black">
         Multiple Choice Questions
