@@ -5,10 +5,16 @@ export type Land = "island"
 
 export type MarkerType = "minigame" | "map"
 export type Position = {x: number, y: number}
-export type Marker = {
+export type Marker = MapMarker | MinigameMarker
+export type MapMarker = {
   type: MarkerType
   position: Position
-//   chapter: number
+  targetLand: Land
+  targetChapter: Chapter
+}
+export type MinigameMarker = {
+  type: MarkerType
+  position: Position
 }
 
 export type GameMapManager = {
@@ -19,8 +25,4 @@ export type GameMapManager = {
   setCurrChapter: React.Dispatch<React.SetStateAction<Chapter>>;
   currLand: Land;
   setCurrLand: React.Dispatch<React.SetStateAction<Land>>;
-  selectedChapter: Chapter | null;
-  setSelectedChapter: React.Dispatch<React.SetStateAction<Chapter | null>>;
-  selectedLand: Land | null;
-  setSelectedLand: React.Dispatch<React.SetStateAction<Land | null>>;
 }

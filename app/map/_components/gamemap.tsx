@@ -6,8 +6,8 @@ import MiniGameMarker from './marker/minigamemarker';
 import MapComponent from './mapcomponent';
 import { selectRandomGame } from '../helpers/selectgame';
 
-import MapMarker from './marker/mapmarker';
-import { Marker, Position, Chapter, Land, GameMapManager} from '../types'
+import { MapMarker } from './marker/mapmarker';
+import { GameMapManager} from '../types'
 import { MAP_BOUNDS, LAND_MAPS_PATHS } from '../constants'
 
 type GameMapProps = {
@@ -15,10 +15,6 @@ type GameMapProps = {
 }
 
 const GameMap: React.FC<GameMapProps> = ({ gameMapManager }) => {
-
-  const handleMarkerDrag = (index: number, position: Position) => {
-    gameMapManager.updateMarkers(index, position);
-  };
 
   const [currMapPath, setCurrMapPath] = useState<string>(LAND_MAPS_PATHS[gameMapManager.currLand]);
 
@@ -52,6 +48,8 @@ const GameMap: React.FC<GameMapProps> = ({ gameMapManager }) => {
               onDragEnd={(newPosition) => gameMapManager.updateMarkers(index, newPosition)}
               setMapPath={setCurrMapPath}
               gameMapManager={gameMapManager}
+              targetChapter={1}
+              targetLand='island'
             />
           )
         ))}
