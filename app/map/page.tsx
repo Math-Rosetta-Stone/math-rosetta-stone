@@ -5,15 +5,10 @@ import GameMap from './_components/gamemap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import './map.css';
-
-type Position = {x: number, y:number}
-type Marker = {
-  type: "chapter" | "minigame"
-  position: Position
-}
+import {Marker, Position, MarkerType} from './types'
 
 const Map: React.FC = () => {
-  const [markerPositions, setMarkerPositions] = useState<Position[]>([]);
+  const [markers, setMarkers] = useState<Marker[]>([]);
 
   useEffect(() => {
     document.body.classList.add('overflow-hidden');
@@ -22,14 +17,14 @@ const Map: React.FC = () => {
     };
   }, []);
 
-  const addMarker = () => {
-    const newMarker = { x: 500, y: 500}; // Default position
-    setMarkerPositions([...markerPositions, newMarker]);
+  const addMarker = (type: MarkerType) => {
+    const newMarker = {position: { x: 500, y: 500}, type: type}; // Default position
+    setMarkers([...markers, newMarker]);
   };
 
   const updateMarkerPosition = (index: number, position: Position) => {
-    const updatedMarkers = markerPositions.map((marker, i) => (i === index ? position : marker));
-    setMarkerPositions(updatedMarkers);
+    const updatedMarkers = markers.map((marker, i) => (i === index ? {position, type: marker.type} : marker));
+    setMarkers(updatedMarkers);
   };
 
   return (
@@ -39,14 +34,20 @@ const Map: React.FC = () => {
           {/* Left controller content */}
         </div>
         <div className="flex-1 flex flex-col items-center justify-center bg-blue-500 relative">
-          <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-blue-500 pl-4 pr-4 pt-8 pb-8">
-            <GameMap markerPositions={markerPositions} onMarkerDrag={updateMarkerPosition} />
+          <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-blue-500 pl-4 pr-4 pt-16 pb-16">
+            <GameMap markers={markers} onMarkerDrag={updateMarkerPosition} />
           </div>
         </div>
         <div className="w-36 h-full bg-gray-200 p-4 flex flex-col items-center justify-center">
           <button
-            onClick={addMarker}
-            className="absolute top-4 right-4 p-2 bg-blue-500 text-white z-10 rounded-full w-12 h-12"
+            onClick={() => addMarker("minigame")}
+            className="absolute top-4 right-4 p-2 bg-red-500 text-white z-10 rounded-full w-12 h-12"
+          >
+            <FontAwesomeIcon icon={faPlus} size="lg" />
+          </button>
+          <button
+            onClick={() => addMarker("map")}
+            className="absolute top-4 right-20 p-2 bg-yellow-500 text-white z-10 rounded-full w-12 h-12"
           >
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
