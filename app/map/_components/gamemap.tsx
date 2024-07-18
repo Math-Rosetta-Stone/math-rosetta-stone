@@ -48,8 +48,8 @@ const GameMap: React.FC<GameMapProps> = ({ gameMapManager }) => {
               onDragEnd={(newPosition) => gameMapManager.updateMarkers(index, newPosition)}
               setMapPath={setCurrMapPath}
               gameMapManager={gameMapManager}
-              targetChapter={1}
-              targetLand='island'
+              targetChapter={marker.targetChapter}
+              targetLand={marker.targetLand}
             />
           )
         ))}
