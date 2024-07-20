@@ -8,7 +8,7 @@ interface PopoutFormProps {
 }
 
 const PopoutForm: React.FC<PopoutFormProps> = ({ onSubmit, onClose }) => {
-  const [targetLand, setTargetLand] = useState<Land>("island");
+  const [targetLand, setTargetLand] = useState<Land>("Island");
   const [targetChapter, setTargetChapter] = useState<Chapter>(1);
 
   const handleSubmit = () => {
@@ -26,9 +26,9 @@ const PopoutForm: React.FC<PopoutFormProps> = ({ onSubmit, onClose }) => {
           onChange={(e) => setTargetLand(e.target.value as Land)}
           className="p-2 border rounded w-full"
         >
-          <option value="island">Island</option>
-          <option value="plain">Plain</option>
-          <option value="interMap">Inter Map</option>
+          <option value="Island">Island</option>
+          <option value="Plain">Plain</option>
+          <option value="InterMap">Inter Map</option>
         </select>
       </div>
       <div className="mb-4">

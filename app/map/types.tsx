@@ -1,7 +1,7 @@
 import { IntRange } from 'type-fest'; //for chapter
 
 export type Chapter = IntRange<1, 7>
-export type Land = "island" | "plain" | "interMap"
+export type Land = "Island" | "Plain" | "InterMap"
 
 export type MarkerType = "minigame" | "map"
 export type Position = {x: number, y: number}

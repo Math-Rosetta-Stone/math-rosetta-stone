@@ -10,7 +10,7 @@ type LandMapsPaths = {
 }
 
 export const LAND_MAPS_PATHS: LandMapsPaths = {
-    "island": "map.png",
-    "interMap": "intermap.png",
-    "plain": "map1.png"
+    "Island": "map.png",
+    "InterMap": "intermap.png",
+    "Plain": "map1.png"
 }

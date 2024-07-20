@@ -13,7 +13,7 @@ import PopoutForm from './_components/popoutform';
 const Map: React.FC = () => {
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [currChapter, setCurrChapter] = useState<Chapter>(1);
-  const [currLand, setCurrLand] = useState<Land>("island");
+  const [currLand, setCurrLand] = useState<Land>("Island");
   const [isPopoutOpen, setIsPopoutOpen] = useState(false);
 
   useEffect(() => {
@@ -82,15 +82,17 @@ const Map: React.FC = () => {
         </NewWindow>
       )}
       <div className="flex-1 flex">
-        <div className="w-36 h-full bg-gray-200 p-4 flex items-center justify-center">
-          {/* Left controller content */}
+        <div className="left-controller w-36 h-full bg-nintendo-red p-4 flex items-center justify-center">
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center bg-blue-500 relative">
-          <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-blue-500 pl-4 pr-4 pt-16 pb-16">
+        <div className="flex-1 flex flex-col items-center justify-center relative">
+          <div className='absolute z-10 top-4'>
+            <h1 className='font-mono font-bold text-gray-200 text-4xl'>{currLand}-{currChapter}</h1>
+          </div>
+          <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-foggy-gray pl-4 pr-4 pt-16 pb-16">
             <GameMap gameMapManager={gameMapManager} />
           </div>
         </div>
-        <div className="w-36 h-full bg-gray-200 p-4 flex flex-col items-center justify-center">
+        <div className="right-controller w-36 h-full bg-nintendo-blue p-4 flex flex-col items-center justify-center">
           <button
             onClick={addMiniGameMarker}
             className="absolute top-4 right-4 p-2 bg-red-500 text-white z-10 rounded-full w-12 h-12"
@@ -99,7 +101,7 @@ const Map: React.FC = () => {
           </button>
           <button
             onClick={openPopout}
-            className="absolute top-4 right-20 p-2 bg-yellow-500 text-white z-10 rounded-full w-12 h-12"
+            className="absolute top-4 right-20 p-2 bg-pink-500 text-white z-10 rounded-full w-12 h-12"
           >
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>

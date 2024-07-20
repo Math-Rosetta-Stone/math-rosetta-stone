@@ -19,6 +19,9 @@ const config = {
     },
     extend: {
       colors: {
+        'nintendo-red': '#FF3D3D',
+        'nintendo-blue': '#0AB9E6',
+        'foggy-gray': '#262626',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
