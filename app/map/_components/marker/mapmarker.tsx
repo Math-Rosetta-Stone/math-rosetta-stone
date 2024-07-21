@@ -1,7 +1,7 @@
 import React from 'react';
 import { Marker } from 'react-leaflet';
 import { DivIcon, LatLngExpression } from 'leaflet';
-import { GameMapManager, Position, Land, Chapter } from '../../types'
+import { GameMapManager, Position, Land, Chapter } from '@/types/map'
 import { LAND_MAPS_PATHS } from '../../constants';
 
 interface MapMarkerProps {

@@ -7,7 +7,7 @@ import MapComponent from './mapcomponent';
 import { selectRandomGame } from '../helpers/selectgame';
 
 import { MapMarker } from './marker/mapmarker';
-import { GameMapManager} from '../types'
+import { GameMapManager} from '@/types/map'
 import { MAP_BOUNDS, LAND_MAPS_PATHS } from '../constants'
 
 type GameMapProps = {

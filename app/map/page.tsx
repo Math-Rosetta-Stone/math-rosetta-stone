@@ -3,11 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import GameMap from './_components/gamemap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSave, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSave, faTrash, faSearch, faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons';
 import './map.css';
-import { Marker, Position, Chapter, Land, MinigameMarker, MapMarker} from './types'
+import { Marker, Position, Chapter, Land, MinigameMarker, MapMarker} from '@/types/map'
 import NewWindow from 'react-new-window';
 import PopoutForm from './_components/popoutform';
+import Dictionary from './_components/dictionary';
 
 
 const Map: React.FC = () => {
@@ -15,6 +16,7 @@ const Map: React.FC = () => {
   const [currChapter, setCurrChapter] = useState<Chapter>(1);
   const [currLand, setCurrLand] = useState<Land>("Island");
   const [isPopoutOpen, setIsPopoutOpen] = useState(false);
+  const [currScreen, setCurrScreen] = useState<"map"|"dict">("map")
 
   useEffect(() => {
     setMarkers(readMarkers);
@@ -89,7 +91,7 @@ const Map: React.FC = () => {
             <h1 className='font-mono font-bold text-gray-200 text-4xl'>{currLand}-{currChapter}</h1>
           </div>
           <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-foggy-gray pl-4 pr-4 pt-16 pb-16">
-            <GameMap gameMapManager={gameMapManager} />
+            {currScreen === 'dict' ? <Dictionary /> : <GameMap gameMapManager={gameMapManager} />}
           </div>
         </div>
         <div className="right-controller w-36 h-full bg-nintendo-blue p-4 flex flex-col items-center justify-center">
@@ -116,6 +118,22 @@ const Map: React.FC = () => {
             className="absolute top-20 right-4 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
           >
             <FontAwesomeIcon icon={faTrash} size="lg" />
+          </button>
+          <button
+            className="absolute top-36 right-4 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
+            title='Dictionary'
+            onClick={
+              () => setCurrScreen(currScreen => (currScreen === 'dict' ? 'map' : 'dict'))
+            }
+          >
+            <FontAwesomeIcon icon={faSearch} size="lg" />
+          </button>
+          <button
+            className="absolute top-36 right-20 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
+            title='Practice'
+            onClick={() => alert("practice mode not done yet")}
+          >
+            <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
           </button>
         </div>
       </div>

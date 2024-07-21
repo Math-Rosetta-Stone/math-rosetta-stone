@@ -3,7 +3,7 @@ import { Marker } from 'react-leaflet';
 import { useRouter } from 'next/navigation';
 import { DivIcon, LatLngExpression } from 'leaflet';
 import { SelectGameMethod } from '../../helpers/selectgame';
-import { Position } from '../../types';
+import { Position } from '@/types/map';
 
 interface MiniGameMarkerProps {
   location: Position;

@@ -1,6 +1,6 @@
 // PopoutForm.tsx
 import React, { useState } from 'react';
-import { Land, Chapter } from '../types';
+import { Land, Chapter } from '@/types/map';
 
 interface PopoutFormProps {
   onSubmit: (targetLand: Land, targetChapter: Chapter) => void;
