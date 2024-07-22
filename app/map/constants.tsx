@@ -1,4 +1,4 @@
-import { TermItem } from "@/types/mcq";
+
 type LatLngBounds = [[number, number], [number, number]];
 
 export const MAP_BOUNDS: LatLngBounds = [
@@ -16,7 +16,21 @@ export const LAND_MAPS_PATHS: LandMapsPaths = {
     "Plain": "map1.png"
 }
 
-const mockDb: TermItem[] = [
+type Image = {
+  title: string;
+  url: string;
+}
+
+export type TermItem = {
+  term: string;
+  definition: string;
+  image: Image;
+  example: string;
+}
+
+
+
+export const mockDb: TermItem[] = [
     {
       term: "derivative",
       definition: "rate of change",
@@ -24,6 +38,7 @@ const mockDb: TermItem[] = [
         title: "Derivative",
         url: "/derivative.jpg",
       },
+      example: "The derivative of f(x)=x^2 is f'(x) = 2x."
     },
     {
       term: "integral",
@@ -32,6 +47,7 @@ const mockDb: TermItem[] = [
         title: "Integral",
         url: "/integral.jpg",
       },
+      example: "Integral is the area under the curve."
     },
     {
       term: "limit",
@@ -40,6 +56,7 @@ const mockDb: TermItem[] = [
         title: "Limit",
         url: "/limit.png",
       },
+      example: "The value a function gets close to but might not reach."
     },
     {
       term: "function",
@@ -48,6 +65,7 @@ const mockDb: TermItem[] = [
         title: "Function",
         url: "/function.jpg",
       },
+      example: "The identity function outputs the input"
     },
     {
       term: "slope",
@@ -56,6 +74,7 @@ const mockDb: TermItem[] = [
         title: "Slope",
         url: "/slope.jpg",
       },
+      example: "The slope of the line y = 2x is 2."
     },
     {
       term: "tangent",
@@ -64,5 +83,6 @@ const mockDb: TermItem[] = [
         title: "Tangent",
         url: "/tangent.png",
       },
+      example: "The tangent line to the function f(x)=x^2 at x=1 is the line y=2x-1."
     },
   ];

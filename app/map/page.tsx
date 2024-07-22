@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import GameMap from './_components/gamemap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSave, faTrash, faSearch, faChalkboardTeacher } from '@fortawesome/free-solid-svg-icons';
-import './map.css';
-import { Marker, Position, Chapter, Land, MinigameMarker, MapMarker} from '@/types/map'
+import './css/map.css';
+import { Marker, Position, Chapter, Land, MinigameMarker, MapMarker } from '@/types/map'
 import NewWindow from 'react-new-window';
 import PopoutForm from './_components/popoutform';
 import Dictionary from './_components/dictionary';
@@ -16,7 +16,7 @@ const Map: React.FC = () => {
   const [currChapter, setCurrChapter] = useState<Chapter>(1);
   const [currLand, setCurrLand] = useState<Land>("Island");
   const [isPopoutOpen, setIsPopoutOpen] = useState(false);
-  const [currScreen, setCurrScreen] = useState<"map"|"dict">("map")
+  const [currScreen, setCurrScreen] = useState<"map" | "dict">("map")
 
   useEffect(() => {
     setMarkers(readMarkers);
@@ -122,9 +122,7 @@ const Map: React.FC = () => {
           <button
             className="absolute top-36 right-4 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
             title='Dictionary'
-            onClick={
-              () => setCurrScreen(currScreen => (currScreen === 'dict' ? 'map' : 'dict'))
-            }
+            onClick={() => setCurrScreen(currScreen => (currScreen === 'dict' ? 'map' : 'dict'))}
           >
             <FontAwesomeIcon icon={faSearch} size="lg" />
           </button>
