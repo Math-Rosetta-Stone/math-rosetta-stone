@@ -97,37 +97,37 @@ const Map: React.FC = () => {
         <div className="right-controller w-36 h-full bg-nintendo-blue p-4 flex flex-col items-center justify-center">
           <button
             onClick={addMiniGameMarker}
-            className="absolute top-4 right-4 p-2 bg-red-500 text-white z-10 rounded-full w-12 h-12"
+            className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-300 text-white z-10 rounded-full w-12 h-12"
           >
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
           <button
             onClick={openPopout}
-            className="absolute top-4 right-20 p-2 bg-pink-500 text-white z-10 rounded-full w-12 h-12"
+            className="absolute top-4 right-20 p-2 bg-yellow-500 hover:bg-yellow-300 text-white z-10 rounded-full w-12 h-12"
           >
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
           <button
             onClick={saveMarkers}
-            className="absolute top-20 right-20 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
+            className="absolute top-20 right-20 p-2 bg-green-500 hover:bg-green-300 text-white z-10 rounded-full w-12 h-12"
           >
             <FontAwesomeIcon icon={faSave} size="lg" />
           </button>
           <button
             onClick={clearMarkers}
-            className="absolute top-20 right-4 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
+            className="absolute top-20 right-4 p-2 bg-green-500 hover:bg-green-300 text-white z-10 rounded-full w-12 h-12"
           >
             <FontAwesomeIcon icon={faTrash} size="lg" />
           </button>
           <button
-            className="absolute top-36 right-4 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
+            className="absolute top-36 right-4 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
             title='Dictionary'
             onClick={() => setCurrScreen(currScreen => (currScreen === 'dict' ? 'map' : 'dict'))}
           >
             <FontAwesomeIcon icon={faSearch} size="lg" />
           </button>
           <button
-            className="absolute top-36 right-20 p-2 bg-green-500 text-white z-10 rounded-full w-12 h-12"
+            className="absolute top-36 right-20 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
             title='Practice'
             onClick={() => alert("practice mode not done yet")}
           >
