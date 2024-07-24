@@ -37,7 +37,7 @@ const DictItem: React.FC<{ termItem: TermItem; goBack: () => void }> = ({ termIt
   const { term, definition, example, image } = termItem;
   return (
     <div className="flex flex-col w-full h-full overflow-auto">
-      <button onClick={goBack} className="self-start text-gray-800 font-bold m-4 hover:text-gray-500">
+      <button onClick={goBack} className="absolute left-8 top-4 text-2xl text-gray-500 font-bold py-2 px-4 rounded hover:text-white transition duration-300">
         <FontAwesomeIcon icon={faArrowLeft} />
       </button>
       <div className="flex flex-col items-center justify-center flex-grow p-6">

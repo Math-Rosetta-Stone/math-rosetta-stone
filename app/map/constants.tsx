@@ -1,6 +1,8 @@
 
 type LatLngBounds = [[number, number], [number, number]];
 
+export const GAMES: readonly ("hangman" | "mcq" | "matching" | "logo")[] = ["hangman", "mcq", "matching", "logo"];
+
 export const MAP_BOUNDS: LatLngBounds = [
     [0, 0],
     [1000, 1000],

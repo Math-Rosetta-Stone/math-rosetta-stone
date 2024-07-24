@@ -9,6 +9,7 @@ import { Marker, Position, Chapter, Land, MinigameMarker, MapMarker } from '@/ty
 import NewWindow from 'react-new-window';
 import PopoutForm from './_components/popoutform';
 import Dictionary from './_components/dictionary';
+import PracticeModal from './_components/practicemodal';
 
 
 const Map: React.FC = () => {
@@ -16,7 +17,7 @@ const Map: React.FC = () => {
   const [currChapter, setCurrChapter] = useState<Chapter>(1);
   const [currLand, setCurrLand] = useState<Land>("Island");
   const [isPopoutOpen, setIsPopoutOpen] = useState(false);
-  const [currScreen, setCurrScreen] = useState<"map" | "dict">("map")
+  const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">("map")
 
   useEffect(() => {
     setMarkers(readMarkers);
@@ -91,7 +92,16 @@ const Map: React.FC = () => {
             <h1 className='font-mono font-bold text-gray-200 text-4xl'>{currLand}-{currChapter}</h1>
           </div>
           <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-foggy-gray pl-4 pr-4 pt-16 pb-16">
-            {currScreen === 'dict' ? <Dictionary /> : <GameMap gameMapManager={gameMapManager} />}
+            {(() => {
+              switch (currScreen) {
+                case "dict":
+                  return <Dictionary />;
+                case "practice":
+                  return <PracticeModal />;
+                default:
+                  return <GameMap gameMapManager={gameMapManager} />;
+              }
+            })()}
           </div>
         </div>
         <div className="right-controller w-36 h-full bg-nintendo-blue p-4 flex flex-col items-center justify-center">
@@ -122,14 +132,14 @@ const Map: React.FC = () => {
           <button
             className="absolute top-36 right-4 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
             title='Dictionary'
-            onClick={() => setCurrScreen(currScreen => (currScreen === 'dict' ? 'map' : 'dict'))}
+            onClick={() => setCurrScreen(currScreen => (currScreen === 'map' ? 'dict' : 'map'))}
           >
             <FontAwesomeIcon icon={faSearch} size="lg" />
           </button>
           <button
             className="absolute top-36 right-20 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
-            title='Practice'
-            onClick={() => alert("practice mode not done yet")}
+            title='Practice Mode'
+            onClick={() => setCurrScreen(currScreen => (currScreen === 'map' ? 'practice' : 'map'))}
           >
             <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
           </button>
