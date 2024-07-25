@@ -1,21 +1,10 @@
 // store.js
-import { configureStore } from "@reduxjs/toolkit";
-import { createSlice } from "@reduxjs/toolkit";
-
-// Create a slice of state
-const dataSlice = createSlice({
-  name: "data",
-  initialState: [],
-  reducers: {
-    setData: (state, action) => action.payload,
-  },
-});
-
-export const { setData } = dataSlice.actions;
+import { configureStore } from "@reduxjs/toolkit"
+import dataReducer from "./reducer" // Import the reducer
 
 // Configure the store
 export const store = configureStore({
   reducer: {
-    data: dataSlice.reducer,
+    data: dataReducer, // Add the reducer to the store
   },
-});
+})
