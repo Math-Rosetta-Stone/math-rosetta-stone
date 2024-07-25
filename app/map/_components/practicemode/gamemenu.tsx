@@ -5,7 +5,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"
 
 export const GameMenu: React.FC<{
   setCurrView: React.Dispatch<React.SetStateAction<"selectTerms" | "selectGames">>
-  setSelectedGames: (games: Game[]) => void
+  setSelectedGames: React.Dispatch<React.SetStateAction<Game[]>>
 }> = ({ setCurrView, setSelectedGames }) => {
   const [selectedGames, setSelectedGame] = useState<number[]>([])
 
