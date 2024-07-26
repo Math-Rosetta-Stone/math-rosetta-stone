@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TermItem } from "@/types/mcq";
-import { cn, getOneRandom } from "@/lib/utils";
-
+import { cn, getOneRandom, shuffle } from "@/lib/utils";
 import { ArrowRight, RotateCcw } from 'lucide-react';
 import { AnimatePresence, motion } from "framer-motion";
-
+import { Mcq } from "./_components/Mcq";
 import { Button } from "@/components/ui/button";
+import { PromptType } from "@/types/mcq";
 
 const TIME_LIMIT = 10; // in seconds
 
-const mockDb: TermItem[] = [
+const mockDb = [
   {
     term: "derivative",
     definition: "rate of change",
@@ -62,42 +61,54 @@ const mockDb: TermItem[] = [
   },
 ];
 
-const LogoQuizGame = () => {
+const McqGame = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
-  const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb));
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.term !== currQuestion.term));
+  const [currQuestion, setCurrQuestion] = useState(getOneRandom(mockDb));
+  const [availableQuestions, setAvailableQuestions] = useState(mockDb.filter((item) => item.term !== currQuestion.term));
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
-  const [userAnswer, setUserAnswer] = useState<string>("");
-  const [inputColor, setInputColor] = useState<string>("");
-  const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("");
+  
+  const speakWord = (word: string) => {
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.rate = 0.7; 
+    speechSynthesis.speak(utterance);
+  };
+
+  const getRandomPromptType = () => {
+    return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF;
+  };
+
+  const [currPromptType, setCurrPromptType] = useState(getRandomPromptType());
+
+  const getChoices = (question: { term: string; definition: any; }, choiceType: PromptType) => {
+    const wrongChoices = shuffle(mockDb.filter((item) => item.term !== question.term)).slice(0, 3);
+    const choices = shuffle([
+      { term: choiceType === PromptType.TERM ? question.term : undefined, definition: choiceType === PromptType.DEF ? question.definition : undefined },
+      ...wrongChoices.map(item => ({
+        term: choiceType === PromptType.TERM ? item.term : undefined,
+        definition: choiceType === PromptType.DEF ? item.definition : undefined
+      }))
+    ]);
+    return choices;
+  };
+  const [currChoices, setCurrChoices] = useState(getChoices(currQuestion, currPromptType));
 
   const handleSubmit = () => {
     setTimerStopped(true);
     setFormSubmitted(true);
-    if (userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()) {
-      setScore(score + 1);
-      setInputColor("green");
-      setShowCorrectAnswer("");
-    } else {
-      setInputColor("red");
-      setShowCorrectAnswer(currQuestion.term);
-    }
   };
 
   const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
     setTimerStopped(false);
-    setInputColor("");
-    setShowCorrectAnswer("");
   };
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {  // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({ ...currQuestion, term: "" });
+      setCurrQuestion({...currQuestion, term: ""});
 
       // stop the timer and set time left to 0 (purely aesthetic)
       setTimerStopped(true);
@@ -107,30 +118,35 @@ const LogoQuizGame = () => {
       const newQuestion = getOneRandom(availableQuestions);
       setCurrQuestion(newQuestion);
 
+      const newPromptType = getRandomPromptType();
+      setCurrPromptType(newPromptType);
+
+      // get new choices for the new question
+      setCurrChoices(getChoices(newQuestion, newPromptType));
+
       // update available questions
-      setAvailableQuestions(prevAvailableQuestions =>
-        prevAvailableQuestions.filter((item) => item.term !== newQuestion.term)
-      );
+      setAvailableQuestions(availableQuestions.filter((item) => item.term !== newQuestion.term));
 
       // reset timer
       handleResetTimer();
+      
     }
 
     // reset form submitted
     setFormSubmitted(false);
-    // reset user answer
-    setUserAnswer("");
   };
 
   const handleRestart = () => {
     // reset all states
     handleResetTimer();
     const newQuestion = getOneRandom(mockDb);
+    const newPromptType = getRandomPromptType();
     setCurrQuestion(newQuestion);
     setAvailableQuestions(mockDb.filter((item) => item.term !== newQuestion.term));
     setFormSubmitted(false);
     setScore(0);
-    setUserAnswer("");
+    setCurrChoices(getChoices(newQuestion, newPromptType));
+    setCurrPromptType(newPromptType);
   };
 
   useEffect(() => {
@@ -138,10 +154,8 @@ const LogoQuizGame = () => {
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft((prevTime) => prevTime - 1);
-      } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
+      } else if (timeLeft === 0 && !formSubmitted) {
         handleSubmit(); // Automatically submit when the timer reaches 0
-        setInputColor("orange");
-        setShowCorrectAnswer(currQuestion.term);
       }
     }, 1000);
 
@@ -153,39 +167,22 @@ const LogoQuizGame = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start gap-2 min-h-screen mt-[8vh]">
-      <div className="text-4xl font-black">
-        Logo Quiz Game
-      </div>
-
-      <div
-        className="flex flex-col
-        rounded-lg shadow-md border border-neutral-200 w-1/3 pb-2"
-      >
-        <div
-          className="flex flex-row rounded-t-lg justify-between w-full
-          border-b border-neutral-200 py-2 px-3 bg-slate-100
-          text-xl font-medium"
-        >
+    <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
+      <div className="text-4xl font-black">Listening Game</div>
+      <div className="flex flex-col rounded-lg shadow-md border border-neutral-200 w-1/3 pb-2">
+        <div className="flex flex-row rounded-t-lg justify-between w-full border-b border-neutral-200 py-2 px-3 bg-slate-50 text-xl font-medium">
           <div>Level #</div>
           <div>{new Date(timeLeft * 1000).toISOString().substring(14, 19)}</div>
         </div>
-
-        <div
-          className="flex flex-row justify-between w-full
-          py-2 px-3 bg-slate-100
-          text-sm font-medium"
-        >
-          Identify the term corresponding to the image.
+        <div className="flex flex-row justify-between w-full py-2 px-3 bg-slate-50 text-sm font-medium">
+          Match the term/definition corresponding to the term spoken.
         </div>
-
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
               <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
-
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
@@ -195,7 +192,6 @@ const LogoQuizGame = () => {
             />
           </div>
         )}
-
         <AnimatePresence mode="wait">
           {currQuestion.term !== "" ? (
             <motion.div
@@ -205,43 +201,16 @@ const LogoQuizGame = () => {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex flex-col items-center justify-center w-full p-5">
-
-                <div className="flex flex-col items-center justify-center w-full">
-                  <img src={currQuestion.image.url} alt={currQuestion.image.title} className="w-1/2 h-auto" />
-                </div>
-                <div className="mt-5 w-full">
-                  <input
-                    type="text"
-                    value={userAnswer}
-                    onChange={(e) => setUserAnswer(e.target.value)}
-                    className={cn(
-                      "w-full px-3 py-2 border rounded-lg",
-                      inputColor === "red" && "border-red-500",
-                      inputColor === "green" && "border-green-500",
-                      inputColor === "orange" && "border-orange-500"
-                    )}
-                    placeholder="Type your answer here"
-                  />
-                </div>
-                {formSubmitted && showCorrectAnswer && (
-                  <div className={cn(
-                    "mt-2",
-                    inputColor === "red" && "text-red-500",
-                    inputColor === "orange" && "text-orange-500"
-                  )}>
-                    Correct Answer: {showCorrectAnswer}
-                  </div>
-                )}
-                <Button
-                  className="mt-5"
-                  variant="default"
-                  onClick={handleSubmit}
-                  disabled={formSubmitted}
-                >
-                  Submit
-                </Button>
-              </div>
+              <Mcq
+                key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
+                question={currQuestion}
+                choices={currChoices}
+                choiceType={currPromptType} // Choices are terms or definitions
+                handleSubmit={handleSubmit}
+                formSubmitted={formSubmitted}
+                updateScore={() => setScore(score + 1)}
+                speakWord={speakWord} // Pass speakWord function to Mcq component
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -256,9 +225,8 @@ const LogoQuizGame = () => {
                 Congratulations! You have completed the game.
                 {` You scored ${score}/${mockDb.length}`}
               </div>
-
               <Button
-                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
+                className="border hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
                 onClick={handleRestart}
               >
@@ -273,4 +241,4 @@ const LogoQuizGame = () => {
   );
 };
 
-export default LogoQuizGame;
+export default McqGame;

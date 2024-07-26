@@ -7,15 +7,71 @@ import { cn, getOneRandom, shuffle } from "@/lib/utils";
 import { ArrowRight, RotateCcw } from 'lucide-react';
 import { AnimatePresence, motion } from "framer-motion";
 
-import { Mcq } from "./_components/mcq";
 import { Button } from "@/components/ui/button";
+import { Fib } from "./_components/fib";
 
 const TIME_LIMIT = 5; // in seconds
+
+// const mockDb: TermDefBlankItem[] = [
+//   {
+//     term: "derivative",
+//     blankDefinitions: [
+//       "rate of $change$",
+//       "$rate$ of change",
+//     ]
+//   },
+//   {
+//     term: "integral",
+//     blankDefinitions: [
+//       "area under the $curve$",
+//       "area $under$ the curve",
+//       "$area$ under the curve",
+//     ]
+//   },
+//   {
+//     term: "limit",
+//     blankDefinitions: [
+//       "approaching a $value$",
+//       "$approaching$ a value",
+//     ]
+//   },
+//   {
+//     term: "function",
+//     blankDefinitions: [
+//       "relation between $inputs$ and outputs",
+//       "relation between inputs and $outputs$",
+//       "$relation$ between inputs and outputs",
+//     ]
+//   },
+//   {
+//     term: "slope",
+//     blankDefinitions: [
+//       "steepness of a $line$",
+//       "$steepness$ of a line",
+//     ]
+//   },
+//   {
+//     term: "tangent",
+//     blankDefinitions: [
+//       "line that touches a $curve$",
+//       "$line$ that touches a curve",
+//       "line that $touches$ a curve",
+//     ]
+//   },
+// ];
 
 const mockDb: TermItem[] = [
   {
     term: "derivative",
-    definition: "rate of change",
+    definition: "$rate$ of change",
+    image: {
+      title: "Derivative",
+      url: "/derivative.jpg",
+    },
+  },
+  {
+    term: "derivative",
+    definition: "rate of $change$",
     image: {
       title: "Derivative",
       url: "/derivative.jpg",
@@ -23,7 +79,23 @@ const mockDb: TermItem[] = [
   },
   {
     term: "integral",
-    definition: "area under the curve",
+    definition: "area under the $curve$",
+    image: {
+      title: "Integral",
+      url: "/integral.jpg",
+    },
+  },
+  {
+    term: "integral",
+    definition: "area $under$ the curve",
+    image: {
+      title: "Integral",
+      url: "/integral.jpg",
+    },
+  },
+  {
+    term: "integral",
+    definition: "$area$ under the curve",
     image: {
       title: "Integral",
       url: "/integral.jpg",
@@ -31,7 +103,15 @@ const mockDb: TermItem[] = [
   },
   {
     term: "limit",
-    definition: "approaching a value",
+    definition: "approaching a $value$",
+    image: {
+      title: "Limit",
+      url: "/limit.png",
+    },
+  },
+  {
+    term: "limit",
+    definition: "$approaching$ a value",
     image: {
       title: "Limit",
       url: "/limit.png",
@@ -39,7 +119,23 @@ const mockDb: TermItem[] = [
   },
   {
     term: "function",
-    definition: "relation between inputs and outputs",
+    definition: "relation between $inputs$ and outputs",
+    image: {
+      title: "Function",
+      url: "/function.jpg",
+    },
+  },
+  {
+    term: "function",
+    definition: "relation between inputs and $outputs$",
+    image: {
+      title: "Function",
+      url: "/function.jpg",
+    },
+  },
+  {
+    term: "function",
+    definition: "$relation$ between inputs and outputs",
     image: {
       title: "Function",
       url: "/function.jpg",
@@ -47,7 +143,15 @@ const mockDb: TermItem[] = [
   },
   {
     term: "slope",
-    definition: "steepness of a line",
+    definition: "steepness of a $line$",
+    image: {
+      title: "Slope",
+      url: "/slope.jpg",
+    },
+  },
+  {
+    term: "slope",
+    definition: "$steepness$ of a line",
     image: {
       title: "Slope",
       url: "/slope.jpg",
@@ -55,7 +159,23 @@ const mockDb: TermItem[] = [
   },
   {
     term: "tangent",
-    definition: "line that touches a curve",
+    definition: "line that touches a $curve$",
+    image: {
+      title: "Tangent",
+      url: "/tangent.png",
+    },
+  },
+  {
+    term: "tangent",
+    definition: "$line$ that touches a curve",
+    image: {
+      title: "Tangent",
+      url: "/tangent.png",
+    },
+  },
+  {
+    term: "tangent",
+    definition: "line that $touches$ a curve",
     image: {
       title: "Tangent",
       url: "/tangent.png",
@@ -63,27 +183,20 @@ const mockDb: TermItem[] = [
   },
 ];
 
-const McqGame = () => {
+const FibGame = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb));
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.term !== currQuestion.term));
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.definition !== currQuestion.definition));
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
-  const getChoices = (question: TermItem) => {
-    const wrongChoices = shuffle(mockDb.filter((item) => item.term !== question.term)).slice(0, 3);
-    return shuffle([question, ...wrongChoices]);
-  };
-  const [currChoices, setCurrChoices] = useState<TermItem[]>(getChoices(currQuestion));
-
   const getGameType = () => {
-    let possibleQATypes = [PromptType.TERM, PromptType.DEF, PromptType.IMG];
-    const typeToRemove = getOneRandom(possibleQATypes);
-    return shuffle(possibleQATypes.filter((type) => type !== typeToRemove));
+    let possibleQTypes = [PromptType.TERM, PromptType.IMG]; // answer type always the definition
+    return getOneRandom(possibleQTypes);
   };
-  const [currGameType, setCurrGameType] = useState<PromptType[]>(getGameType()); // [question type, choice type]
+  const [currGameType, setCurrGameType] = useState<PromptType>(getGameType()); // question type
 
   const handleSubmit = () => {
     setTimerStopped(true);
@@ -98,7 +211,7 @@ const McqGame = () => {
   const handleNext = () => {
     if (availableQuestions.length === 0) {  // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({...currQuestion, term: ""});
+      setCurrQuestion({...currQuestion, definition: ""});
 
       // stop the timer and set time left to 0 (purely aesthetic)
       setTimerStopped(true);
@@ -108,15 +221,12 @@ const McqGame = () => {
       const newQuestion = getOneRandom(availableQuestions);
       setCurrQuestion(newQuestion);
 
-      // get new choices for the new question
-      setCurrChoices(getChoices(newQuestion));
-
       // get new game type
       setCurrGameType(getGameType());
 
       // update available questions
       setAvailableQuestions(prevAvailableQuestions =>
-        prevAvailableQuestions.filter((item) => item.term !== newQuestion.term)
+        prevAvailableQuestions.filter((item) => item.definition !== newQuestion.definition)
       );
 
       // reset timer
@@ -132,10 +242,9 @@ const McqGame = () => {
     handleResetTimer();
     const newQuestion = getOneRandom(mockDb);
     setCurrQuestion(newQuestion);
-    setAvailableQuestions(mockDb.filter((item) => item.term !== newQuestion.term));
+    setAvailableQuestions(mockDb.filter((item) => item.definition !== newQuestion.definition));
     setFormSubmitted(false);
     setScore(0);
-    setCurrChoices(getChoices(newQuestion));
     setCurrGameType(getGameType());
   };
 
@@ -157,10 +266,10 @@ const McqGame = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start gap-2 min-h-screen mt-[8vh]">
+    <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
 
       <div className="text-4xl font-black">
-        Multiple Choice Questions
+        Fill in the blanks
       </div>
 
       <div
@@ -181,10 +290,10 @@ const McqGame = () => {
           border-b border-neutral-100 py-2 px-3 bg-slate-100
           text-sm font-medium"
         >
-          Match the term/definition/image corresponding to the term/definition/image.
+          Complete the definition given the term/image.
         </div>
 
-        {currQuestion.term !== "" && (
+        {currQuestion.definition !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
               <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
@@ -194,28 +303,27 @@ const McqGame = () => {
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+                formSubmitted && currQuestion.definition !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
-              onClick={() => { if (formSubmitted && currQuestion.term !== "") handleNext() }}
+              onClick={() => { if (formSubmitted && currQuestion.definition !== "") handleNext() }}
             />
           </div>
         )}
 
         <AnimatePresence mode="wait">
-          {currQuestion.term !== "" ? (
+          {currQuestion.definition !== "" ? (
             <motion.div
-              key={currQuestion.term}
+              key={currQuestion.definition}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Mcq
+              <Fib
                 key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
                 question={currQuestion}
-                questionType={currGameType[0]}
-                choices={currChoices}
-                choiceType={currGameType[1]}
+                questionType={currGameType}
+                // answerWithBlank={currQuestion.definition}
                 handleSubmit={handleSubmit}
                 formSubmitted={formSubmitted}
                 updateScore={() => setScore(score + 1)}
@@ -236,7 +344,8 @@ const McqGame = () => {
               </div>
 
               <Button
-                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
+                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
+                ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
                 onClick={handleRestart}
               >
@@ -252,4 +361,4 @@ const McqGame = () => {
   );
 };
 
-export default McqGame;
+export default FibGame;

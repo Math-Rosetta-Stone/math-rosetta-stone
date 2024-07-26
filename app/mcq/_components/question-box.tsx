@@ -19,7 +19,7 @@ export const QuestionBox = ({
       case PromptType.TERM:
         return question.term;
       case PromptType.DEF:
-        return question.definition;
+        return question.definition + ".";
       case PromptType.IMG:
         return (
           <Image
@@ -42,7 +42,7 @@ export const QuestionBox = ({
       <div>
         <span className="font-semibold underline underline-offset-2">
           {questionType === PromptType.TERM ? "Term" : questionType === PromptType.DEF ? "Definition" : "Image"}
-        </span>: {getQuestionContent()}.
+        </span>: {getQuestionContent()}
       </div>
 
       <div>

@@ -55,7 +55,7 @@ const MatchingGame = () => {
     return null;
   }
   return (
-    <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
+    <div className="flex flex-col items-center justify-start gap-2 min-h-screen mt-[8vh]">
 
       <div className="text-4xl font-black">
         Matching Game
@@ -67,7 +67,7 @@ const MatchingGame = () => {
       >
         <div
           className="flex flex-row rounded-t-lg justify-between w-full
-          border-b border-neutral-200 py-2 px-3 bg-slate-50
+          border-b border-neutral-200 py-2 px-3 bg-slate-100
           text-xl font-medium"
         >
           <div>Level #</div>
@@ -76,7 +76,7 @@ const MatchingGame = () => {
 
         <div
           className="flex flex-row justify-between w-full
-          py-2 px-3 bg-slate-50
+          border-b border-neutral-100 py-2 px-3 bg-slate-100
           text-sm font-medium"
         >
           Match the terms to their definitions.
