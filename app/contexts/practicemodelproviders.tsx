@@ -1,28 +1,30 @@
+"use client"
 import { createContext, useState, ReactNode, useContext, Dispatch, SetStateAction } from "react"
 import { Game } from "../map/constants"
 
 interface PracticeModalContextProps {
-  currTermsIndex: number[]
+  TermsIndex: number[]
   selectedGames: Game[]
-  setCurrTermsIndex: Dispatch<SetStateAction<number[]>>
+  setTermsIndex: Dispatch<SetStateAction<number[]>>
   setSelectedGames: Dispatch<SetStateAction<Game[]>>
 }
 
-const PracticeModalContext = createContext<PracticeModalContextProps | undefined>(undefined)
+const PracticeModalContext = createContext<PracticeModalContextProps>({
+  TermsIndex: [],
+  selectedGames: [],
+  setTermsIndex: () => {},
+  setSelectedGames: () => {},
+})
 
-interface PracticeModalProviderProps {
-  children: ReactNode
-}
-
-const PracticeModalProvider = ({ children }: PracticeModalProviderProps) => {
-  const [currTermsIndex, setCurrTermsIndex] = useState<number[]>([])
+const PracticeModalProvider = ({ children }: Readonly<{ children: ReactNode }>) => {
+  const [TermsIndex, setTermsIndex] = useState<number[]>([])
   const [selectedGames, setSelectedGames] = useState<Game[]>([])
 
   return (
     <PracticeModalContext.Provider
       value={{
-        currTermsIndex,
-        setCurrTermsIndex,
+        TermsIndex,
+        setTermsIndex,
         selectedGames,
         setSelectedGames,
       }}>
@@ -32,11 +34,3 @@ const PracticeModalProvider = ({ children }: PracticeModalProviderProps) => {
 }
 
 export { PracticeModalProvider, PracticeModalContext }
-
-export function usePracticeModalContext() {
-  const context = useContext(PracticeModalContext)
-  if (context === undefined) {
-    throw new Error("usePracticeModalContext must be used within a PracticeModalProvider")
-  }
-  return context
-}

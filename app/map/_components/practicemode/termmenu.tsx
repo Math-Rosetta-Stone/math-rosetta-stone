@@ -1,15 +1,17 @@
+"use client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons"
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { mockDb, TermItem } from "../../constants"
+import { PracticeModalContext } from "../../../contexts/practicemodelproviders"
 
 type TermMenuProps = {
-  setCurrTermsIndex: React.Dispatch<React.SetStateAction<number[]>>
   setCurrView: React.Dispatch<React.SetStateAction<"selectTerms" | "selectGames">>
 }
 
-export const TermMenu: React.FC<TermMenuProps> = ({ setCurrTermsIndex, setCurrView }) => {
+export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
   const [selectedTerms, setSelectedTerms] = useState<number[]>([])
+  const { setTermsIndex } = useContext(PracticeModalContext)
 
   const handleCheckboxChange = (index: number) => {
     setSelectedTerms(prevState =>
@@ -18,7 +20,7 @@ export const TermMenu: React.FC<TermMenuProps> = ({ setCurrTermsIndex, setCurrVi
   }
 
   const handleView = () => {
-    setCurrTermsIndex(selectedTerms)
+    setTermsIndex(selectedTerms)
     setCurrView("selectGames")
   }
 

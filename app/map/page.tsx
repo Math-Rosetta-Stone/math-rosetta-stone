@@ -1,7 +1,5 @@
 "use client"
-
 import React, { useEffect, useState } from "react"
-import GameMap from "./_components/gamemap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faSave, faTrash, faSearch, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons"
 import "./css/map.css"
@@ -10,6 +8,8 @@ import NewWindow from "react-new-window"
 import PopoutForm from "./_components/popoutform"
 import Dictionary from "./_components/dictionary"
 import PracticeModal from "./_components/practicemode/practicemodal"
+import dynamic from "next/dynamic"
+const GameMap = dynamic(() => import("./_components/gamemap"), { ssr: false })
 
 const Map: React.FC = () => {
   const [markers, setMarkers] = useState<Marker[]>([])
@@ -106,22 +106,36 @@ const Map: React.FC = () => {
           </div>
         </div>
         <div className="right-controller w-36 h-full bg-nintendo-blue p-4 flex flex-col items-center justify-center">
-          <button onClick={addMiniGameMarker} className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-300 text-white z-10 rounded-full w-12 h-12">
+          <button
+            onClick={addMiniGameMarker}
+            className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-300 text-white z-10 rounded-full w-12 h-12">
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
-          <button onClick={openPopout} className="absolute top-4 right-20 p-2 bg-yellow-500 hover:bg-yellow-300 text-white z-10 rounded-full w-12 h-12">
+          <button
+            onClick={openPopout}
+            className="absolute top-4 right-20 p-2 bg-yellow-500 hover:bg-yellow-300 text-white z-10 rounded-full w-12 h-12">
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
-          <button onClick={saveMarkers} className="absolute top-20 right-20 p-2 bg-green-500 hover:bg-green-300 text-white z-10 rounded-full w-12 h-12">
+          <button
+            onClick={saveMarkers}
+            className="absolute top-20 right-20 p-2 bg-green-500 hover:bg-green-300 text-white z-10 rounded-full w-12 h-12">
             <FontAwesomeIcon icon={faSave} size="lg" />
           </button>
-          <button onClick={clearMarkers} className="absolute top-20 right-4 p-2 bg-green-500 hover:bg-green-300 text-white z-10 rounded-full w-12 h-12">
+          <button
+            onClick={clearMarkers}
+            className="absolute top-20 right-4 p-2 bg-green-500 hover:bg-green-300 text-white z-10 rounded-full w-12 h-12">
             <FontAwesomeIcon icon={faTrash} size="lg" />
           </button>
-          <button className="absolute top-36 right-4 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12" title="Dictionary" onClick={() => setCurrScreen(currScreen => (currScreen === "map" ? "dict" : "map"))}>
+          <button
+            className="absolute top-36 right-4 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
+            title="Dictionary"
+            onClick={() => setCurrScreen(currScreen => (currScreen === "map" ? "dict" : "map"))}>
             <FontAwesomeIcon icon={faSearch} size="lg" />
           </button>
-          <button className="absolute top-36 right-20 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12" title="Practice Mode" onClick={() => setCurrScreen(currScreen => (currScreen === "map" ? "practice" : "map"))}>
+          <button
+            className="absolute top-36 right-20 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
+            title="Practice Mode"
+            onClick={() => setCurrScreen(currScreen => (currScreen === "map" ? "practice" : "map"))}>
             <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
           </button>
         </div>

@@ -1,13 +1,17 @@
+"use client"
 import { Game, GAMES } from "../../constants"
-import { useState } from "react"
+import { useState, useContext } from "react"
+import { PracticeModalContext } from "../../../contexts/practicemodelproviders"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"
+import { useRouter } from "next/navigation"
 
 export const GameMenu: React.FC<{
   setCurrView: React.Dispatch<React.SetStateAction<"selectTerms" | "selectGames">>
-  setSelectedGames: React.Dispatch<React.SetStateAction<Game[]>>
-}> = ({ setCurrView, setSelectedGames }) => {
+}> = ({ setCurrView }) => {
+  const router = useRouter()
   const [selectedGames, setSelectedGame] = useState<number[]>([])
+  const { setSelectedGames } = useContext(PracticeModalContext)
 
   const handleCheckboxChange = (index: number) => {
     setSelectedGame(prevState =>
@@ -17,6 +21,7 @@ export const GameMenu: React.FC<{
 
   const handleSave = () => {
     setSelectedGames(selectedGames.map(index => GAMES[index]))
+    router.push("/test")
   }
 
   return (
