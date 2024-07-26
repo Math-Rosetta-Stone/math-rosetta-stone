@@ -10,13 +10,11 @@ type TermMenuProps = {
 }
 
 export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
-  const [selectedTerms, setSelectedTerms] = useState<number[]>([])
-  const { setTermsIndex } = useContext(PracticeModalContext)
+  const { TermsIndex, setTermsIndex } = useContext(PracticeModalContext)
+  const [selectedTerms, setSelectedTerms] = useState<number[]>(TermsIndex)
 
   const handleCheckboxChange = (index: number) => {
-    setSelectedTerms(prevState =>
-      prevState.includes(index) ? prevState.filter(i => i !== index) : [...prevState, index]
-    )
+    setSelectedTerms(prevState => (prevState.includes(index) ? prevState.filter(i => i !== index) : [...prevState, index]))
   }
 
   const handleView = () => {
@@ -35,7 +33,7 @@ export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
               type="checkbox"
               checked={selectedTerms.includes(index)}
               onChange={() => handleCheckboxChange(index)}
-              className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+              className="form-checkbox h-5 w-5 transition duration-150 ease-in-out"
             />
             <span className="ml-3">{termItem.term}</span>
           </label>

@@ -1,32 +1,31 @@
 "use client"
 import { createContext, useState, ReactNode, useContext, Dispatch, SetStateAction } from "react"
-import { Game } from "../map/constants"
 
 interface PracticeModalContextProps {
   TermsIndex: number[]
-  selectedGames: Game[]
+  GamesIndex: number[]
   setTermsIndex: Dispatch<SetStateAction<number[]>>
-  setSelectedGames: Dispatch<SetStateAction<Game[]>>
+  setGamesIndex: Dispatch<SetStateAction<number[]>>
 }
 
 const PracticeModalContext = createContext<PracticeModalContextProps>({
   TermsIndex: [],
-  selectedGames: [],
+  GamesIndex: [],
   setTermsIndex: () => {},
-  setSelectedGames: () => {},
+  setGamesIndex: () => {},
 })
 
 const PracticeModalProvider = ({ children }: Readonly<{ children: ReactNode }>) => {
   const [TermsIndex, setTermsIndex] = useState<number[]>([])
-  const [selectedGames, setSelectedGames] = useState<Game[]>([])
+  const [GamesIndex, setGamesIndex] = useState<number[]>([])
 
   return (
     <PracticeModalContext.Provider
       value={{
         TermsIndex,
         setTermsIndex,
-        selectedGames,
-        setSelectedGames,
+        GamesIndex,
+        setGamesIndex,
       }}>
       {children}
     </PracticeModalContext.Provider>
