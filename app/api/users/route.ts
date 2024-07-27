@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   try {
     const db = await pool.getConnection();
     const [rows] = await db.execute(
-      "SELECT * FROM user"
+      "SELECT * FROM User"
     );
     db.release();
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     console.log();
 
     await db.execute(
-      "INSERT INTO user (username, password) \
+      "INSERT INTO User (username, password) \
       VALUES (?, ?)",
       [userName, hashedPassword]
     );

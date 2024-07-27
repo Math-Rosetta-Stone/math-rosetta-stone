@@ -94,7 +94,7 @@ export const Matching = ({
                   ref={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
                   className="flex flex-col items-center justify-center rounded w-64"
-                  style={{ minHeight: Math.max(...minHeights) || 'auto' }} // Set min-height to prevent jumping
+                  style={{ minHeight: Math.max(...minHeights) || "auto" }} // Set min-height to prevent jumping
                 >
                   <Draggable
                     key={`answer-${index}`}
