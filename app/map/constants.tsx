@@ -1,36 +1,36 @@
-type LatLngBounds = [[number, number], [number, number]];
-export type Game = "hangman" | "mcq" | "matching" | "logo";
+type LatLngBounds = [[number, number], [number, number]]
+export type Game = "hangman" | "mcq" | "matching" | "logo"
 
-export const GAMES: Game[] = ["hangman", "mcq", "matching", "logo"];
+export const GAMES: Game[] = ["hangman", "mcq", "matching", "logo"]
 
 export const MAP_BOUNDS: LatLngBounds = [
   [0, 0],
   [1000, 1000],
-]; // Define bounds according to your image dimensions
+] // Define bounds according to your image dimensions
 
 type LandMapsPaths = {
-  [key: string]: string;
-};
+  [key: string]: string
+}
 
 export const LAND_MAPS_PATHS: LandMapsPaths = {
   Island: "map.png",
   InterMap: "intermap.png",
   Plain: "map1.png",
-};
+}
 
 type Image = {
-  title: string;
-  url: string;
-};
+  title: string
+  url: string
+}
 
 export type TermItem = {
-  term: string;
-  definition: string;
-  image: Image;
-  example: string;
-};
+  term: string
+  definition: string
+  image: Image
+  example: string
+}
 
-export const mockDb: TermItem[] = [
+export const MOCK_DB: TermItem[] = [
   {
     term: "derivative",
     definition: "rate of change",
@@ -83,7 +83,6 @@ export const mockDb: TermItem[] = [
       title: "Tangent",
       url: "/tangent.png",
     },
-    example:
-      "The tangent line to the function f(x)=x^2 at x=1 is the line y=2x-1.",
+    example: "The tangent line to the function f(x)=x^2 at x=1 is the line y=2x-1.",
   },
-];
+]

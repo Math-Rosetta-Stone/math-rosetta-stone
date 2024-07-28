@@ -2,30 +2,37 @@
 import { createContext, useState, ReactNode, useContext, Dispatch, SetStateAction } from "react"
 
 interface PracticeModalContextProps {
-  TermsIndex: number[]
-  GamesIndex: number[]
+  termsIndex: number[]
+  gamesIndex: number[]
   setTermsIndex: Dispatch<SetStateAction<number[]>>
   setGamesIndex: Dispatch<SetStateAction<number[]>>
+  gameMode: "practice" | "regular"
+  setGameMode: Dispatch<SetStateAction<"practice" | "regular">>
 }
 
 const PracticeModalContext = createContext<PracticeModalContextProps>({
-  TermsIndex: [],
-  GamesIndex: [],
+  termsIndex: [],
+  gamesIndex: [],
+  gameMode: "regular",
   setTermsIndex: () => {},
   setGamesIndex: () => {},
+  setGameMode: () => {},
 })
 
 const PracticeModalProvider = ({ children }: Readonly<{ children: ReactNode }>) => {
-  const [TermsIndex, setTermsIndex] = useState<number[]>([])
-  const [GamesIndex, setGamesIndex] = useState<number[]>([])
+  const [termsIndex, setTermsIndex] = useState<number[]>([])
+  const [gamesIndex, setGamesIndex] = useState<number[]>([])
+  const [gameMode, setGameMode] = useState<"practice" | "regular">("regular")
 
   return (
     <PracticeModalContext.Provider
       value={{
-        TermsIndex,
+        termsIndex,
         setTermsIndex,
-        GamesIndex,
+        gamesIndex,
         setGamesIndex,
+        gameMode,
+        setGameMode,
       }}>
       {children}
     </PracticeModalContext.Provider>

@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="relative pb-5">
-        <div
+        {/* <div
           className="fixed top-0 flex flex-row justify-start items-center
           w-full h-[6vh] pt-2 px-3 backdrop-blur-sm
           font-black">
@@ -32,7 +32,7 @@ export default function RootLayout({
             hover:text-slate-50 hover:bg-slate-900 hover:decoration-slate-50">
             Math Rosetta Stone
           </Link>
-        </div>
+        </div> */}
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

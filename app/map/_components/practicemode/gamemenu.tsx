@@ -3,7 +3,7 @@ import { GAMES } from "../../constants"
 import { useState, useContext } from "react"
 import { PracticeModalContext } from "../../../contexts/practicemodelproviders"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons"
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"
 import { useRouter } from "next/navigation"
 
 export const GameMenu: React.FC<{
@@ -11,8 +11,8 @@ export const GameMenu: React.FC<{
 }> = ({ setCurrView }) => {
   const router = useRouter()
 
-  const { GamesIndex, setGamesIndex } = useContext(PracticeModalContext)
-  const [currSelectedGames, setCurrSelectedGame] = useState<number[]>(GamesIndex)
+  const { gamesIndex, setGamesIndex, setGameMode } = useContext(PracticeModalContext)
+  const [currSelectedGames, setCurrSelectedGame] = useState<number[]>(gamesIndex)
 
   const handleCheckboxChange = (index: number) => {
     setCurrSelectedGame(prevState => (prevState.includes(index) ? prevState.filter(i => i !== index) : [...prevState, index]))
@@ -24,7 +24,8 @@ export const GameMenu: React.FC<{
   }
   const handleSave = () => {
     setGamesIndex(currSelectedGames)
-    router.push("/test")
+    setGameMode("practice")
+    router.push("/hangman/practice")
   }
 
   return (

@@ -2,7 +2,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons"
 import { useState, useContext } from "react"
-import { mockDb, TermItem } from "../../constants"
+import { MOCK_DB, TermItem } from "../../constants"
 import { PracticeModalContext } from "../../../contexts/practicemodelproviders"
 
 type TermMenuProps = {
@@ -10,8 +10,8 @@ type TermMenuProps = {
 }
 
 export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
-  const { TermsIndex, setTermsIndex } = useContext(PracticeModalContext)
-  const [selectedTerms, setSelectedTerms] = useState<number[]>(TermsIndex)
+  const { termsIndex, setTermsIndex } = useContext(PracticeModalContext)
+  const [selectedTerms, setSelectedTerms] = useState<number[]>(termsIndex)
 
   const handleCheckboxChange = (index: number) => {
     setSelectedTerms(prevState => (prevState.includes(index) ? prevState.filter(i => i !== index) : [...prevState, index]))
@@ -25,7 +25,7 @@ export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {mockDb.map((termItem: TermItem, index: number) => (
+        {MOCK_DB.map((termItem: TermItem, index: number) => (
           <label
             key={index}
             className="flex items-center bg-amber-300 text-white font-bold py-2 px-4 rounded hover:bg-amber-500 transition duration-300">
