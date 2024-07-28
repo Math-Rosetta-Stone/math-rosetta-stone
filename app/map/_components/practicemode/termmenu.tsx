@@ -1,9 +1,12 @@
 "use client"
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons"
 import { useState, useContext } from "react"
 import { MOCK_DB, TermItem } from "../../constants"
 import { PracticeModalContext } from "../../../contexts/practicemodelproviders"
+import { cn } from "@/lib/utils"
+import "./transition.css"
 
 type TermMenuProps = {
   setCurrView: React.Dispatch<React.SetStateAction<"selectTerms" | "selectGames">>
@@ -12,18 +15,24 @@ type TermMenuProps = {
 export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
   const { termsIndex, setTermsIndex } = useContext(PracticeModalContext)
   const [selectedTerms, setSelectedTerms] = useState<number[]>(termsIndex)
+  const [screenShake, setScreenShake] = useState(false)
 
   const handleCheckboxChange = (index: number) => {
     setSelectedTerms(prevState => (prevState.includes(index) ? prevState.filter(i => i !== index) : [...prevState, index]))
   }
 
   const handleView = () => {
+    if (selectedTerms.length === 0) {
+      setScreenShake(true)
+      setTimeout(() => setScreenShake(false), 500)
+      return
+    }
     setTermsIndex(selectedTerms)
     setCurrView("selectGames")
   }
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full", screenShake && "shake")}>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {MOCK_DB.map((termItem: TermItem, index: number) => (
           <label
@@ -41,7 +50,10 @@ export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
       </div>
       <button
         onClick={handleView}
-        className="absolute right-8 top-4 text-2xl text-gray-500 font-bold py-2 px-4 rounded hover:text-white transition duration-300">
+        className={cn(
+          "absolute right-8 top-4 text-2xl text-gray-500 font-bold py-2 px-4 rounded hover:text-white transition duration-300",
+          screenShake && "visibility: hidden"
+        )}>
         <FontAwesomeIcon icon={faArrowRight} />
       </button>
     </div>
