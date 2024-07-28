@@ -33,7 +33,7 @@ export const GameMenu: React.FC<{
     }
     setGamesIndex(currSelectedGames)
     setGameMode("practice")
-    router.push("/hangman/practice")
+    router.push("/fib/practice")
   }
 
   return (

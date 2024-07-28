@@ -13,17 +13,9 @@ import { ArrowRight, RotateCcw } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { MOCK_DB, TermItem } from "@/app/map/constants"
+import { LayoutProps } from "@/types/practice"
 
 import "../hangman.css"
-
-type RegularGame = {
-  gameMode: "regular"
-}
-type PracticeGame = {
-  gameMode: "practice"
-  termsIndex: number[]
-}
-type LayoutProps = RegularGame | PracticeGame
 
 const Layout: React.FC<LayoutProps> = props => {
   const mockDb = props.gameMode === "practice" ? MOCK_DB.filter((_, index) => props.termsIndex.includes(index)) : MOCK_DB

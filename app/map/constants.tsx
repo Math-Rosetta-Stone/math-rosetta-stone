@@ -1,7 +1,7 @@
 type LatLngBounds = [[number, number], [number, number]]
-export type Game = "hangman" | "mcq" | "matching" | "logo"
+export type Game = "hangman" | "mcq" | "matching" | "logo" | "fib" | "listen"
 
-export const GAMES: Game[] = ["hangman", "mcq", "matching", "logo"]
+export const GAMES: Game[] = ["hangman", "mcq", "matching", "logo", "fib", "listen"]
 
 export const MAP_BOUNDS: LatLngBounds = [
   [0, 0],
