@@ -17,10 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="relative pb-5">
+      <body>
         <div
-          className="fixed top-0 flex flex-row justify-start items-center
-          w-full h-[6vh] pt-2 px-3 backdrop-blur-sm
+          className="sticky top-0 flex flex-row justify-start items-center
+          w-full h-10 pt-2 px-3 backdrop-blur-sm
           font-black"
         >
           <Link

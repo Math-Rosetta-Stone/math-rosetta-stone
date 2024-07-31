@@ -12,54 +12,6 @@ import { Fib } from "./_components/fib";
 
 const TIME_LIMIT = 5; // in seconds
 
-// const mockDb: TermDefBlankItem[] = [
-//   {
-//     term: "derivative",
-//     blankDefinitions: [
-//       "rate of $change$",
-//       "$rate$ of change",
-//     ]
-//   },
-//   {
-//     term: "integral",
-//     blankDefinitions: [
-//       "area under the $curve$",
-//       "area $under$ the curve",
-//       "$area$ under the curve",
-//     ]
-//   },
-//   {
-//     term: "limit",
-//     blankDefinitions: [
-//       "approaching a $value$",
-//       "$approaching$ a value",
-//     ]
-//   },
-//   {
-//     term: "function",
-//     blankDefinitions: [
-//       "relation between $inputs$ and outputs",
-//       "relation between inputs and $outputs$",
-//       "$relation$ between inputs and outputs",
-//     ]
-//   },
-//   {
-//     term: "slope",
-//     blankDefinitions: [
-//       "steepness of a $line$",
-//       "$steepness$ of a line",
-//     ]
-//   },
-//   {
-//     term: "tangent",
-//     blankDefinitions: [
-//       "line that touches a $curve$",
-//       "$line$ that touches a curve",
-//       "line that $touches$ a curve",
-//     ]
-//   },
-// ];
-
 const mockDb: TermItem[] = [
   {
     term: "derivative",
