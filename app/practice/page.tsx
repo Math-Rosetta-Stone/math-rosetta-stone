@@ -1,10 +1,11 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { useEffect, useContext } from "react"
+import { useEffect, useContext, useState } from "react"
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
 import { GAMES } from "../map/constants"
 
 const PracticeRedirectPage = () => {
+  const [message, setMessage] = useState<string>("")
   const { gameMode, gamesIndex, setGamesIndex } = useContext(PracticeModalContext)
   const router = useRouter()
 
@@ -16,12 +17,16 @@ const PracticeRedirectPage = () => {
   }
 
   useEffect(() => {
+    if (gameMode === "regular") setMessage("Redirecting...")
     const currGameIndex = handlePop()
-    if (currGameIndex === undefined) return
+    if (currGameIndex === undefined) {
+      setMessage("No more games left!")
+      return
+    }
     router.push(`/${GAMES[currGameIndex]}/practice`)
   }, [])
 
-  return <div>Redirecting...</div>
+  return <div>{message}</div>
 }
 
 export default PracticeRedirectPage
