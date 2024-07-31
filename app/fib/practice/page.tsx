@@ -1,12 +1,9 @@
 "use client"
 
-import Layout from "../_components/layout"
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
-import { useContext } from "react"
+import FibGame from "../page"
 
-const Hangman: React.FC = () => {
-  const { termsIndex } = useContext(PracticeModalContext)
-  return <Layout gameMode="practice" termsIndex={termsIndex} />
+const FibPractice: React.FC = () => {
+  return <FibGame />
 }
 
-export default Hangman
+export default FibPractice

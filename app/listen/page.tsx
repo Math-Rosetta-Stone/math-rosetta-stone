@@ -1,169 +1,127 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { cn, getOneRandom, shuffle } from "@/lib/utils";
-import { ArrowRight, RotateCcw } from 'lucide-react';
-import { AnimatePresence, motion } from "framer-motion";
-import { Mcq } from "./_components/Mcq";
-import { Button } from "@/components/ui/button";
-import { PromptType } from "@/types/mcq";
+import { useContext, useEffect, useState } from "react"
+import { cn, getOneRandom, shuffle } from "@/lib/utils"
+import { ArrowRight, RotateCcw } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
+import { Mcq } from "./_components/Mcq"
+import { Button } from "@/components/ui/button"
+import { PromptType } from "@/types/mcq"
+import { LayoutProps } from "@/types/practice"
+import { MOCK_DB } from "@/app/map/constants"
+import { PracticeModalContext } from "../contexts/practicemodelproviders"
 
-const TIME_LIMIT = 10; // in seconds
+const TIME_LIMIT = 10 // in seconds
 
-const mockDb = [
-  {
-    term: "derivative",
-    definition: "rate of change",
-    image: {
-      title: "Derivative",
-      url: "/derivative.jpg",
-    },
-  },
-  {
-    term: "integral",
-    definition: "area under the curve",
-    image: {
-      title: "Integral",
-      url: "/integral.jpg",
-    },
-  },
-  {
-    term: "limit",
-    definition: "approaching a value",
-    image: {
-      title: "Limit",
-      url: "/limit.png",
-    },
-  },
-  {
-    term: "function",
-    definition: "relation between inputs and outputs",
-    image: {
-      title: "Function",
-      url: "/function.jpg",
-    },
-  },
-  {
-    term: "slope",
-    definition: "steepness of a line",
-    image: {
-      title: "Slope",
-      url: "/slope.jpg",
-    },
-  },
-  {
-    term: "tangent",
-    definition: "line that touches a curve",
-    image: {
-      title: "Tangent",
-      url: "/tangent.png",
-    },
-  },
-];
+const ListeningGame: React.FC = () => {
+  const { gameMode, termsIndex } = useContext(PracticeModalContext)
+  const mockDb = gameMode === "practice" ? MOCK_DB.filter((_, index) => termsIndex.includes(index)) : MOCK_DB
 
-const McqGame = () => {
-  const [hydrated, setHydrated] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
-  const [timerStopped, setTimerStopped] = useState(false);
-  const [currQuestion, setCurrQuestion] = useState(getOneRandom(mockDb));
-  const [availableQuestions, setAvailableQuestions] = useState(mockDb.filter((item) => item.term !== currQuestion.term));
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [score, setScore] = useState(0);
-  
+  const [hydrated, setHydrated] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
+  const [timerStopped, setTimerStopped] = useState(false)
+  const [currQuestion, setCurrQuestion] = useState(getOneRandom(mockDb))
+  const [availableQuestions, setAvailableQuestions] = useState(mockDb.filter(item => item.term !== currQuestion.term))
+  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [score, setScore] = useState(0)
+
   const speakWord = (word: string) => {
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.rate = 0.7; 
-    speechSynthesis.speak(utterance);
-  };
+    const utterance = new SpeechSynthesisUtterance(word)
+    utterance.rate = 0.7
+    speechSynthesis.speak(utterance)
+  }
 
   const getRandomPromptType = () => {
-    return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF;
-  };
+    return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF
+  }
 
-  const [currPromptType, setCurrPromptType] = useState(getRandomPromptType());
+  const [currPromptType, setCurrPromptType] = useState(getRandomPromptType())
 
-  const getChoices = (question: { term: string; definition: any; }, choiceType: PromptType) => {
-    const wrongChoices = shuffle(mockDb.filter((item) => item.term !== question.term)).slice(0, 3);
+  const getChoices = (question: { term: string; definition: any }, choiceType: PromptType) => {
+    const wrongChoices = shuffle(mockDb.filter(item => item.term !== question.term)).slice(0, 3)
     const choices = shuffle([
-      { term: choiceType === PromptType.TERM ? question.term : undefined, definition: choiceType === PromptType.DEF ? question.definition : undefined },
+      {
+        term: choiceType === PromptType.TERM ? question.term : undefined,
+        definition: choiceType === PromptType.DEF ? question.definition : undefined,
+      },
       ...wrongChoices.map(item => ({
         term: choiceType === PromptType.TERM ? item.term : undefined,
-        definition: choiceType === PromptType.DEF ? item.definition : undefined
-      }))
-    ]);
-    return choices;
-  };
-  const [currChoices, setCurrChoices] = useState(getChoices(currQuestion, currPromptType));
+        definition: choiceType === PromptType.DEF ? item.definition : undefined,
+      })),
+    ])
+    return choices
+  }
+  const [currChoices, setCurrChoices] = useState(getChoices(currQuestion, currPromptType))
 
   const handleSubmit = () => {
-    setTimerStopped(true);
-    setFormSubmitted(true);
-  };
+    setTimerStopped(true)
+    setFormSubmitted(true)
+  }
 
   const handleResetTimer = () => {
-    setTimeLeft(TIME_LIMIT);
-    setTimerStopped(false);
-  };
+    setTimeLeft(TIME_LIMIT)
+    setTimerStopped(false)
+  }
 
   const handleNext = () => {
-    if (availableQuestions.length === 0) {  // if no more questions, stop the game
+    if (availableQuestions.length === 0) {
+      // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({...currQuestion, term: ""});
+      setCurrQuestion({ ...currQuestion, term: "" })
 
       // stop the timer and set time left to 0 (purely aesthetic)
-      setTimerStopped(true);
-      setTimeLeft(0);
+      setTimerStopped(true)
+      setTimeLeft(0)
     } else {
       // get a new question from available questions
-      const newQuestion = getOneRandom(availableQuestions);
-      setCurrQuestion(newQuestion);
+      const newQuestion = getOneRandom(availableQuestions)
+      setCurrQuestion(newQuestion)
 
-      const newPromptType = getRandomPromptType();
-      setCurrPromptType(newPromptType);
+      const newPromptType = getRandomPromptType()
+      setCurrPromptType(newPromptType)
 
       // get new choices for the new question
-      setCurrChoices(getChoices(newQuestion, newPromptType));
+      setCurrChoices(getChoices(newQuestion, newPromptType))
 
       // update available questions
-      setAvailableQuestions(availableQuestions.filter((item) => item.term !== newQuestion.term));
+      setAvailableQuestions(availableQuestions.filter(item => item.term !== newQuestion.term))
 
       // reset timer
-      handleResetTimer();
-      
+      handleResetTimer()
     }
 
     // reset form submitted
-    setFormSubmitted(false);
-  };
+    setFormSubmitted(false)
+  }
 
   const handleRestart = () => {
     // reset all states
-    handleResetTimer();
-    const newQuestion = getOneRandom(mockDb);
-    const newPromptType = getRandomPromptType();
-    setCurrQuestion(newQuestion);
-    setAvailableQuestions(mockDb.filter((item) => item.term !== newQuestion.term));
-    setFormSubmitted(false);
-    setScore(0);
-    setCurrChoices(getChoices(newQuestion, newPromptType));
-    setCurrPromptType(newPromptType);
-  };
+    handleResetTimer()
+    const newQuestion = getOneRandom(mockDb)
+    const newPromptType = getRandomPromptType()
+    setCurrQuestion(newQuestion)
+    setAvailableQuestions(mockDb.filter(item => item.term !== newQuestion.term))
+    setFormSubmitted(false)
+    setScore(0)
+    setCurrChoices(getChoices(newQuestion, newPromptType))
+    setCurrPromptType(newPromptType)
+  }
 
   useEffect(() => {
-    setHydrated(true);
+    setHydrated(true)
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
-        setTimeLeft((prevTime) => prevTime - 1);
+        setTimeLeft(prevTime => prevTime - 1)
       } else if (timeLeft === 0 && !formSubmitted) {
-        handleSubmit(); // Automatically submit when the timer reaches 0
+        handleSubmit() // Automatically submit when the timer reaches 0
       }
-    }, 1000);
+    }, 1000)
 
-    return () => clearInterval(interval);
-  }, [timerStopped, timeLeft]);
+    return () => clearInterval(interval)
+  }, [timerStopped, timeLeft])
 
   if (!hydrated) {
-    return null;
+    return null
   }
 
   return (
@@ -188,7 +146,9 @@ const McqGame = () => {
                 "text-slate-300 ease-in duration-150",
                 formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
-              onClick={() => { if (formSubmitted && currQuestion.term !== "") handleNext() }}
+              onClick={() => {
+                if (formSubmitted && currQuestion.term !== "") handleNext()
+              }}
             />
           </div>
         )}
@@ -199,8 +159,7 @@ const McqGame = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+              transition={{ duration: 0.3 }}>
               <Mcq
                 key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
                 question={currQuestion}
@@ -219,8 +178,7 @@ const McqGame = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center"
-            >
+              className="flex flex-col items-center justify-center">
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
                 {` You scored ${score}/${mockDb.length}`}
@@ -228,8 +186,7 @@ const McqGame = () => {
               <Button
                 className="border hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
-                onClick={handleRestart}
-              >
+                onClick={handleRestart}>
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>
@@ -238,7 +195,7 @@ const McqGame = () => {
         </AnimatePresence>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default McqGame;
+export default ListeningGame
