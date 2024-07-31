@@ -23,7 +23,7 @@ const PracticeRedirectPage = () => {
       router.push("/map")
       return
     }
-    router.push(`/${GAMES[currGameIndex]}/practice`)
+    router.push(`/practice/${GAMES[currGameIndex]}`)
   }, [])
 
   return <div>{message}</div>

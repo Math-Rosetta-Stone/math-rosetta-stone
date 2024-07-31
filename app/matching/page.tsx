@@ -1,20 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { shuffle } from "@/lib/utils"
 
 import { Matching } from "./_components/matching"
+import { PracticeModalContext } from "../contexts/practicemodelproviders"
+import { MOCK_DB } from "../map/constants"
+import termItemToRecord from "./practice/helper"
 
 const TIME_LIMIT = 20 // in seconds
 
-const termToDefinition: { [key: string]: string } = {
-  derivative: "rate of change",
-  integral: "area under the curve",
-  limit: "approaching a value",
-  function: "relation between inputs and outputs",
-}
+// const termToDefinition: { [key: string]: string } = {
+//   derivative: "rate of change",
+//   integral: "area under the curve",
+//   limit: "approaching a value",
+//   function: "relation between inputs and outputs",
+// }
 
 const MatchingGame = () => {
+  const { gameMode, termsIndex } = useContext(PracticeModalContext)
+  const termToDefinition =
+    gameMode === "practice" ? termItemToRecord(MOCK_DB.filter((_, index) => termsIndex.includes(index))) : termItemToRecord(MOCK_DB)
+
   const [hydrated, setHydrated] = useState(false)
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
   const [timerStopped, setTimerStopped] = useState(false)
