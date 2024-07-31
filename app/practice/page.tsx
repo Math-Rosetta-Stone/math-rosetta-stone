@@ -5,7 +5,7 @@ import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
 import { GAMES } from "../map/constants"
 
 const PracticeRedirectPage = () => {
-  const [message, setMessage] = useState<string>("")
+  const [message, setMessage] = useState<string>("Redirecting...")
   const { gameMode, gamesIndex, setGamesIndex } = useContext(PracticeModalContext)
   const router = useRouter()
 
@@ -17,10 +17,10 @@ const PracticeRedirectPage = () => {
   }
 
   useEffect(() => {
-    if (gameMode === "regular") setMessage("Redirecting...")
     const currGameIndex = handlePop()
-    if (currGameIndex === undefined) {
-      setMessage("No more games left!")
+    if (gameMode === "regular" || currGameIndex === undefined) {
+      setMessage("No more games left. Redirecting to select games...")
+      router.push("/map")
       return
     }
     router.push(`/${GAMES[currGameIndex]}/practice`)
