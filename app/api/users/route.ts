@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   }
 }
 
-// Register user
+// Sign up user
 export async function POST(request: Request) {
   try {
     const { userName, password } = await request.json();
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Username taken" }, { status: 400 });
     }
 
-    // Register user
+    // Sign up user
     const hashedPassword = await argon2.hash(password);
     await db.insert(user).values({ username: userName, password_hash: hashedPassword });
 

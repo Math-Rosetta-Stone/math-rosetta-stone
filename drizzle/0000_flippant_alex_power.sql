@@ -23,9 +23,16 @@ CREATE TABLE `level` (
 	CONSTRAINT `level_chapter_no_branch_no_x_y_unique` UNIQUE(`chapter_no`,`branch_no`,`x`,`y`)
 );
 --> statement-breakpoint
+CREATE TABLE `session` (
+	`id` varchar(255) NOT NULL,
+	`user_id` varchar(255) NOT NULL,
+	`expires_at` datetime NOT NULL,
+	CONSTRAINT `session_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `user` (
-	`id` serial AUTO_INCREMENT NOT NULL,
-	`username` varchar(50) COLLATE utf8mb4_bin NOT NULL,
+	`id` varchar(255) NOT NULL,
+	`username` varchar(50) NOT NULL,
 	`password_hash` varchar(100) NOT NULL,
 	`curr_branch_no` int DEFAULT 1,
 	`curr_chapter_no` int DEFAULT 1,
@@ -34,13 +41,6 @@ CREATE TABLE `user` (
 	CONSTRAINT `user_username_unique` UNIQUE(`username`)
 );
 --> statement-breakpoint
-CREATE TABLE `user_session` (
-	`id` serial AUTO_INCREMENT NOT NULL,
-	`expires_at` datetime NOT NULL,
-	`user_id` bigint,
-	CONSTRAINT `user_session_id` PRIMARY KEY(`id`)
-);
---> statement-breakpoint
 ALTER TABLE `chapter` ADD CONSTRAINT `chapter_branch_no_branch_branch_no_fk` FOREIGN KEY (`branch_no`) REFERENCES `branch`(`branch_no`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `level` ADD CONSTRAINT `level_chapter_no_branch_no_chapter_chapter_no_branch_no_fk` FOREIGN KEY (`chapter_no`,`branch_no`) REFERENCES `chapter`(`chapter_no`,`branch_no`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `user_session` ADD CONSTRAINT `user_session_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `session` ADD CONSTRAINT `session_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE no action ON UPDATE no action;

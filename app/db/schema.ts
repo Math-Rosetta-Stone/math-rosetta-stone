@@ -1,18 +1,15 @@
 import {
-  bigint,
   datetime,
   foreignKey,
   int,
-  json,
   mysqlTable,
   primaryKey,
-  serial,
   unique,
   varchar
 } from "drizzle-orm/mysql-core";
 
 export const user = mysqlTable("user", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 255 }).primaryKey(),
   username: varchar("username", { length: 50 }).$type<string>().unique().notNull(),
   password_hash: varchar("password_hash", { length: 100 }).notNull(),
   curr_branch_no: int("curr_branch_no").default(1),
@@ -20,10 +17,10 @@ export const user = mysqlTable("user", {
   curr_level_no: int("curr_level_no").default(1),
 });
 
-export const user_session = mysqlTable("user_session", {
-  id: serial("id").primaryKey(),
-  expires_at: datetime("expires_at").notNull(),
-  user_id: bigint("user_id", { mode: "number" }).references(() => user.id),
+export const session = mysqlTable("session", {
+	id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull().references(() => user.id),
+	expiresAt: datetime("expires_at").notNull()
 });
 
 export const branch = mysqlTable("branch", {

@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import argon2 from "argon2";
 import { omitPassword } from "@/lib/utils";
 
-// Login user
+// Sign in user
 export async function POST(request: Request) {
   try {
     const { userName, password } = await request.json();
