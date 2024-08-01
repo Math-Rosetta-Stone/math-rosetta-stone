@@ -6,7 +6,7 @@ import FibGame from "@/app/fib/page"
 import LogoGame from "@/app/logo/page"
 import ListeningGame from "@/app/listen/page"
 import MatchingGame from "@/app/matching/page"
-import { Game } from "@/app/map/constants"
+import { Game } from "@/types/map"
 
 export default function PracticeGame({ params }: { params: { gameName: Game } }): JSX.Element {
   switch (params.gameName) {

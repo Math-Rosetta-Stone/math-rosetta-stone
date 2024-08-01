@@ -3,9 +3,10 @@ import React, { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faSave, faTrash, faSearch, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons"
 import "./css/map.css"
-import { Marker, Position, Chapter, Land, MinigameMarker, MapMarker } from "@/types/map"
+import { Marker, Position, Chapter, Land, MinigameMarker, MapMarker, GameAndRandom } from "@/types/map"
 import NewWindow from "react-new-window"
-import PopoutForm from "./_components/popoutform"
+import PopoutFormMap from "./_components/popoutform/mappopout"
+import PopoutFormMini from "./_components/popoutform/mgpopout"
 import Dictionary from "./_components/dictionary"
 import PracticeModal from "./_components/practicemode/practicemodal"
 import dynamic from "next/dynamic"
@@ -15,7 +16,8 @@ const Map: React.FC = () => {
   const [markers, setMarkers] = useState<Marker[]>([])
   const [currChapter, setCurrChapter] = useState<Chapter>(1)
   const [currLand, setCurrLand] = useState<Land>("Island")
-  const [isPopoutOpen, setIsPopoutOpen] = useState(false)
+  const [isPopoutMapOpen, setIsPopoutMapOpen] = useState(false)
+  const [isPopoutMiniOpen, setIsPopoutMiniOpen] = useState(false)
   const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">("map")
 
   useEffect(() => {
@@ -46,8 +48,9 @@ const Map: React.FC = () => {
     setMarkers([...markers, newMapMarker])
   }
 
-  const addMiniGameMarker = () => {
+  const addMiniGameMarker = (targetGame: GameAndRandom) => {
     const newMarker: MinigameMarker = {
+      targetGame,
       position: { x: 500, y: 500 },
       type: "minigame",
     } // Default position
@@ -59,12 +62,18 @@ const Map: React.FC = () => {
     setMarkers(updatedMarkers)
   }
 
-  const openPopout = () => setIsPopoutOpen(true)
-  const closePopout = () => setIsPopoutOpen(false)
+  const openMapPopout = () => setIsPopoutMapOpen(true)
+  const closeMapPopout = () => setIsPopoutMapOpen(false)
+  const openMiniPopout = () => setIsPopoutMiniOpen(true)
+  const closeMiniPopout = () => setIsPopoutMiniOpen(false)
 
-  const handlePopoutSubmit = (targetLand: Land, targetChapter: Chapter) => {
+  const handleMapPopoutSubmit = (targetLand: Land, targetChapter: Chapter) => {
     addMapMarker(targetLand, targetChapter)
-    closePopout()
+    closeMapPopout()
+  }
+  const handleMiniPopoutSubmit = (targetGame: GameAndRandom) => {
+    addMiniGameMarker(targetGame)
+    closeMapPopout()
   }
 
   const gameMapManager = {
@@ -79,9 +88,14 @@ const Map: React.FC = () => {
 
   return (
     <div className="w-screen h-screen bg-blue-900 flex flex-col">
-      {isPopoutOpen && (
-        <NewWindow onUnload={closePopout}>
-          <PopoutForm onSubmit={handlePopoutSubmit} onClose={closePopout} />
+      {isPopoutMapOpen && (
+        <NewWindow onUnload={closeMapPopout}>
+          <PopoutFormMap onSubmit={handleMapPopoutSubmit} onClose={closeMapPopout} />
+        </NewWindow>
+      )}
+      {isPopoutMiniOpen && (
+        <NewWindow onUnload={closeMiniPopout}>
+          <PopoutFormMini onSubmit={handleMiniPopoutSubmit} onClose={closeMiniPopout} />
         </NewWindow>
       )}
       <div className="flex-1 flex">
@@ -106,13 +120,11 @@ const Map: React.FC = () => {
           </div>
         </div>
         <div className="right-controller w-36 h-full bg-nintendo-blue p-4 flex flex-col items-center justify-center">
-          <button
-            onClick={addMiniGameMarker}
-            className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-300 text-white z-10 rounded-full w-12 h-12">
+          <button onClick={openMiniPopout} className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-300 text-white z-10 rounded-full w-12 h-12">
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
           <button
-            onClick={openPopout}
+            onClick={openMapPopout}
             className="absolute top-4 right-20 p-2 bg-yellow-500 hover:bg-yellow-300 text-white z-10 rounded-full w-12 h-12">
             <FontAwesomeIcon icon={faPlus} size="lg" />
           </button>
