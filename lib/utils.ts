@@ -25,5 +25,5 @@ export const getOneRandom = (array: any[]) => {
 }
 
 export const omitPassword = (array: any[]) => {
-  return array.map(({ password, ...rest }) => rest);
+  return array.map(({ password_hash, ...rest }) => rest);
 }

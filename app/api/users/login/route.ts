@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/mysql";
-import argon2 from "argon2";
 
+import { db } from "@/app/db/db";
+import { user } from "@/app/db/schema";
+import { eq } from "drizzle-orm";
+
+import argon2 from "argon2";
 import { omitPassword } from "@/lib/utils";
 
 // Login user
@@ -12,19 +15,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Missing fields" }, { status: 400 });
     }
 
-    const db = await pool.getConnection();
-    const [rows] = await db.execute(
-      "SELECT * FROM User WHERE username COLLATE utf8mb4_bin LIKE ?",
-      [userName]
-    );
-    db.release();
+    // Find user
+    const userFound = await db.select().from(user).where(eq(user.username, userName));
 
-    if (rows.length <= 0) return NextResponse.json({ message: "User not found" }, { status: 404 });
+    if (userFound.length <= 0) return NextResponse.json({ message: "User not found" }, { status: 404 });
 
-    if (await argon2.verify(rows[0].password, password)) {
+    if (await argon2.verify(userFound[0].password_hash, password)) {
       return NextResponse.json({
-          message: `Logged in as ${rows[0].username}`,
-          payload: omitPassword(rows)[0]
+          message: `Logged in as ${userFound[0].username}`,
+          payload: omitPassword(userFound)[0]
         }, { status: 200 });
     } else {
       return NextResponse.json({ message: "Incorrect username or password" }, { status: 400 });

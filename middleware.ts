@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 
 export function middleware(request: Request) {
-  console.log("running");
-
-  const user = "fdsafds";
+  const user = "loggedIn";
   if (!user) {
     return NextResponse.redirect(
       new URL("/login", request.url)
