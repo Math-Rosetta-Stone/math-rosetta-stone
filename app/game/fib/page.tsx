@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { PromptType, TermItem } from "@/types/mcq";
 import { cn, getOneRandom, shuffle } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Fib } from "./_components/fib";
+import { useRouter } from "next/navigation";
 
 const TIME_LIMIT = 5; // in seconds
 
@@ -144,6 +145,9 @@ const FibGame = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
   const getGameType = () => {
     let possibleQTypes = [PromptType.TERM, PromptType.IMG]; // answer type always the definition
     return getOneRandom(possibleQTypes);
@@ -201,6 +205,19 @@ const FibGame = () => {
   };
 
   useEffect(() => {
+    fetch("/api/user")
+      .then((res) => {
+        if (res.status === 401) {
+          return router.push("/");
+        } else if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        setIsLoading(false);
+        return res.json()
+      });
+  }, []);
+
+  useEffect(() => {
     setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
@@ -215,6 +232,14 @@ const FibGame = () => {
 
   if (!hydrated) {
     return null;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    );
   }
 
   return (

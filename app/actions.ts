@@ -20,5 +20,8 @@ export async function signout() {
     sessionCookie.value,
     sessionCookie.attributes
   );
-	return redirect("/");
+
+  return {
+    success: true
+  };
 }

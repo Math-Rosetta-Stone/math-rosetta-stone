@@ -3,7 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const gamesList = [
   {
@@ -34,6 +35,30 @@ const gamesList = [
 
 export default function Games() {
   const basePath = usePathname();
+
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user")
+      .then((res) => {
+        if (res.status === 401) {
+          return router.push("/");
+        } else if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        setIsLoading(false);
+        return res.json()
+      });
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
 
   return (
     <AnimatePresence>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { shuffle } from "@/lib/utils";
 
 import { Matching } from "./_components/matching";
+import { useRouter } from "next/navigation";
 
 const TIME_LIMIT = 20; // in seconds
 
@@ -22,6 +23,9 @@ const MatchingGame = () => {
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)));
   const [formSubmitted, setFormSubmitted] = useState(false);
 
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleSubmit = () => {
     setTimerStopped(true);
     setFormSubmitted(true);
@@ -39,6 +43,20 @@ const MatchingGame = () => {
   };
 
   useEffect(() => {
+    fetch("/api/user")
+      .then((res) => {
+        if (res.status === 401) {
+          return router.push("/");
+        } else if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        setIsLoading(false);
+        return res.json()
+      });
+  }, []);
+
+
+  useEffect(() => {
     setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
@@ -54,6 +72,15 @@ const MatchingGame = () => {
   if (!hydrated) {
     return null;
   }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-start gap-2 min-h-screen mt-[8vh]">
 

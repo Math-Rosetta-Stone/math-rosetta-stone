@@ -13,6 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 import './hangman.css';
+import { useRouter } from 'next/navigation';
 
 const mockDb: TermItem[] = [
   {
@@ -77,6 +78,9 @@ const Hangman: React.FC = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [gameMessage, setGameMessage] = useState<string>('');
 
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleNext = () => {
     if (availableQuestions.length === 0) {  // if no more questions, stop the game
       // to mark no more questions left
@@ -116,6 +120,19 @@ const Hangman: React.FC = () => {
     setScore(0);
     setGameMessage('');
   };
+
+  useEffect(() => {
+    fetch("/api/user")
+      .then((res) => {
+        if (res.status === 401) {
+          return router.push("/");
+        } else if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        setIsLoading(false);
+        return res.json()
+      });
+  }, []);
 
   useEffect(() => {
     setHydrated(true);
@@ -159,6 +176,14 @@ const Hangman: React.FC = () => {
 
   if (!hydrated) {
     return null;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    );
   }
 
   return (

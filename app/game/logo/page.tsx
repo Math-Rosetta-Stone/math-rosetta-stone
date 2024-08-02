@@ -8,6 +8,7 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const TIME_LIMIT = 10; // in seconds
 
@@ -74,6 +75,9 @@ const LogoQuizGame = () => {
   const [inputColor, setInputColor] = useState<string>("");
   const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("");
 
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleSubmit = () => {
     setTimerStopped(true);
     setFormSubmitted(true);
@@ -134,6 +138,19 @@ const LogoQuizGame = () => {
   };
 
   useEffect(() => {
+    fetch("/api/user")
+      .then((res) => {
+        if (res.status === 401) {
+          return router.push("/");
+        } else if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        setIsLoading(false);
+        return res.json()
+      });
+  }, []);
+
+  useEffect(() => {
     setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
@@ -150,6 +167,14 @@ const LogoQuizGame = () => {
 
   if (!hydrated) {
     return null;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    );
   }
 
   return (

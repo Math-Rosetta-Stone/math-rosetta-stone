@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Mcq } from "./_components/Mcq";
 import { Button } from "@/components/ui/button";
 import { PromptType } from "@/types/mcq";
+import { useRouter } from "next/navigation";
 
 const TIME_LIMIT = 10; // in seconds
 
@@ -69,10 +70,13 @@ const McqGame = () => {
   const [availableQuestions, setAvailableQuestions] = useState(mockDb.filter((item) => item.term !== currQuestion.term));
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
-  
+
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
   const speakWord = (word: string) => {
     const utterance = new SpeechSynthesisUtterance(word);
-    utterance.rate = 0.7; 
+    utterance.rate = 0.7;
     speechSynthesis.speak(utterance);
   };
 
@@ -129,7 +133,7 @@ const McqGame = () => {
 
       // reset timer
       handleResetTimer();
-      
+
     }
 
     // reset form submitted
@@ -150,6 +154,19 @@ const McqGame = () => {
   };
 
   useEffect(() => {
+    fetch("/api/user")
+      .then((res) => {
+        if (res.status === 401) {
+          return router.push("/");
+        } else if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        setIsLoading(false);
+        return res.json()
+      });
+  }, []);
+
+  useEffect(() => {
     setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
@@ -164,6 +181,14 @@ const McqGame = () => {
 
   if (!hydrated) {
     return null;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    );
   }
 
   return (
