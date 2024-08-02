@@ -24,9 +24,9 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ location, onDragEnd, se
   const handleClick = () => {
     if (targetGame === "random") {
       const gameName = selectGame()
-      router.push(`/${gameName}`)
+      router.push(`/game/${gameName}`)
     } else {
-      router.push(`/${targetGame}`)
+      router.push(`/game/${targetGame}`)
     }
   }
 
