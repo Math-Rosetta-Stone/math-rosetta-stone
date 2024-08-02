@@ -4,9 +4,11 @@ import { useEffect, useState, useContext } from "react"
 import { shuffle } from "@/lib/utils"
 
 import { Matching } from "./_components/matching"
-import { PracticeModalContext } from "../contexts/practicemodelproviders"
-import { MOCK_DB } from "../map/constants"
-import termItemToRecord from "./practice/helper"
+import { useRouter } from "next/navigation"
+
+import { termItemToRecord } from "@/app/practice/helpers"
+import { MOCK_DB } from "@/app/map/constants"
+import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
 
 const TIME_LIMIT = 20 // in seconds
 
@@ -20,7 +22,7 @@ const TIME_LIMIT = 20 // in seconds
 const MatchingGame = () => {
   const { gameMode, termsIndex } = useContext(PracticeModalContext)
   const termToDefinition =
-    gameMode === "practice" ? termItemToRecord(MOCK_DB.filter((_, index) => termsIndex.includes(index))) : termItemToRecord(MOCK_DB)
+    gameMode === "regular" ? termItemToRecord(MOCK_DB) : termItemToRecord(MOCK_DB.filter((_, index) => termsIndex.includes(index)))
 
   const [hydrated, setHydrated] = useState(false)
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
@@ -28,6 +30,9 @@ const MatchingGame = () => {
   const [randomizedTerms, setRandomizedTerms] = useState<string[]>(shuffle(Object.keys(termToDefinition)))
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)))
   const [formSubmitted, setFormSubmitted] = useState(false)
+
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
 
   const handleSubmit = () => {
     setTimerStopped(true)
@@ -46,6 +51,18 @@ const MatchingGame = () => {
   }
 
   useEffect(() => {
+    fetch("/api/user").then(res => {
+      if (res.status === 401) {
+        return router.push("/")
+      } else if (!res.ok) {
+        throw new Error("Failed to fetch user data")
+      }
+      setIsLoading(false)
+      return res.json()
+    })
+  }, [])
+
+  useEffect(() => {
     setHydrated(true)
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
@@ -61,6 +78,15 @@ const MatchingGame = () => {
   if (!hydrated) {
     return null
   }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col items-center justify-start gap-2 min-h-screen mt-[8vh]">
       <div className="text-4xl font-black">Matching Game</div>

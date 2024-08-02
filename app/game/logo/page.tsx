@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState } from "react"
 import { TermItem } from "@/types/mcq"
 import { cn, getOneRandom } from "@/lib/utils"
 
@@ -8,15 +8,61 @@ import { ArrowRight, RotateCcw } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
-import { MOCK_DB } from "../map/constants"
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
 
 const TIME_LIMIT = 10 // in seconds
 
-const LogoGame: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext)
-  const mockDb = gameMode === "practice" ? MOCK_DB.filter((_, index) => termsIndex.includes(index)) : MOCK_DB
+const mockDb: TermItem[] = [
+  {
+    term: "derivative",
+    definition: "rate of change",
+    image: {
+      title: "Derivative",
+      url: "/derivative.jpg",
+    },
+  },
+  {
+    term: "integral",
+    definition: "area under the curve",
+    image: {
+      title: "Integral",
+      url: "/integral.jpg",
+    },
+  },
+  {
+    term: "limit",
+    definition: "approaching a value",
+    image: {
+      title: "Limit",
+      url: "/limit.png",
+    },
+  },
+  {
+    term: "function",
+    definition: "relation between inputs and outputs",
+    image: {
+      title: "Function",
+      url: "/function.jpg",
+    },
+  },
+  {
+    term: "slope",
+    definition: "steepness of a line",
+    image: {
+      title: "Slope",
+      url: "/slope.jpg",
+    },
+  },
+  {
+    term: "tangent",
+    definition: "line that touches a curve",
+    image: {
+      title: "Tangent",
+      url: "/tangent.png",
+    },
+  },
+]
 
+const LogoQuizGame = () => {
   const [hydrated, setHydrated] = useState(false)
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
   const [timerStopped, setTimerStopped] = useState(false)
@@ -210,4 +256,4 @@ const LogoGame: React.FC = () => {
   )
 }
 
-export default LogoGame
+export default LogoQuizGame

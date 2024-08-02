@@ -16,6 +16,7 @@ type GameMapProps = {
 
 const GameMap: React.FC<GameMapProps> = ({ gameMapManager }) => {
   const [currMapPath, setCurrMapPath] = useState<string>(LAND_MAPS_PATHS[gameMapManager.currLand])
+  //TODO: fetch call to api user
 
   return (
     <div className="relative w-full h-full overflow-hidden no-select">

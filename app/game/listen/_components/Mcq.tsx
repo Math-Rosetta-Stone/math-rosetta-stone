@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PromptType, TermItem } from "@/types/mcq";
 
-import { ChoiceBox } from "@/app/mcq/_components/choice-box";
+import { ChoiceBox } from "../../mcq/_components/choice-box";
 import { Button } from "@/components/ui/button";
 
 interface McqProps {
@@ -67,9 +67,9 @@ export const Mcq = ({
               <Button onClick={() => {
                   speakWord("The choices are: ");
                   choices.forEach((choice, index) => {
-                  const label = String.fromCharCode(65 + index); 
-                  //seperated so there is a pause 
-                  speakWord(`${label}.`); 
+                  const label = String.fromCharCode(65 + index);
+                  //seperated so there is a pause
+                  speakWord(`${label}.`);
                   speakWord(`${choice.definition}`);
                 });
               }}>Listen to the choices</Button>

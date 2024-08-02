@@ -3,6 +3,7 @@
 // original hangman code with a little props modifications for incorporate the gameMode prop
 // only touched the props and added logic for choosing mockDb
 import React, { useState, useEffect, KeyboardEvent, useContext } from "react"
+import { useRouter } from "next/navigation"
 import Figure from "./_components/Figure"
 import WrongLetters from "./_components/WrongLetters"
 import Word from "./_components/Word"
@@ -31,6 +32,9 @@ const Hangman: React.FC = () => {
   const [score, setScore] = useState(0)
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [gameMessage, setGameMessage] = useState<string>("")
+
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {
@@ -70,6 +74,18 @@ const Hangman: React.FC = () => {
     setScore(0)
     setGameMessage("")
   }
+
+  useEffect(() => {
+    fetch("/api/user").then(res => {
+      if (res.status === 401) {
+        return router.push("/")
+      } else if (!res.ok) {
+        throw new Error("Failed to fetch user data")
+      }
+      setIsLoading(false)
+      return res.json()
+    })
+  }, [])
 
   useEffect(() => {
     setHydrated(true)
@@ -113,6 +129,14 @@ const Hangman: React.FC = () => {
 
   if (!hydrated) {
     return null
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    )
   }
 
   return (

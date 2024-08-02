@@ -23,3 +23,7 @@ export const shuffle = (array: any[]) => {
 export const getOneRandom = (array: any[]) => {
   return array[Math.floor(Math.random() * array.length)];
 }
+
+export const omitPassword = (array: any[]) => {
+  return array.map(({ password_hash, ...rest }) => rest);
+}

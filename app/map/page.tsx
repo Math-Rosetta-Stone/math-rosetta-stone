@@ -10,6 +10,7 @@ import PopoutFormMini from "./_components/popoutform/mgpopout"
 import Dictionary from "./_components/dictionary"
 import PracticeModal from "./_components/practicemode/practicemodal"
 import dynamic from "next/dynamic"
+import { useRouter } from "next/navigation"
 const GameMap = dynamic(() => import("./_components/gamemap"), { ssr: false })
 
 const Map: React.FC = () => {
@@ -19,6 +20,21 @@ const Map: React.FC = () => {
   const [isPopoutMapOpen, setIsPopoutMapOpen] = useState(false)
   const [isPopoutMiniOpen, setIsPopoutMiniOpen] = useState(false)
   const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">("map")
+
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/user").then(res => {
+      if (res.status === 401) {
+        return router.push("/")
+      } else if (!res.ok) {
+        throw new Error("Failed to fetch user data")
+      }
+      setIsLoading(false)
+      return res.json()
+    })
+  }, [])
 
   useEffect(() => {
     setMarkers(readMarkers)
@@ -84,6 +100,14 @@ const Map: React.FC = () => {
     setCurrChapter,
     currLand,
     setCurrLand,
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
+      </div>
+    )
   }
 
   return (
