@@ -6,13 +6,14 @@ import { cn, getOneRandom, shuffle } from "@/lib/utils"
 
 import { ArrowRight, RotateCcw } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
-import { Button } from "@/components/ui/button";
-import { Fib } from "./_components/fib";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button"
+import { Fib } from "./_components/fib"
 
 import { TermItem } from "@/types/mcq"
 import { doubleAndNext } from "@/app/practice/helpers"
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
+import { useUserData } from "@/app/hook/userdata"
+import LoadingAnimation from "@/components/ui/loadinganimation"
 
 const TIME_LIMIT = 100 // in seconds
 
@@ -151,8 +152,7 @@ const FibGame: React.FC = () => {
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [score, setScore] = useState(0)
 
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading } = useUserData()
 
   const getGameType = () => {
     let possibleQTypes = [PromptType.TERM, PromptType.IMG] // answer type always the definition
@@ -210,20 +210,7 @@ const FibGame: React.FC = () => {
   }
 
   useEffect(() => {
-    fetch("/api/user")
-      .then((res) => {
-        if (res.status === 401) {
-          return router.push("/");
-        } else if (!res.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-        setIsLoading(false);
-        return res.json()
-      });
-  }, []);
-
-  useEffect(() => {
-    setHydrated(true);
+    setHydrated(true)
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft(prevTime => prevTime - 1)
@@ -240,11 +227,7 @@ const FibGame: React.FC = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
-      </div>
-    );
+    return <LoadingAnimation />
   }
 
   return (

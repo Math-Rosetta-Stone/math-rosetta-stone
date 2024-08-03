@@ -1,68 +1,23 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { TermItem } from "@/types/mcq"
+import { useEffect, useState, useContext } from "react"
+import { TermItem, MOCK_DB } from "@/app/map/constants"
 import { cn, getOneRandom } from "@/lib/utils"
 
 import { ArrowRight, RotateCcw } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
+import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
+import { useUserData } from "@/app/hook/userdata"
+import LoadingAnimation from "@/components/ui/loadinganimation"
 
 const TIME_LIMIT = 10 // in seconds
 
-const mockDb: TermItem[] = [
-  {
-    term: "derivative",
-    definition: "rate of change",
-    image: {
-      title: "Derivative",
-      url: "/derivative.jpg",
-    },
-  },
-  {
-    term: "integral",
-    definition: "area under the curve",
-    image: {
-      title: "Integral",
-      url: "/integral.jpg",
-    },
-  },
-  {
-    term: "limit",
-    definition: "approaching a value",
-    image: {
-      title: "Limit",
-      url: "/limit.png",
-    },
-  },
-  {
-    term: "function",
-    definition: "relation between inputs and outputs",
-    image: {
-      title: "Function",
-      url: "/function.jpg",
-    },
-  },
-  {
-    term: "slope",
-    definition: "steepness of a line",
-    image: {
-      title: "Slope",
-      url: "/slope.jpg",
-    },
-  },
-  {
-    term: "tangent",
-    definition: "line that touches a curve",
-    image: {
-      title: "Tangent",
-      url: "/tangent.png",
-    },
-  },
-]
-
 const LogoQuizGame = () => {
+  const { gameMode, termsIndex } = useContext(PracticeModalContext)
+  const mockDb = gameMode === "regular" ? MOCK_DB : MOCK_DB.filter((_, index) => termsIndex.includes(index))
+
   const [hydrated, setHydrated] = useState(false)
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
   const [timerStopped, setTimerStopped] = useState(false)
@@ -73,6 +28,8 @@ const LogoQuizGame = () => {
   const [userAnswer, setUserAnswer] = useState<string>("")
   const [inputColor, setInputColor] = useState<string>("")
   const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("")
+
+  const { isLoading } = useUserData()
 
   const handleSubmit = () => {
     setTimerStopped(true)
@@ -149,6 +106,10 @@ const LogoQuizGame = () => {
 
   if (!hydrated) {
     return null
+  }
+
+  if (isLoading) {
+    return <LoadingAnimation />
   }
 
   return (

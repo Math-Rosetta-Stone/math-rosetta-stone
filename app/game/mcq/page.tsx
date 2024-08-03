@@ -11,7 +11,8 @@ import { Mcq } from "./_components/mcq"
 import { Button } from "@/components/ui/button"
 import { MOCK_DB } from "@/app/map/constants"
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
-import { useRouter } from "next/navigation"
+import LoadingAnimation from "@/components/ui/loadinganimation"
+import { useUserData } from "@/app/hook/userdata"
 
 const TIME_LIMIT = 5 // in seconds
 
@@ -27,8 +28,7 @@ const McqGame = () => {
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [score, setScore] = useState(0)
 
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
+  const { isLoading } = useUserData()
 
   const getChoices = (question: TermItem) => {
     const wrongChoices = shuffle(mockDb.filter(item => item.term !== question.term)).slice(0, 3)
@@ -97,18 +97,6 @@ const McqGame = () => {
   }
 
   useEffect(() => {
-    fetch("/api/user").then(res => {
-      if (res.status === 401) {
-        return router.push("/")
-      } else if (!res.ok) {
-        throw new Error("Failed to fetch user data")
-      }
-      setIsLoading(false)
-      return res.json()
-    })
-  }, [])
-
-  useEffect(() => {
     setHydrated(true)
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
@@ -126,11 +114,7 @@ const McqGame = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
-      </div>
-    )
+    return <LoadingAnimation />
   }
 
   return (

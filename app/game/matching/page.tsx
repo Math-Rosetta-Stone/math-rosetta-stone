@@ -4,11 +4,12 @@ import { useEffect, useState, useContext } from "react"
 import { shuffle } from "@/lib/utils"
 
 import { Matching } from "./_components/matching"
-import { useRouter } from "next/navigation"
 
 import { termItemToRecord } from "@/app/practice/helpers"
 import { MOCK_DB } from "@/app/map/constants"
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
+import LoadingAnimation from "@/components/ui/loadinganimation"
+import { useUserData } from "@/app/hook/userdata"
 
 const TIME_LIMIT = 20 // in seconds
 
@@ -31,8 +32,7 @@ const MatchingGame = () => {
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)))
   const [formSubmitted, setFormSubmitted] = useState(false)
 
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
+  const { isLoading } = useUserData()
 
   const handleSubmit = () => {
     setTimerStopped(true)
@@ -49,18 +49,6 @@ const MatchingGame = () => {
     setRandomizedTerms(shuffledTerms)
     setRandomizedDefinitions(shuffledDefinitions)
   }
-
-  useEffect(() => {
-    fetch("/api/user").then(res => {
-      if (res.status === 401) {
-        return router.push("/")
-      } else if (!res.ok) {
-        throw new Error("Failed to fetch user data")
-      }
-      setIsLoading(false)
-      return res.json()
-    })
-  }, [])
 
   useEffect(() => {
     setHydrated(true)
@@ -80,11 +68,7 @@ const MatchingGame = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
-      </div>
-    )
+    return <LoadingAnimation />
   }
 
   return (

@@ -17,6 +17,8 @@ import { MOCK_DB, TermItem } from "@/app/map/constants"
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
 
 import "./hangman.css"
+import { useUserData } from "@/app/hook/userdata"
+import LoadingAnimation from "@/components/ui/loadinganimation"
 
 const Hangman: React.FC = () => {
   const { gameMode, termsIndex } = useContext(PracticeModalContext)
@@ -33,8 +35,7 @@ const Hangman: React.FC = () => {
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [gameMessage, setGameMessage] = useState<string>("")
 
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
+  const { isLoading } = useUserData()
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {
@@ -74,18 +75,6 @@ const Hangman: React.FC = () => {
     setScore(0)
     setGameMessage("")
   }
-
-  useEffect(() => {
-    fetch("/api/user").then(res => {
-      if (res.status === 401) {
-        return router.push("/")
-      } else if (!res.ok) {
-        throw new Error("Failed to fetch user data")
-      }
-      setIsLoading(false)
-      return res.json()
-    })
-  }, [])
 
   useEffect(() => {
     setHydrated(true)
@@ -132,11 +121,7 @@ const Hangman: React.FC = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
-      </div>
-    )
+    return <LoadingAnimation />
   }
 
   return (
