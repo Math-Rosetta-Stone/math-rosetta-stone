@@ -1,8 +1,7 @@
-import { GAMES } from "../constants"
-export type SelectGameMethod = () => "hangman" | "mcq" | "matching" | "logo"
+import { Game, GAMES } from "../constants"
+export type SelectGameMethod = () => Game
 
 export const selectRandomGame: SelectGameMethod = () => {
-
-    const randomIndex = Math.floor(Math.random() * GAMES.length);
-    return GAMES[randomIndex];
-};
+  const randomIndex = Math.floor(Math.random() * GAMES.length)
+  return GAMES[randomIndex]
+}

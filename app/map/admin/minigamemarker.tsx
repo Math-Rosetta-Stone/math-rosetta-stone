@@ -2,17 +2,23 @@ import React from "react"
 import { Marker } from "react-leaflet"
 import { useRouter } from "next/navigation"
 import { DivIcon, LatLngExpression } from "leaflet"
-import { selectRandomGame } from "../../helpers/selectgame"
+import { selectRandomGame } from "../helpers/selectgame"
 import { Position } from "@/types/map"
 import { GameAndRandom } from "@/types/map"
 
 interface MiniGameMarkerProps {
   location: Position
+  onDragEnd: (position: Position) => void
   targetGame: GameAndRandom
 }
 
-const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ location, targetGame }) => {
+const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ location, onDragEnd, targetGame }) => {
   const router = useRouter()
+
+  const handleDragEnd = (e: L.DragEndEvent) => {
+    const newLatLng = e.target.getLatLng()
+    onDragEnd({ x: newLatLng.lng, y: newLatLng.lat })
+  }
 
   const handleClick = () => {
     if (targetGame === "random") {
@@ -34,7 +40,9 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ location, targetGame })
     <Marker
       position={position}
       icon={icon}
+      draggable={true}
       eventHandlers={{
+        dragend: handleDragEnd,
         click: handleClick,
       }}
     />

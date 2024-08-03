@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { MapContainer, ImageOverlay } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import MiniGameMarker from "./marker/minigamemarker"
 import MapComponent from "./mapcomponent"
-import { selectRandomGame } from "../helpers/selectgame"
 
-import { MapMarker } from "./marker/mapmarker"
-import { GameMapManager } from "@/types/map"
-import { MAP_BOUNDS, LAND_MAPS_PATHS } from "../constants"
+import { MAP_BOUNDS } from "../constants"
 import { Level } from "@/types/db"
+import { MapContext } from "@/app/contexts/mapproviders"
 
-type GameMapProps = {
-  gameMapManager: GameMapManager
-}
-
-const GameMap: React.FC<GameMapProps> = ({ gameMapManager }) => {
-  const [currMapPath, setCurrMapPath] = useState<string>(LAND_MAPS_PATHS[gameMapManager.currLand])
+const GameMap: React.FC = () => {
+  const { currMapPath } = useContext(MapContext)
   const [levels, setLevels] = useState<Level[]>([])
 
   //TODO: fetch call mini markers location
@@ -57,35 +51,8 @@ const GameMap: React.FC<GameMapProps> = ({ gameMapManager }) => {
       >
         <MapComponent bounds={MAP_BOUNDS} />
         <ImageOverlay url={`/${currMapPath}`} bounds={MAP_BOUNDS} />
-        {gameMapManager.markers.map((marker, index) =>
-          marker.type === "minigame" ? (
-            <MiniGameMarker
-              key={index}
-              location={marker.position}
-              targetGame={marker.targetGame}
-              onDragEnd={newPosition => gameMapManager.updateMarkers(index, newPosition)}
-              selectGame={selectRandomGame}
-            />
-          ) : (
-            <MapMarker
-              key={index}
-              location={marker.position}
-              onDragEnd={newPosition => gameMapManager.updateMarkers(index, newPosition)}
-              setMapPath={setCurrMapPath}
-              gameMapManager={gameMapManager}
-              targetChapter={marker.targetChapter}
-              targetLand={marker.targetLand}
-            />
-          )
-        )}
         {levels.map((level, index) => (
-          <MiniGameMarker
-            key={index}
-            location={{ x: level.x, y: level.y }}
-            targetGame={level.minigame_name}
-            onDragEnd={newPosition => gameMapManager.updateMarkers(index, newPosition)}
-            selectGame={selectRandomGame}
-          />
+          <MiniGameMarker key={index} location={{ x: level.x, y: level.y }} targetGame={level.minigame_name} />
         ))}
       </MapContainer>
     </div>
