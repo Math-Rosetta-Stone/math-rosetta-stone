@@ -1,5 +1,6 @@
 import { PracticeModalProvider } from "./practicemodelproviders"
 import { MapProviders } from "./mapproviders"
+import { PermissionProvider } from "./permissionproviders"
 
 interface AppProvidersProps {
   children: React.ReactNode
@@ -7,9 +8,11 @@ interface AppProvidersProps {
 
 const AppProviders = ({ children }: AppProvidersProps) => {
   return (
-    <MapProviders>
-      <PracticeModalProvider>{children}</PracticeModalProvider>
-    </MapProviders>
+    <PermissionProvider>
+      <MapProviders>
+        <PracticeModalProvider>{children}</PracticeModalProvider>
+      </MapProviders>
+    </PermissionProvider>
   )
 }
 
