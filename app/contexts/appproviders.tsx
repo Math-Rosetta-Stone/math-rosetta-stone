@@ -1,6 +1,7 @@
 import { PracticeModalProvider } from "./practicemodelproviders"
 import { MapProviders } from "./mapproviders"
 import { PermissionProvider } from "./permissionproviders"
+import { GamePositionProvider } from "./gamepositionproviders"
 
 interface AppProvidersProps {
   children: React.ReactNode
@@ -8,11 +9,13 @@ interface AppProvidersProps {
 
 const AppProviders = ({ children }: AppProvidersProps) => {
   return (
-    <PermissionProvider>
-      <MapProviders>
-        <PracticeModalProvider>{children}</PracticeModalProvider>
-      </MapProviders>
-    </PermissionProvider>
+    <GamePositionProvider>
+      <PermissionProvider>
+        <MapProviders>
+          <PracticeModalProvider>{children}</PracticeModalProvider>
+        </MapProviders>
+      </PermissionProvider>
+    </GamePositionProvider>
   )
 }
 

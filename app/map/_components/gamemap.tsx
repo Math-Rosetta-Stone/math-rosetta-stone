@@ -29,7 +29,6 @@ const GameMap: React.FC = () => {
           }),
         })
         const content = await rawResponse.json()
-        console.log(content)
         setLevels(content.payload)
       } catch (error) {
         console.error("Error fetching data:", error)
@@ -52,7 +51,7 @@ const GameMap: React.FC = () => {
         <MapComponent bounds={MAP_BOUNDS} />
         <ImageOverlay url={`/${currMapPath}`} bounds={MAP_BOUNDS} />
         {levels.map((level, index) => (
-          <MiniGameMarker key={index} location={{ x: level.x, y: level.y }} targetGame={level.minigame_name} />
+          <MiniGameMarker key={index} level={level} />
         ))}
       </MapContainer>
     </div>

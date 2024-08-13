@@ -1,12 +1,12 @@
 "use client"
 
 import { createContext, ReactNode, useState, useContext } from "react"
-import { usePermissions } from "@/app/hook/usePermission"
 import { GamePosition } from "@/types/db"
+import { useRouter } from "next/navigation"
 
 interface PermissionContextProps {
   permissions: GamePosition
-  updatePermissions: (branch_no: number) => void
+  updatePermissions: (newPermissions: Partial<GamePosition>) => void
 }
 
 const PermissionContext = createContext<PermissionContextProps>({
@@ -19,7 +19,28 @@ const PermissionContext = createContext<PermissionContextProps>({
 })
 
 const PermissionProvider = ({ children }: { children: ReactNode }) => {
-  const { permissions, setPermissions } = usePermissions()
+  const router = useRouter()
+  const [permissions, setPermissions] = useState<GamePosition>({
+    branch_no: 1,
+    chapter_no: 1,
+    level_no: 1,
+  })
+  const fetchPermission = async () => {
+    try {
+      const res = await fetch("/api/user")
+      if (res.status === 401) {
+        router.push("/")
+      } else if (!res.ok) {
+        throw new Error("Failed to fetch user data")
+      } else {
+        const data = await res.json()
+        setPermissions({ level_no: data.curr_level_no, chapter_no: data.curr_chapter_no, branch_no: data.curr_branch_no })
+      }
+    } catch (error) {
+      console.error(error)
+      router.push("/")
+    }
+  }
 
   const updatePermissions = (newPermissions: Partial<GamePosition>) => {
     setPermissions(prevState => ({
@@ -39,9 +60,4 @@ const PermissionProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
-// Custom hook to use the PermissionContext
-const usePermissionContext = () => {
-  return useContext(PermissionContext)
-}
-
-export { PermissionProvider, usePermissionContext }
+export { PermissionProvider, PermissionContext }

@@ -11,7 +11,7 @@ import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
 import LoadingAnimation from "@/components/ui/loadinganimation"
 import { useUserData } from "@/app/hook/userdata"
 
-const TIME_LIMIT = 20 // in seconds
+const TIME_LIMIT = 30 // in seconds
 
 // const termToDefinition: { [key: string]: string } = {
 //   derivative: "rate of change",

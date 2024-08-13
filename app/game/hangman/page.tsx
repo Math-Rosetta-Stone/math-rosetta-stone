@@ -19,6 +19,7 @@ import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
 import "./hangman.css"
 import { useUserData } from "@/app/hook/userdata"
 import LoadingAnimation from "@/components/ui/loadinganimation"
+import NextGameButton from "../permission/_components/nextgame"
 
 const Hangman: React.FC = () => {
   const { gameMode, termsIndex } = useContext(PracticeModalContext)
@@ -193,13 +194,18 @@ const Hangman: React.FC = () => {
                 {` You scored ${score - 1}/${mockDb.length}`}
               </div>
 
-              <Button
-                className="border hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
-                variant="default"
-                onClick={handleRestart}>
-                <RotateCcw className="mr-2" />
-                Restart
-              </Button>
+              {score - 1 !== mockDb.length ? (
+                <Button
+                  className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
+                ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
+                  variant="default"
+                  onClick={handleRestart}>
+                  <RotateCcw className="mr-2" />
+                  Restart
+                </Button>
+              ) : (
+                <NextGameButton />
+              )}
             </motion.div>
           )}
         </AnimatePresence>
