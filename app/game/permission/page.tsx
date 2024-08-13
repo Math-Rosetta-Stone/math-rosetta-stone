@@ -22,8 +22,8 @@ const PermissionPage = () => {
         branch_no: permissions.branch_no,
         chapter_no: permissions.chapter_no,
       }
-
-      updatePermissions(newGamePosition)
+      // TODO: need to update chapter if no more levels
+      updatePermissions({ level_no: permissions.level_no + 1 })
 
       const updatePermissionDB = async () => {
         try {
@@ -43,7 +43,6 @@ const PermissionPage = () => {
       setGamePosition(null)
       updatePermissionDB()
       router.push("/map")
-      console.log(JSON.stringify(newGamePosition))
     }
   }, [gamePosition, permissions, setGamePosition, updatePermissions])
 
