@@ -12,70 +12,39 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 const TIME_LIMIT = 5; // in seconds
-
-const mockDb: TermItem[] = [
-  {
-    term: "derivative",
-    definition: "rate of change",
-    image: {
-      title: "Derivative",
-      url: "/derivative.jpg",
-    },
-  },
-  {
-    term: "integral",
-    definition: "area under the curve",
-    image: {
-      title: "Integral",
-      url: "/integral.jpg",
-    },
-  },
-  {
-    term: "limit",
-    definition: "approaching a value",
-    image: {
-      title: "Limit",
-      url: "/limit.png",
-    },
-  },
-  {
-    term: "function",
-    definition: "relation between inputs and outputs",
-    image: {
-      title: "Function",
-      url: "/function.jpg",
-    },
-  },
-  {
-    term: "slope",
-    definition: "steepness of a line",
-    image: {
-      title: "Slope",
-      url: "/slope.jpg",
-    },
-  },
-  {
-    term: "tangent",
-    definition: "line that touches a curve",
-    image: {
-      title: "Tangent",
-      url: "/tangent.png",
-    },
-  },
-];
+let mockDb: any[] = [];
 
 const McqGame = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
-  const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb));
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter((item) => item.term !== currQuestion.term));
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
+  const [currQuestion, setCurrQuestion] = useState([]);
+  const [availableQuestions, setAvailableQuestions] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/terms')
+      .then((res) => { 
+        if (!res.ok) {
+          throw new Error("Failed to fetch terms data")
+        }
+        return res.json()
+      })
+      .then(data => {
+        mockDb = data.payload
+        setIsLoading(false)
+        setCurrQuestion(getOneRandom(mockDb));
+        setAvailableQuestions(mockDb.filter((item:any) => item.term !== currQuestion.term));
+        console.log(mockDb)
+      })
+      .catch((err) => console.error("ERROR", err))
+  }, []);
+  
   const getChoices = (question: TermItem) => {
     const wrongChoices = shuffle(mockDb.filter((item) => item.term !== question.term)).slice(0, 3);
     return shuffle([question, ...wrongChoices]);

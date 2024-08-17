@@ -6,68 +6,19 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import { AnimatePresence, motion } from "framer-motion";
 import { Mcq } from "./_components/Mcq";
 import { Button } from "@/components/ui/button";
-import { PromptType } from "@/types/mcq";
+import { PromptType, TermItem } from "@/types/mcq";
 import { useRouter } from "next/navigation";
 
 const TIME_LIMIT = 10; // in seconds
 
-const mockDb = [
-  {
-    term: "derivative",
-    definition: "rate of change",
-    image: {
-      title: "Derivative",
-      url: "/derivative.jpg",
-    },
-  },
-  {
-    term: "integral",
-    definition: "area under the curve",
-    image: {
-      title: "Integral",
-      url: "/integral.jpg",
-    },
-  },
-  {
-    term: "limit",
-    definition: "approaching a value",
-    image: {
-      title: "Limit",
-      url: "/limit.png",
-    },
-  },
-  {
-    term: "function",
-    definition: "relation between inputs and outputs",
-    image: {
-      title: "Function",
-      url: "/function.jpg",
-    },
-  },
-  {
-    term: "slope",
-    definition: "steepness of a line",
-    image: {
-      title: "Slope",
-      url: "/slope.jpg",
-    },
-  },
-  {
-    term: "tangent",
-    definition: "line that touches a curve",
-    image: {
-      title: "Tangent",
-      url: "/tangent.png",
-    },
-  },
-];
+let mockDb: TermItem[] = []; // Now this is empty initially
 
 const McqGame = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
-  const [currQuestion, setCurrQuestion] = useState(getOneRandom(mockDb));
-  const [availableQuestions, setAvailableQuestions] = useState(mockDb.filter((item) => item.term !== currQuestion.term));
+  const [currQuestion, setCurrQuestion] = useState<TermItem | null>(null);
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>([]);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
@@ -86,7 +37,7 @@ const McqGame = () => {
 
   const [currPromptType, setCurrPromptType] = useState(getRandomPromptType());
 
-  const getChoices = (question: { term: string; definition: any; }, choiceType: PromptType) => {
+  const getChoices = (question: TermItem, choiceType: PromptType) => {
     const wrongChoices = shuffle(mockDb.filter((item) => item.term !== question.term)).slice(0, 3);
     const choices = shuffle([
       { term: choiceType === PromptType.TERM ? question.term : undefined, definition: choiceType === PromptType.DEF ? question.definition : undefined },
@@ -97,7 +48,43 @@ const McqGame = () => {
     ]);
     return choices;
   };
-  const [currChoices, setCurrChoices] = useState(getChoices(currQuestion, currPromptType));
+
+  const [currChoices, setCurrChoices] = useState<TermItem[]>([]); // Initially empty
+
+  useEffect(() => {
+    // Fetch terms data from API
+    fetch('/api/terms')
+      .then((res) => { 
+        if (!res.ok) {
+          throw new Error("Failed to fetch terms data");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        mockDb = data.payload;
+        setIsLoading(false);
+        
+        // Initialize questions and choices
+        const initialQuestion = getOneRandom(mockDb);
+        setCurrQuestion(initialQuestion);
+        setAvailableQuestions(mockDb.filter((item) => item.term !== initialQuestion.term));
+        setCurrChoices(getChoices(initialQuestion, getRandomPromptType()));
+      })
+      .catch((err) => console.error("ERROR", err));
+  }, []);
+
+  useEffect(() => {
+    setHydrated(true);
+    const interval = setInterval(() => {
+      if (timeLeft > 0 && !timerStopped) {
+        setTimeLeft((prevTime) => prevTime - 1);
+      } else if (timeLeft === 0 && !formSubmitted) {
+        handleSubmit(); // Automatically submit when the timer reaches 0
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerStopped, timeLeft]);
 
   const handleSubmit = () => {
     setTimerStopped(true);
@@ -111,10 +98,8 @@ const McqGame = () => {
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {  // if no more questions, stop the game
-      // to mark no more questions left
-      setCurrQuestion({...currQuestion, term: ""});
+      setCurrQuestion({...currQuestion, term: ""} as TermItem);
 
-      // stop the timer and set time left to 0 (purely aesthetic)
       setTimerStopped(true);
       setTimeLeft(0);
     } else {
@@ -150,40 +135,9 @@ const McqGame = () => {
     setFormSubmitted(false);
     setScore(0);
     setCurrChoices(getChoices(newQuestion, newPromptType));
-    setCurrPromptType(newPromptType);
   };
 
-  useEffect(() => {
-    fetch("/api/user")
-      .then((res) => {
-        if (res.status === 401) {
-          return router.push("/");
-        } else if (!res.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-        setIsLoading(false);
-        return res.json()
-      });
-  }, []);
-
-  useEffect(() => {
-    setHydrated(true);
-    const interval = setInterval(() => {
-      if (timeLeft > 0 && !timerStopped) {
-        setTimeLeft((prevTime) => prevTime - 1);
-      } else if (timeLeft === 0 && !formSubmitted) {
-        handleSubmit(); // Automatically submit when the timer reaches 0
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timerStopped, timeLeft]);
-
-  if (!hydrated) {
-    return null;
-  }
-
-  if (isLoading) {
+  if (!hydrated || isLoading || !currQuestion) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
