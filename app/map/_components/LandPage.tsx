@@ -24,7 +24,6 @@ const LandPage: React.FC<LandPageProps> = ({ title, imageUrl, clickableDots = []
         <Image
           src={imageUrl}
           alt={title}
-          layout="responsive"
           width={1920} // Replace with the actual width of your image
           height={1080} // Replace with the actual height of your image
           className="w-full h-auto mb-4"
