@@ -1,13 +1,18 @@
 "use client"
 
 import { useEffect, useState } from "react"
-
+import MainMap from "@/app/map/_components/MainMap";
 import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
 import { signout } from "./actions"
 
+// Define the User type
+type User = {
+  payload: any
+}
+
 export default function Home() {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [animationKey, setAnimationKey] = useState(0)
 
@@ -75,7 +80,7 @@ export default function Home() {
               hover:no-underline">
                 Sign in
               </Link>{" "}
-              to get back in action! Don't have an account ?{" "}
+              to get back in action! Don&apos;t have an account ?{" "}
               <Link
                 href="/signup"
                 className="ease-in-out duration-200
@@ -92,9 +97,11 @@ export default function Home() {
 
         {user && (
           <>
-            <div className="text-4xl font-black">Hello, {user.username}!</div>
+            <div className="text-4xl font-black">Hello, {user.payload.username}!</div>
 
             <div className="max-w-40 text-wrap">{JSON.stringify(user)}</div>
+
+            <MainMap />
 
             <Link
               href="/game"
