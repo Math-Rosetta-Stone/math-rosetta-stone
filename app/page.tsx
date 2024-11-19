@@ -99,7 +99,9 @@ export default function Home() {
           <>
             <div className="text-4xl font-black">Hello, {user.payload.username}!</div>
 
-            <div className="max-w-40 text-wrap">{JSON.stringify(user)}</div>
+            {/* <div className="max-w-40 text-wrap">{JSON.stringify(user)}</div> */}
+
+          <div className="text-2xl font-black">Welcome to Main Map</div>
 
             <MainMap />
 

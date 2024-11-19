@@ -16,8 +16,8 @@ const MainMap: React.FC = () => {
         src="/intermap.png"
         alt="Intermap"
         layout="responsive"
-        width={1920} // Replace with the actual width of your image
-        height={1080} // Replace with the actual height of your image
+        width={1920} 
+        height={1080} 
         className="w-full h-auto"
       />
       {clickableDots.map((dot) => (

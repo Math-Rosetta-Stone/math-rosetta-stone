@@ -72,3 +72,20 @@ export const level = mysqlTable("level", {
     unique: unique().on(table.chapter_no, table.branch_no, table.x, table.y),
   };
 });
+
+export const permission = mysqlTable("permission", {
+  user_id: varchar("user_id", { length: 255 }).notNull().references(() => user.id),
+  curr_branch_no: int("curr_branch_no").notNull(),
+  curr_chapter_no: int("curr_chapter_no").notNull(),
+  curr_level_no: int("curr_level_no").notNull(),
+}, (table) => {
+  return {
+    primaryKey: primaryKey({
+      columns: [table.user_id, table.curr_branch_no]
+    }),
+    foreignKey: foreignKey({
+      columns: [table.curr_branch_no, table.curr_chapter_no, table.curr_level_no],
+      foreignColumns: [level.branch_no, level.chapter_no, level.level_no],
+    }),
+  };
+});
