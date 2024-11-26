@@ -71,6 +71,7 @@ export async function PUT(request: Request, context: any) {
 
     return NextResponse.json({ payload: updatedPermission }, { status: 200 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: error }, { status: 500 });
   }
 }

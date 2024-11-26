@@ -24,8 +24,8 @@ const LandPage: React.FC<LandPageProps> = ({ title, imageUrl, clickableDots = []
         <Image
           src={imageUrl}
           alt={title}
-          width={1920} 
-          height={1080} 
+          width={1920}
+          height={1080}
           className="w-full h-auto mb-4"
         />
         {clickableDots.map((dot) => (
