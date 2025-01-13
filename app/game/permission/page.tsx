@@ -1,4 +1,5 @@
 "use client"
+
 import { useRouter } from "next/navigation"
 import { PermissionContext } from "@/app/contexts/permissionproviders"
 import { useContext, useEffect } from "react"
@@ -13,30 +14,54 @@ const PermissionPage = () => {
   useEffect(() => {
     if (
       gamePosition &&
-      gamePosition.level_no === permissions.level_no &&
-      gamePosition.branch_no === permissions.branch_no &&
-      gamePosition.chapter_no === permissions.chapter_no
+      permissions.some(
+        permission =>
+          permission.level_no === gamePosition.level_no &&
+          permission.branch_no === gamePosition.branch_no &&
+          permission.chapter_no === gamePosition.chapter_no
+      )
     ) {
+      const currentPermission = permissions.find(
+        permission =>
+          permission.level_no === gamePosition.level_no &&
+          permission.branch_no === gamePosition.branch_no &&
+          permission.chapter_no === gamePosition.chapter_no
+      )
+
+      if (!currentPermission) return
+
       const newGamePosition = {
-        level_no: permissions.level_no + 1,
-        branch_no: permissions.branch_no,
-        chapter_no: permissions.chapter_no,
+        level_no: currentPermission.level_no + 1,
+        branch_no: currentPermission.branch_no,
+        chapter_no: currentPermission.chapter_no,
       }
-      // TODO: need to update chapter if no more levels
-      updatePermissions({ level_no: permissions.level_no + 1 })
+
+      updatePermissions(newGamePosition)
 
       const updatePermissionDB = async () => {
         try {
-          await fetch("/api/user", {
-            method: "POST",
+          const response = await fetch(`/api/permission/${newGamePosition.branch_no}`, {
+            method: "PUT",
             headers: {
-              Accept: "application/json",
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(newGamePosition),
+            body: JSON.stringify({
+              updatedChapterNo: newGamePosition.chapter_no,
+              updatedLevelNo: newGamePosition.level_no,
+            }),
           })
+
+          if (!response.ok) {
+            const data = await response.json()
+            console.error("Error updating permission:", data.error || "Unknown error")
+            return
+          }
+
+          const data = await response.json()
+          updatePermissions(data.payload)
+          console.log("Updated permissions:", permissions)
         } catch (error) {
-          console.error("Error updating permissions in DB:", error)
+          console.error("Failed to update permissions:", error)
         }
       }
 
