@@ -3,9 +3,11 @@ import { Marker } from "react-leaflet"
 import { useRouter } from "next/navigation"
 import { DivIcon, LatLngExpression } from "leaflet"
 import { selectRandomGame } from "../../helpers/selectgame"
-import { Level } from "@/types/db"
+import { GamePosition, Level } from "@/types/db"
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders"
 import { PermissionContext } from "@/app/contexts/permissionproviders"
+import { MapContext } from "@/app/contexts/mapproviders"
+import { Land_to_branch_no } from "../../constants"
 
 interface MiniGameMarkerProps {
   level: Level
@@ -15,6 +17,7 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ level }) => {
   const router = useRouter()
   const { setGamePosition } = useContext(GamePositionContext)
   const { permissions } = useContext(PermissionContext)
+  const { currLand, currChapter } = useContext(MapContext)
 
   const handleClick = () => {
     setGamePosition({ level_no: level.level_no, branch_no: level.branch_no, chapter_no: level.chapter_no })
@@ -26,12 +29,14 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ level }) => {
     }
   }
 
-  const isPermissionHigher =
-    permissions.branch_no > level.branch_no ||
-    (permissions.branch_no === level.branch_no && permissions.chapter_no > level.chapter_no) ||
-    (permissions.branch_no === level.branch_no && permissions.chapter_no === level.chapter_no && permissions.level_no > level.level_no)
+  const have_permission = (permissions: GamePosition[], level: Level) => {
+    console.log(permissions)
+    const permission = permissions.filter(permission => permission.branch_no === Land_to_branch_no[currLand])[0]
+    if (permission.chapter_no > currChapter || (permission.chapter_no === currChapter && permission.level_no > level.level_no)) return true
+    return false
+  }
 
-  const iconColor = isPermissionHigher ? "green" : "red"
+  const iconColor = have_permission(permissions, level) ? "green" : "red"
 
   const icon = new DivIcon({
     className: "custom-div-icon",

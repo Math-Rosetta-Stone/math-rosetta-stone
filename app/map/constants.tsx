@@ -16,6 +16,20 @@ export const LAND_MAPS_PATHS: LandMapsPaths = {
   Island: "map.png",
   InterMap: "intermap.png",
   Plain: "map1.png",
+  Land1: "land/land1.png",
+  Land2: "land/land2.png",
+  Land3: "land/land3.png",
+  Land4: "land/land4.png",
+}
+
+export const Land_to_branch_no = {
+  Island: 1,
+  InterMap: 2,
+  Plain: 3,
+  Land1: 4,
+  Land2: 5,
+  Land3: 6,
+  Land4: 7,
 }
 
 type Image = {

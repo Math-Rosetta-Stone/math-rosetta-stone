@@ -14,8 +14,8 @@ interface MapContextProps {
 
 const MapContext = createContext<MapContextProps>({
   currChapter: 1,
-  currLand: "Island",
-  currMapPath: LAND_MAPS_PATHS["Island"],
+  currLand: "InterMap",
+  currMapPath: LAND_MAPS_PATHS["InterMap"],
   setCurrLand: (land: Land) => {},
   setCurrChapter: (chapter: Chapter) => {},
   setCurrMapPath: (path: string) => {},
@@ -23,7 +23,7 @@ const MapContext = createContext<MapContextProps>({
 
 const MapProviders = ({ children }: Readonly<{ children: ReactNode }>) => {
   const [currChapter, setCurrChapter] = useState<Chapter>(1)
-  const [currLand, setCurrLand] = useState<Land>("Island")
+  const [currLand, setCurrLand] = useState<Land>("InterMap")
   const [currMapPath, setCurrMapPath] = useState<string>(LAND_MAPS_PATHS[currLand])
 
   return (
