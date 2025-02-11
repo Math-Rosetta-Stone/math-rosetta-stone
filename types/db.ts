@@ -1,9 +1,9 @@
 import { GameAndRandom } from "./map"
 
 export type GamePosition = {
-  level_no: number
-  chapter_no: number
   branch_no: number
+  chapter_no: number
+  level_no: number
 }
 
 export type Level = {

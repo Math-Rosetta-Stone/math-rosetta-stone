@@ -1,5 +1,5 @@
 "use client"
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSearch, faChalkboardTeacher } from "@fortawesome/free-solid-svg-icons"
 import "./css/map.css"
@@ -9,6 +9,7 @@ import dynamic from "next/dynamic"
 import LoadingAnimation from "@/components/ui/loadinganimation"
 import { useUserData } from "../hook/userdata"
 import { MapContext } from "../contexts/mapproviders"
+import { initGameData } from "../hook/initGameData"
 const GameMap = dynamic(() => import("./_components/gamemap"), { ssr: false })
 
 const Map: React.FC = () => {
@@ -20,6 +21,10 @@ const Map: React.FC = () => {
   if (isLoading) {
     return <LoadingAnimation />
   }
+
+  useEffect(() => {
+    initGameData()
+  }, [])
 
   return (
     <div className="w-screen h-screen bg-blue-900 flex flex-col">
