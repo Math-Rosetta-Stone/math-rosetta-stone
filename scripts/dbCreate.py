@@ -71,6 +71,8 @@ def insert_languages():
         cursor.execute(insert_language_query, (lang,))
     conn.commit()
     print("Successfully inserted languages...\n")
+    
+    
 
 def insert_branches():
     branches = [
