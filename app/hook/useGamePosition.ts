@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { GamePosition } from "@/types/db"
-import { useUser } from "./useUser"
-import { SelectBranch, SelectChapter } from "../db/schema"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GamePosition } from "@/types/db";
+import { useUser } from "./useUser";
+import { SelectBranch, SelectChapter } from "../db/schema";
 
 const INITIAL_GAME_POSITION: GamePosition[] = [
   {
@@ -39,54 +39,88 @@ const INITIAL_GAME_POSITION: GamePosition[] = [
     chapter_no: 1,
     level_no: 1,
   },
-]
+];
+
+const INITIAL_CURR_BRANCH: number = 0;
 
 export const useGamePosition = () => {
-  const queryClient = useQueryClient()
-  const { user } = useUser()
+  const queryClient = useQueryClient();
+  const { user } = useUser();
 
-  queryClient.setQueryData(["gamePosition", user?.id], INITIAL_GAME_POSITION)
+  if (!queryClient.getQueryData(["gamePosition", user?.id])) {
+    queryClient.setQueryData(["gamePosition", user?.id], INITIAL_GAME_POSITION);
+  }
+  if (!queryClient.getQueryData(["currBranch"])) {
+    queryClient.setQueryData(["currBranch"], INITIAL_CURR_BRANCH);
+  }
 
   const updateGamePosition = useMutation({
     mutationFn: async (newPosition: GamePosition) => {
-      const currentPosition = queryClient.getQueryData<GamePosition[]>(["gamePosition", user?.id])
+      const currentPosition = queryClient.getQueryData<GamePosition[]>([
+        "gamePosition",
+        user?.id,
+      ]);
 
       if (!currentPosition) {
-        return INITIAL_GAME_POSITION
+        return INITIAL_GAME_POSITION;
       }
 
-      currentPosition[newPosition.branch_no] = newPosition
-      return currentPosition
+      currentPosition[newPosition.branch_no] = newPosition;
+      return currentPosition;
     },
     onSuccess: newPosition => {
-      queryClient.setQueryData(["gamePosition", user?.id], newPosition)
-      queryClient.invalidateQueries({ queryKey: ["gamePosition", user?.id] })
+      queryClient.setQueryData(["gamePosition", user?.id], newPosition);
     },
-  })
+  });
 
-  const incrementPosition = (branch_no: number) => {
-    const chapters = queryClient.getQueryData<SelectChapter[]>(["chapters", user?.id])
-    const branches = queryClient.getQueryData<SelectBranch[]>(["branches", user?.id])
-    let currentPosition = queryClient.getQueryData<GamePosition[]>(["gamePosition", user?.id])
+  const incrementGamePosition = (branch_no: number) => {
+    const chapters = queryClient.getQueryData<SelectChapter[]>([
+      "chapters",
+      user?.id,
+    ]);
+    const branches = queryClient.getQueryData<SelectBranch[]>([
+      "branches",
+      user?.id,
+    ]);
+    let currentPosition = queryClient.getQueryData<GamePosition[]>([
+      "gamePosition",
+      user?.id,
+    ]);
     if (!currentPosition) {
-      currentPosition = INITIAL_GAME_POSITION
+      currentPosition = INITIAL_GAME_POSITION;
     }
-    const newPosition = currentPosition[branch_no]
-    const isLastChapter: boolean = branches?.[newPosition.branch_no].no_of_chapters === newPosition.chapter_no
-    const isLastLevel: boolean = chapters?.[newPosition.chapter_no].no_of_minigames === newPosition.level_no
-    newPosition.level_no = isLastLevel && !isLastChapter ? 1 : newPosition.level_no + 1
-    newPosition.chapter_no = isLastLevel && !isLastChapter ? 1 : newPosition.chapter_no + 1
+    const newPosition = currentPosition[branch_no];
+    const isLastChapter: boolean =
+      branches?.[newPosition.branch_no].no_of_chapters ===
+      newPosition.chapter_no;
+    const isLastLevel: boolean =
+      chapters?.[newPosition.chapter_no].no_of_minigames ===
+      newPosition.level_no;
+    newPosition.level_no =
+      isLastLevel && !isLastChapter ? 1 : newPosition.level_no + 1;
+    newPosition.chapter_no =
+      isLastLevel && !isLastChapter ? 1 : newPosition.chapter_no + 1;
 
-    updateGamePosition.mutate(newPosition)
-  }
+    updateGamePosition.mutate(newPosition);
+  };
 
-  const setPosition = (position: GamePosition) => {
-    updateGamePosition.mutate(position)
-  }
+  const setGamePosition = (position: GamePosition) => {
+    updateGamePosition.mutate(position);
+  };
+
+  const setCurrBranch = (branch_no: number) => {
+    queryClient.setQueryData(["currBranch"], branch_no);
+    queryClient.invalidateQueries({ queryKey: ["currBranch"] });
+  };
 
   return {
-    incrementPosition,
-    setPosition,
+    gamePosition: queryClient.getQueryData<GamePosition[]>([
+      "gamePosition",
+    ]) as GamePosition[],
+    incrementGamePosition,
+    currBranch: queryClient.getQueryData<number>(["currBranch"]) as number,
+    setCurrBranch,
+    setGamePosition,
     isPending: updateGamePosition.isPending,
-  }
-}
+  };
+};

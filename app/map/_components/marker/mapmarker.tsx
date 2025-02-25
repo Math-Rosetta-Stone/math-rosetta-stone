@@ -1,29 +1,46 @@
-import React, { useContext } from "react"
-import { Marker } from "react-leaflet"
-import { DivIcon, LatLngExpression } from "leaflet"
-import { GameMapManager, Position, Land, Chapter } from "@/types/map"
-import { LAND_MAPS_PATHS } from "../../constants"
-import { MapContext } from "@/app/contexts/mapproviders"
+import React, { useContext } from "react";
+import { Marker } from "react-leaflet";
+import { DivIcon, LatLngExpression } from "leaflet";
+import { useGamePosition } from "@/app/hook/useGamePosition";
+import { QueryClient } from "@tanstack/react-query";
 
 interface MapMarkerProps {
-  location: { x: number; y: number }
-  targetLand: Land
-  targetChapter: Chapter
+  location: { x: number; y: number };
+  targetBranch: number;
+  targetChapter: number;
+  queryClient: QueryClient;
 }
 
-export const MapMarker: React.FC<MapMarkerProps> = ({ location, targetChapter, targetLand }) => {
-  const { setCurrChapter, setCurrLand, setCurrMapPath } = useContext(MapContext)
+export const MapMarker: React.FC<MapMarkerProps> = ({
+  location,
+  targetBranch,
+  targetChapter,
+  queryClient,
+}) => {
+  const { setGamePosition, setCurrBranch } = useGamePosition();
   const icon = new DivIcon({
     className: "custom-div-icon",
     html: `<div class="custom-marker" style="background-color: yellow; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;"></div>`,
-  })
+  });
 
-  const position: LatLngExpression = [location.y, location.x]
+  const position: LatLngExpression = [location.y, location.x];
+  // TODO:use the setter in useGamePosition to handle set chapter and land
   const handleClick = () => {
-    setCurrChapter(targetChapter)
-    setCurrLand(targetLand)
-    setCurrMapPath(LAND_MAPS_PATHS[targetLand])
-  }
+    // Set branch first
+    setCurrBranch(targetBranch);
+
+    // Then update game position
+    setGamePosition({
+      branch_no: targetBranch,
+      chapter_no: targetChapter,
+      level_no: 0,
+    });
+
+    // Invalidate the levels query
+    queryClient.invalidateQueries({
+      queryKey: ["levels", targetBranch, targetChapter],
+    });
+  };
 
   return (
     <Marker
@@ -34,5 +51,5 @@ export const MapMarker: React.FC<MapMarkerProps> = ({ location, targetChapter, t
         click: handleClick,
       }}
     />
-  )
-}
+  );
+};
