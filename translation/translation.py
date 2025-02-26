@@ -49,15 +49,20 @@ def translate_text_parts(parts, translator, language):
 
 def translate(args):
     # Initialize languages to translate to
-    chinese = Language("Chinese", args.zh_out_col, "ZH", ApiType.DEEPL)
-    french = Language("French", args.fr_out_col, "FR", ApiType.DEEPL)
-    spanish = Language("Spanish", args.es_out_col, "ES", ApiType.DEEPL)
-    portuguese = Language("Portuguese", args.pt_out_col, "PT-BR", ApiType.DEEPL)
-    farsi = Language("Farsi", args.fa_out_col, "fa", ApiType.GOOGLE)
-    hindi = Language("Hindi", args.hi_out_col, "hi", ApiType.GOOGLE)
-    marathi = Language("Marathi", args.mr_out_col, "mr", ApiType.GOOGLE)
+    languages = [
+        Language("Chinese", args.zh_out_col, "ZH", ApiType.DEEPL),
+        Language("French", args.fr_out_col, "FR", ApiType.DEEPL),
+        Language("Spanish", args.es_out_col, "ES", ApiType.DEEPL),
+        Language("Portuguese", args.pt_out_col, "PT-BR", ApiType.DEEPL),
+        Language("Farsi", args.fa_out_col, "fa", ApiType.GOOGLE),
+        Language("Hindi", args.hi_out_col, "hi", ApiType.GOOGLE),
+        Language("Marathi", args.mr_out_col, "mr", ApiType.GOOGLE),
+        Language("Tagalog", args.tl_out_col, "tl", ApiType.GOOGLE),
+    ]
 
-    languages = [french, chinese, spanish, portuguese, hindi, farsi, marathi]
+    # Filter out languages where column number is -1
+    languages = [lang for lang in languages if lang.col_num != -1]
+    print(languages)
 
     # Setup DeepL translator
     auth_key = args.deepl_auth_key
@@ -71,7 +76,6 @@ def translate(args):
     ws = wb[args.sheetname]
 
     for row in range(args.en_start_row, args.en_end_row + 1):
-        # print("ROW:", row)
         src_cell = ws.cell(row=row, column=args.en_col)
         if (src_cell.value is None or
             src_cell.value == "#VALUE!" or
@@ -81,9 +85,10 @@ def translate(args):
             continue
 
         text_parts = extract_text_parts(src_cell.value)
-        # print("TEXT PARTS:", text_parts)
         contains_latex = any(start_delim in part and end_delim in part for part in text_parts)
         is_ready_to_translate = ws.cell(row=row, column=args.ready_to_translate_col)
+        # TODO: remove the contains_latex check because in future, it'll always have latex
+        # so want to respsect is_ready_to_translate
         if not contains_latex and is_ready_to_translate.value != "Ready for Translation":
             print(f"--- Skipping row {row}, no latex and not ready for translation ---")
             continue
@@ -210,9 +215,15 @@ if __name__ == "__main__":
         help="Column number (1-indexed) to store Marathi translations."
     )
     parser.add_argument(
+        "--tl_out_col",
+        default="28",
+        type=int,
+        help="Column number (1-indexed) to store Tagalog/Filipino translations."
+    )
+    parser.add_argument(
         "--been_edited",
         default="",
-        help="Value to change the 'Has the translation been edited?' column to. Yes/No. Leave blank to not change."
+        help="Value to change the 'Has the translation been edited?' column to. No/Yes not Uploaded/Yes Uploaded. Leave blank to not change."
     )
     parser.add_argument(
         "--update_ready_to_translate",

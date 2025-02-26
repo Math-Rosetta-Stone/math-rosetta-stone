@@ -40,7 +40,7 @@ Ensure the following Python libraries are installed (check `import` statements i
    - The column number of the **"Ready to Translate"** column.
    - The column number containing the English text you want to translate.
    - The range of rows you want to translate (separately pass the start and end row).
-   - The column number where you want the translated text to be output for a particular supported language.
+   - The column number where you want the translated text to be output for a particular supported language. -1 if you want to skip this language.
    - What you want the **"Has the translation been edited?"** column to update to (yes/no). If neither is provided, the column remains unchanged.
    - If you want the **"Ready to translate?"** column to be updated to "Translate" upon successful translations, use it's respective flag.
 
