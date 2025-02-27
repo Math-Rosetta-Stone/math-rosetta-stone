@@ -21,7 +21,7 @@ export default function RootLayout({
         <div
           className="fixed top-0 flex flex-row justify-start items-center
           w-full h-[6vh] pt-2 px-3 backdrop-blur-sm
-          font-black"
+          font-black z-50"
         >
           <Link
             href="/"
