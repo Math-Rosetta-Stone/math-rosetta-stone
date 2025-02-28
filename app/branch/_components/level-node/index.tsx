@@ -1,5 +1,6 @@
+import { forwardRef } from "react";
 import Link from "next/link";
-import { GameType, Level } from "../_data/types";
+import { GameType, Level } from "../../_data/types";
 import {
   PersonStanding,
   ClipboardList,
@@ -17,6 +18,7 @@ import {
 import {
   TbMathFunction,
 } from "react-icons/tb";
+import Overlay from "./overlay";
 
 interface LevelNodeProps {
   level: Level;
@@ -25,14 +27,14 @@ interface LevelNodeProps {
 }
 
 const IconWrapper = ({ Icon }: { Icon: React.ElementType }) => (
-  <Icon className="w-10 h-10 text-slate-800 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+  <Icon className="absolute inset-0 h-full w-full opacity-100 group-hover:opacity-0 transition-opacity ease-in duration-100 text-slate-800 p-3" />
 );
 
-const LevelNode = ({
+const LevelNode = forwardRef<HTMLDivElement, LevelNodeProps>(({
   level,
   isLocked,
   isCurrent,
-}: LevelNodeProps) => {
+}, ref) => {
 
   const getGameUrl = () => {
     let game = level.game;
@@ -57,18 +59,26 @@ const LevelNode = ({
   };
 
   return (
-    <Link
-      href={getGameUrl()}
-      className={`relative group flex items-center justify-center h-24 w-24 \
-        ${isCurrent && "outline outline-4 outline-offset-1 outline-slate-700"} border border-slate-800 rounded-full hover:bg-opacity-50 \
-        ${isLocked ? "bg-red-300" : "bg-green-300"}`}
+    <div
+      ref={isCurrent ? ref : undefined}
+      className="absolute"
+      style={{
+        top: `${level.position.y}px`,
+        left: `${level.position.x}px`,
+      }}
     >
-      <div className="absolute opacity-100 group-hover:opacity-0 transition-all duration-300 ease-out font-bold text-5xl">
-        {level.rank}
-      </div>
-      {getGameIcon()}
-    </Link>
+      <Link href={getGameUrl()} className={`${isLocked && "pointer-events-none"}`}>
+        <div
+          className={`relative group aspect-square h-20 w-20 overflow-hidden border border-slate-800 rounded-full \
+          ${isCurrent && "outline outline-4 outline-offset-1 outline-slate-700 bg-amber-300"} \
+          ${!isCurrent && (isLocked ? "bg-red-300" : "bg-green-300")}`}
+        >
+          {getGameIcon()}
+          <Overlay level={level} />
+        </div>
+      </Link>
+    </div>
   );
-};
+});
 
 export default LevelNode;

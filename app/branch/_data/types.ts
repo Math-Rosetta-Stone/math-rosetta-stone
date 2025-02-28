@@ -8,7 +8,13 @@ export enum GameType {
   MYSTERY = "mystery",
 };
 
+export type Point = {
+  x: number;
+  y: number;
+};
+
 export type Level = {
   rank: number;
   game: GameType;
+  position: Point;
 };
