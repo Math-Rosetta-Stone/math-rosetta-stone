@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Marker } from "react-leaflet";
 import { DivIcon, LatLngExpression } from "leaflet";
-import { useGamePosition } from "@/app/hook/useGamePosition";
+import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { QueryClient } from "@tanstack/react-query";
 
 interface MapMarkerProps {
@@ -9,6 +9,7 @@ interface MapMarkerProps {
   targetBranch: number;
   targetChapter: number;
   queryClient: QueryClient;
+  setImageOverlayKey: (key: number) => void;
 }
 
 export const MapMarker: React.FC<MapMarkerProps> = ({
@@ -16,8 +17,9 @@ export const MapMarker: React.FC<MapMarkerProps> = ({
   targetBranch,
   targetChapter,
   queryClient,
+  setImageOverlayKey,
 }) => {
-  const { setGamePosition, setCurrBranch } = useGamePosition();
+  const { setGamePosition, setCurrBranch } = useContext(GamePositionContext);
   const icon = new DivIcon({
     className: "custom-div-icon",
     html: `<div class="custom-marker" style="background-color: yellow; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;"></div>`,
@@ -40,6 +42,7 @@ export const MapMarker: React.FC<MapMarkerProps> = ({
     queryClient.invalidateQueries({
       queryKey: ["levels", targetBranch, targetChapter],
     });
+    setImageOverlayKey(targetBranch);
   };
 
   return (

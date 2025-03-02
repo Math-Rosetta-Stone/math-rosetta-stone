@@ -13,7 +13,7 @@ import LoadingAnimation from "@/components/ui/loadinganimation";
 import { useUserData } from "../hook/userdata";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@/app/hook/useUser";
-import { useGamePosition } from "../hook/useGamePosition";
+import { GamePositionContext } from "../contexts/gamepositionproviders";
 const GameMap = dynamic(() => import("./_components/gamemap"), { ssr: false });
 
 const Map: React.FC = () => {
@@ -21,7 +21,7 @@ const Map: React.FC = () => {
     "map"
   );
 
-  const { currBranch, gamePosition } = useGamePosition();
+  const { currBranch, gamePosition } = useContext(GamePositionContext);
   const { isLoading } = useUserData();
   const queryClient = useQueryClient();
   const { user } = useUser();

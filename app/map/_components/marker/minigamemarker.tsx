@@ -2,21 +2,20 @@ import React, { useContext } from "react";
 import { Marker } from "react-leaflet";
 import { useRouter } from "next/navigation";
 import { DivIcon, LatLngExpression } from "leaflet";
-import { GamePosition, Level } from "@/types/db";
-import { Land_to_branch_no } from "../../constants";
-import { useGamePosition } from "@/app/hook/useGamePosition";
+import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { SelectLevel } from "@/app/db/schema";
 import { usePermission } from "@/app/hook/usePermission";
 import { selectRandomGame } from "../../helpers/selectgame";
+import { GamePosition } from "@/types/db";
 interface MiniGameMarkerProps {
   level: SelectLevel;
 }
 
 const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ level }) => {
   const router = useRouter();
-  const { setGamePosition } = useGamePosition();
+  const { setGamePosition } = useContext(GamePositionContext);
   const { permissions } = usePermission();
-  const { currBranch } = useGamePosition();
+  const { currBranch } = useContext(GamePositionContext);
 
   const handleClick = () => {
     setGamePosition({

@@ -1,72 +1,66 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SelectBranch, SelectChapter, SelectLevel } from "@/app/db/schema";
 import { useUser } from "./useUser";
 
-// export const initGameData = async () => {
-//   const queryClient = useQueryClient();
-//   const { user } = useUser();
+// Cache time constants
+const CACHE_TIME = 1000 * 60 * 60 * 24; // 24 hours
+const STALE_TIME = 1000 * 60 * 5; // 5 minutes
 
-//   try {
-//     const chapters: SelectChapter[] = await fetchChapterData();
-//     const branches: SelectBranch[] = await fetchBranchData();
-//     queryClient.setQueryData(["chapters", user?.id], chapters);
-//     queryClient.setQueryData(["branches", user?.id], branches);
-//   } catch (error) {
-//     console.error("Error initializing chapters:", error);
-//   }
-// };
-
-// const fetchChapterData = async (): Promise<SelectChapter[]> => {
-//   const res = await fetch("/api/chapters");
-//   if (!res.ok) {
-//     throw new Error("Failed to fetch chapter data");
-//   }
-//   return res.json();
-// };
-
-// const fetchBranchData = async (): Promise<SelectBranch[]> => {
-//   const res = await fetch("/api/branches");
-//   if (!res.ok) {
-//     throw new Error("Failed to fetch branch data");
-//   }
-//   return res.json();
-// };
-
-export const useGameData = async () => {
-  const queryClient = useQueryClient();
+export const useGameData = () => {
   const { user } = useUser();
+  const queryClient = useQueryClient();
 
-  let chapters = queryClient.getQueryData<SelectChapter[]>([
-    "chapters",
-    user?.id,
-  ]);
-  let branches = queryClient.getQueryData<SelectBranch[]>([
-    "branches",
-    user?.id,
-  ]);
-  let levels = queryClient.getQueryData<SelectLevel[]>(["levels", user?.id]);
+  // Fetch branches
+  const { data: branches } = useQuery<SelectBranch[]>({
+    queryKey: ["branches"],
+    queryFn: async () => {
+      const res = await fetch("/api/branches");
+      const data = await res.json();
+      return data.payload;
+    },
+    staleTime: STALE_TIME,
+    gcTime: CACHE_TIME,
+    enabled: !!user,
+  });
 
-  if (!chapters) {
-    const chaptersRes = await fetch("/api/chapters");
-    chapters = await chaptersRes.json();
-    queryClient.setQueryData(["chapters", user?.id], chapters);
-  }
+  // Fetch chapters
+  const { data: chapters } = useQuery<SelectChapter[]>({
+    queryKey: ["chapters"],
+    queryFn: async () => {
+      const res = await fetch("/api/chapters");
+      const data = await res.json();
+      return data.payload;
+    },
+    staleTime: STALE_TIME,
+    gcTime: CACHE_TIME,
+    enabled: !!user,
+  });
 
-  if (!branches) {
-    const branchesRes = await fetch("/api/branches");
-    branches = await branchesRes.json();
-    queryClient.setQueryData(["branches", user?.id], branches);
-  }
+  const { data: levels } = useQuery<SelectLevel[]>({
+    queryKey: ["levels"],
+    queryFn: async () => {
+      const res = await fetch("/api/levels");
+      const data = await res.json();
+      return data.payload;
+    },
+    staleTime: STALE_TIME,
+    gcTime: CACHE_TIME,
+    enabled: !!user,
+  });
 
-  if (!levels) {
-    const levelsRes = await fetch("/api/levels");
-    levels = await levelsRes.json();
-    queryClient.setQueryData(["levels", user?.id], levels);
-  }
+  // Function to force refresh data
+  const refreshGameData = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["branches"] }),
+      queryClient.invalidateQueries({ queryKey: ["chapters"] }),
+      queryClient.invalidateQueries({ queryKey: ["levels"] }),
+    ]);
+  };
 
   return {
-    chapters,
     branches,
+    chapters,
     levels,
+    refreshGameData,
   };
 };

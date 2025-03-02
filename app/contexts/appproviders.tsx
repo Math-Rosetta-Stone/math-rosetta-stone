@@ -2,6 +2,7 @@
 
 import { PracticeModalProvider } from "./practicemodelproviders";
 import { PermissionProvider } from "./permissionproviders";
+import { GamePositionProvider } from "./gamepositionproviders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 interface AppProvidersProps {
@@ -13,9 +14,11 @@ const queryClient = new QueryClient();
 const AppProviders = ({ children }: AppProvidersProps) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <PermissionProvider>
-        <PracticeModalProvider>{children}</PracticeModalProvider>
-      </PermissionProvider>
+      <GamePositionProvider>
+        <PermissionProvider>
+          <PracticeModalProvider>{children}</PracticeModalProvider>
+        </PermissionProvider>
+      </GamePositionProvider>
     </QueryClientProvider>
   );
 };
