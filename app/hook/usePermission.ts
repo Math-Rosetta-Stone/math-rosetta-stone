@@ -3,6 +3,9 @@ import { GamePosition } from "@/types/db";
 import { useUser } from "./useUser";
 import { useRouter } from "next/navigation";
 
+const STALE_TIME = 1000 * 60 * 5; // 5 minutes
+const CACHE_TIME = 1000 * 60 * 10; // 10 minutes
+
 const INITIAL_PERMISSIONS: GamePosition[] = [
   { branch_no: 1, chapter_no: 1, level_no: 1 },
   { branch_no: 2, chapter_no: 1, level_no: 1 },
@@ -48,6 +51,8 @@ export const usePermission = () => {
         return INITIAL_PERMISSIONS;
       }
     },
+    staleTime: STALE_TIME,
+    gcTime: CACHE_TIME,
     enabled: !!user,
   });
 

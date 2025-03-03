@@ -1,21 +1,31 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Marker } from "react-leaflet";
 import { useRouter } from "next/navigation";
-import { DivIcon, LatLngExpression } from "leaflet";
+import { DivIcon } from "leaflet";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { SelectLevel } from "@/app/db/schema";
 import { usePermission } from "@/app/hook/usePermission";
 import { selectRandomGame } from "../../helpers/selectgame";
 import { GamePosition } from "@/types/db";
+
 interface MiniGameMarkerProps {
   level: SelectLevel;
+  isAdmin?: boolean;
+  setLevels: React.Dispatch<React.SetStateAction<SelectLevel[]>>;
 }
 
-const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ level }) => {
+const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
+  level,
+  isAdmin = false,
+  setLevels,
+}) => {
   const router = useRouter();
   const { setGamePosition } = useContext(GamePositionContext);
   const { permissions } = usePermission();
   const { currBranch } = useContext(GamePositionContext);
+  useEffect(() => {
+    console.log("setLevels", setLevels);
+  }, [setLevels]);
 
   const handleClick = () => {
     setGamePosition({
@@ -32,7 +42,6 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ level }) => {
   };
 
   const have_permission = (permissions: GamePosition[], level: SelectLevel) => {
-    console.log(permissions);
     const permission = permissions.filter(
       permission => permission.branch_no === currBranch
     )[0];
@@ -52,15 +61,33 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({ level }) => {
     html: `<div class="custom-marker" style="background-color: ${iconColor}; width: 20px; height: 20px; border-radius: 50%; cursor: pointer;"></div>`,
   });
 
-  // y and x are reversed in the screen
-  const position: LatLngExpression = [level.y, level.x];
+  const handleDragEnd = (event: L.DragEndEvent) => {
+    if (isAdmin) {
+      const marker = event.target;
+      setLevels(levels =>
+        levels.map(prevLevel =>
+          prevLevel.branch_no === level.branch_no &&
+          prevLevel.chapter_no === level.chapter_no &&
+          prevLevel.level_no === level.level_no
+            ? {
+                ...prevLevel,
+                y: marker.getLatLng().lat,
+                x: marker.getLatLng().lng,
+              }
+            : prevLevel
+        )
+      );
+    }
+  };
 
   return (
     <Marker
-      position={position}
+      position={[level.y, level.x]}
       icon={icon}
+      draggable={isAdmin}
       eventHandlers={{
         click: handleClick,
+        dragend: isAdmin ? handleDragEnd : undefined,
       }}
     />
   );

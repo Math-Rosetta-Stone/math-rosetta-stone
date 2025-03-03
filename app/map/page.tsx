@@ -1,20 +1,18 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
   faChalkboardTeacher,
+  faFloppyDisk,
 } from "@fortawesome/free-solid-svg-icons";
 import "./css/map.css";
 import Dictionary from "./_components/dictionary";
 import PracticeModal from "./_components/practicemode/practicemodal";
-import dynamic from "next/dynamic";
-import LoadingAnimation from "@/components/ui/loadinganimation";
-import { useUserData } from "../hook/userdata";
-import { useQueryClient } from "@tanstack/react-query";
-import { useUser } from "@/app/hook/useUser";
 import { GamePositionContext } from "../contexts/gamepositionproviders";
-const GameMap = dynamic(() => import("./_components/gamemap"), { ssr: false });
+import { withAuth } from "@/lib/withAuth";
+import GameMap from "./_components/gamemap";
+import { SelectLevel } from "../db/schema";
 
 const Map: React.FC = () => {
   const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">(
@@ -22,20 +20,10 @@ const Map: React.FC = () => {
   );
 
   const { currBranch, gamePosition } = useContext(GamePositionContext);
-  const { isLoading } = useUserData();
-  const queryClient = useQueryClient();
-  const { user } = useUser();
-
-  useEffect(() => {
-    if (user) {
-      // Prefetch and cache user data
-      queryClient.setQueryData(["user"], { user });
-    }
-  }, [user, queryClient]);
-
-  if (isLoading) {
-    return <LoadingAnimation />;
-  }
+  const [levels, setLevels] = useState<SelectLevel[]>([]);
+  const saveLevels = () => {
+    localStorage.setItem("levels", JSON.stringify(levels));
+  };
 
   return (
     <div className="w-screen h-screen bg-blue-900 flex flex-col">
@@ -56,7 +44,13 @@ const Map: React.FC = () => {
                 case "practice":
                   return <PracticeModal />;
                 default:
-                  return <GameMap />;
+                  return (
+                    <GameMap
+                      isAdmin={true}
+                      levels={levels}
+                      setLevels={setLevels}
+                    />
+                  );
               }
             })()}
           </div>
@@ -82,10 +76,18 @@ const Map: React.FC = () => {
             }>
             <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
           </button>
+          <button
+            className="absolute top-20 right-20 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
+            title="Admin Mode"
+            onClick={() => {
+              saveLevels();
+            }}>
+            <FontAwesomeIcon icon={faFloppyDisk} />
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default Map;
+export default withAuth(Map);

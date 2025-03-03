@@ -1,17 +1,18 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useContext } from "react"
-import { shuffle } from "@/lib/utils"
+import { useEffect, useState, useContext } from "react";
+import { shuffle } from "@/lib/utils";
+import { withAuth } from "@/lib/withAuth";
 
-import { Matching } from "./_components/matching"
+import { Matching } from "./_components/matching";
 
-import { termItemToRecord } from "@/app/practice/helpers"
-import { MOCK_DB } from "@/app/map/constants"
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
-import LoadingAnimation from "@/components/ui/loadinganimation"
-import { useUserData } from "@/app/hook/userdata"
+import { termItemToRecord } from "@/app/practice/helpers";
+import { MOCK_DB } from "@/app/map/constants";
+import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
+import LoadingAnimation from "@/components/ui/loadinganimation";
+import { useUserData } from "@/app/hook/userdata";
 
-const TIME_LIMIT = 30 // in seconds
+const TIME_LIMIT = 30; // in seconds
 
 // const termToDefinition: { [key: string]: string } = {
 //   derivative: "rate of change",
@@ -21,54 +22,65 @@ const TIME_LIMIT = 30 // in seconds
 // }
 
 const MatchingGame = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext)
+  const { gameMode, termsIndex } = useContext(PracticeModalContext);
   const termToDefinition =
-    gameMode === "regular" ? termItemToRecord(MOCK_DB) : termItemToRecord(MOCK_DB.filter((_, index) => termsIndex.includes(index)))
+    gameMode === "regular"
+      ? termItemToRecord(MOCK_DB)
+      : termItemToRecord(
+          MOCK_DB.filter((_, index) => termsIndex.includes(index))
+        );
 
-  const [hydrated, setHydrated] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
-  const [timerStopped, setTimerStopped] = useState(false)
-  const [randomizedTerms, setRandomizedTerms] = useState<string[]>(shuffle(Object.keys(termToDefinition)))
-  const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(shuffle(Object.values(termToDefinition)))
-  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [hydrated, setHydrated] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  const [timerStopped, setTimerStopped] = useState(false);
+  const [randomizedTerms, setRandomizedTerms] = useState<string[]>(
+    shuffle(Object.keys(termToDefinition))
+  );
+  const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(
+    shuffle(Object.values(termToDefinition))
+  );
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const { isLoading } = useUserData()
+  const { isLoading } = useUserData();
 
   const handleSubmit = () => {
-    setTimerStopped(true)
-    setFormSubmitted(true)
-  }
+    setTimerStopped(true);
+    setFormSubmitted(true);
+  };
 
   const handleResetTimer = () => {
-    setTimeLeft(TIME_LIMIT)
-    setTimerStopped(false)
-    setFormSubmitted(false)
-  }
+    setTimeLeft(TIME_LIMIT);
+    setTimerStopped(false);
+    setFormSubmitted(false);
+  };
 
-  const handleShuffle = (shuffledTerms: string[], shuffledDefinitions: string[]) => {
-    setRandomizedTerms(shuffledTerms)
-    setRandomizedDefinitions(shuffledDefinitions)
-  }
+  const handleShuffle = (
+    shuffledTerms: string[],
+    shuffledDefinitions: string[]
+  ) => {
+    setRandomizedTerms(shuffledTerms);
+    setRandomizedDefinitions(shuffledDefinitions);
+  };
 
   useEffect(() => {
-    setHydrated(true)
+    setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
-        setTimeLeft(prevTime => prevTime - 1)
+        setTimeLeft(prevTime => prevTime - 1);
       } else if (timeLeft === 0 && !formSubmitted) {
-        handleSubmit() // Automatically submit when the timer reaches 0
+        handleSubmit(); // Automatically submit when the timer reaches 0
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [timerStopped, timeLeft])
+    return () => clearInterval(interval);
+  }, [timerStopped, timeLeft]);
 
   if (!hydrated) {
-    return null
+    return null;
   }
 
   if (isLoading) {
-    return <LoadingAnimation />
+    return <LoadingAnimation />;
   }
 
   return (
@@ -104,7 +116,7 @@ const MatchingGame = () => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MatchingGame
+export default MatchingGame;

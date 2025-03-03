@@ -2,22 +2,21 @@ import React, { useContext } from "react";
 import { Marker } from "react-leaflet";
 import { DivIcon, LatLngExpression } from "leaflet";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
-import { QueryClient } from "@tanstack/react-query";
 
-interface MapMarkerProps {
+interface BranchMarkerProps {
   location: { x: number; y: number };
   targetBranch: number;
   targetChapter: number;
-  queryClient: QueryClient;
   setImageOverlayKey: (key: number) => void;
+  isAdmin?: boolean;
 }
 
-export const MapMarker: React.FC<MapMarkerProps> = ({
+export const BranchMarker: React.FC<BranchMarkerProps> = ({
   location,
   targetBranch,
   targetChapter,
-  queryClient,
   setImageOverlayKey,
+  isAdmin,
 }) => {
   const { setGamePosition, setCurrBranch } = useContext(GamePositionContext);
   const icon = new DivIcon({
@@ -26,30 +25,21 @@ export const MapMarker: React.FC<MapMarkerProps> = ({
   });
 
   const position: LatLngExpression = [location.y, location.x];
-  // TODO:use the setter in useGamePosition to handle set chapter and land
   const handleClick = () => {
-    // Set branch first
+    setImageOverlayKey(targetBranch);
     setCurrBranch(targetBranch);
-
-    // Then update game position
     setGamePosition({
       branch_no: targetBranch,
       chapter_no: targetChapter,
       level_no: 0,
     });
-
-    // Invalidate the levels query
-    queryClient.invalidateQueries({
-      queryKey: ["levels", targetBranch, targetChapter],
-    });
-    setImageOverlayKey(targetBranch);
   };
 
   return (
     <Marker
       position={position}
       icon={icon}
-      draggable={true}
+      draggable={isAdmin}
       eventHandlers={{
         click: handleClick,
       }}
