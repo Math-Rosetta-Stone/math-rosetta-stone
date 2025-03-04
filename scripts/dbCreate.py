@@ -62,7 +62,7 @@ def escape_special_characters(string):
 
 # Insert languages into the `languages` table
 def insert_languages():
-    languages = ["French", "Chinese", "Spanish", "Portuguese", "Hindi", "Farsi", "Marathi"]
+    languages = ["French", "Chinese (simple)", "Spanish", "Portuguese", "Hindi", "Farsi", "Marathi"]
     for lang in languages:
         insert_language_query = """
         INSERT INTO languages (name)
@@ -235,7 +235,7 @@ def insert_excel_data_into_sql_tables():
                 # Check if the combination of term_id and lang_id already exists
                 cursor.execute("""
                 SELECT COUNT(*) FROM translations WHERE term_id = %s AND lang_id = %s
-                """, (row - ROW_START + 1, language_id_map[lang_name.split()[0]]))
+                """, (row - ROW_START + 1, language_id_map[lang_name.split(' Definition')[0]]))
                 if cursor.fetchone()[0] == 0:
                     insert_translation_query = """
                     INSERT INTO translations (term_id, lang_id, definition)
@@ -243,7 +243,7 @@ def insert_excel_data_into_sql_tables():
                     """
                     cursor.execute(insert_translation_query, (
                         row - ROW_START + 1,  # term_id
-                        language_id_map[lang_name.split()[0]],  # lang_id from the database
+                        language_id_map[lang_name.split(' Definition')[0]],  # lang_id from the database
                         translation
                     ))
                     conn.commit()
