@@ -1,22 +1,21 @@
-"use client"
+"use client";
 
-import { useContext, useEffect, useState } from "react"
-import { PromptType } from "@/types/mcq"
-import { cn, getOneRandom, shuffle } from "@/lib/utils"
+import { useContext, useEffect, useState } from "react";
+import { PromptType } from "@/types/mcq";
+import { cn, getOneRandom } from "@/lib/utils";
 
-import { ArrowRight, RotateCcw } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Fib } from "./_components/fib"
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Fib } from "./_components/fib";
 
-import { TermItem } from "@/types/mcq"
-import { doubleAndNext } from "@/app/practice/helpers"
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
-import { useUserData } from "@/app/hook/userdata"
-import LoadingAnimation from "@/components/ui/loadinganimation"
-import NextGameButton from "../permission/_components/nextgame"
+import { TermItem } from "@/types/mcq";
+import { doubleAndNext } from "@/app/practice/helpers";
+import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
+import { useUserData } from "@/app/hook/userdata";
+import LoadingAnimation from "@/components/ui/loadinganimation";
 
-const TIME_LIMIT = 100 // in seconds
+const TIME_LIMIT = 100; // in seconds
 
 const MOCK_DB: TermItem[] = [
   {
@@ -139,96 +138,109 @@ const MOCK_DB: TermItem[] = [
       url: "/tangent.png",
     },
   },
-]
+];
 
 const FibGame: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext)
-  const mockDb = gameMode === "practice" ? MOCK_DB.filter((_, index) => doubleAndNext(termsIndex).includes(index)) : MOCK_DB
+  const { gameMode, termsIndex } = useContext(PracticeModalContext);
+  const mockDb =
+    gameMode === "practice"
+      ? MOCK_DB.filter((_, index) => doubleAndNext(termsIndex).includes(index))
+      : MOCK_DB;
 
-  const [hydrated, setHydrated] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
-  const [timerStopped, setTimerStopped] = useState(false)
-  const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb))
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter(item => item.definition !== currQuestion.definition))
-  const [formSubmitted, setFormSubmitted] = useState(false)
-  const [score, setScore] = useState(0)
+  const [hydrated, setHydrated] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  const [timerStopped, setTimerStopped] = useState(false);
+  const [currQuestion, setCurrQuestion] = useState<TermItem>(
+    getOneRandom(mockDb)
+  );
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
+    mockDb.filter(item => item.definition !== currQuestion.definition)
+  );
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [score, setScore] = useState(0);
 
-  const { isLoading } = useUserData()
+  const { isLoading } = useUserData();
 
   const getGameType = () => {
-    let possibleQTypes = [PromptType.TERM, PromptType.IMG] // answer type always the definition
-    return getOneRandom(possibleQTypes)
-  }
-  const [currGameType, setCurrGameType] = useState<PromptType>(getGameType()) // question type
+    let possibleQTypes = [PromptType.TERM, PromptType.IMG]; // answer type always the definition
+    return getOneRandom(possibleQTypes);
+  };
+  const [currGameType, setCurrGameType] = useState<PromptType>(getGameType()); // question type
 
   const handleSubmit = () => {
-    setTimerStopped(true)
-    setFormSubmitted(true)
-  }
+    setTimerStopped(true);
+    setFormSubmitted(true);
+  };
 
   const handleResetTimer = () => {
-    setTimeLeft(TIME_LIMIT)
-    setTimerStopped(false)
-  }
+    setTimeLeft(TIME_LIMIT);
+    setTimerStopped(false);
+  };
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {
       // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({ ...currQuestion, definition: "" })
+      setCurrQuestion({ ...currQuestion, definition: "" });
 
       // stop the timer and set time left to 0 (purely aesthetic)
-      setTimerStopped(true)
-      setTimeLeft(0)
+      setTimerStopped(true);
+      setTimeLeft(0);
     } else {
       // get a new question from available questions
-      const newQuestion = getOneRandom(availableQuestions)
-      setCurrQuestion(newQuestion)
+      const newQuestion = getOneRandom(availableQuestions);
+      setCurrQuestion(newQuestion);
 
       // get new game type
-      setCurrGameType(getGameType())
+      setCurrGameType(getGameType());
 
       // update available questions
-      setAvailableQuestions(prevAvailableQuestions => prevAvailableQuestions.filter(item => item.definition !== newQuestion.definition))
+      setAvailableQuestions(prevAvailableQuestions =>
+        prevAvailableQuestions.filter(
+          item => item.definition !== newQuestion.definition
+        )
+      );
 
       // reset timer
-      handleResetTimer()
+      handleResetTimer();
     }
 
     // reset form submitted
-    setFormSubmitted(false)
-  }
+    setFormSubmitted(false);
+  };
 
   const handleRestart = () => {
     // reset all states
-    handleResetTimer()
-    const newQuestion = getOneRandom(mockDb)
-    setCurrQuestion(newQuestion)
-    setAvailableQuestions(mockDb.filter(item => item.definition !== newQuestion.definition))
-    setFormSubmitted(false)
-    setScore(0)
-    setCurrGameType(getGameType())
-  }
+    handleResetTimer();
+    const newQuestion = getOneRandom(mockDb);
+    setCurrQuestion(newQuestion);
+    setAvailableQuestions(
+      mockDb.filter(item => item.definition !== newQuestion.definition)
+    );
+    setFormSubmitted(false);
+    setScore(0);
+    setCurrGameType(getGameType());
+  };
 
   useEffect(() => {
-    setHydrated(true)
+    setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
-        setTimeLeft(prevTime => prevTime - 1)
+        setTimeLeft(prevTime => prevTime - 1);
       } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
-        handleSubmit() // Automatically submit when the timer reaches 0
+        handleSubmit(); // Automatically submit when the timer reaches 0
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [timerStopped, timeLeft])
+    return () => clearInterval(interval);
+  }, [timerStopped, timeLeft]);
 
   if (!hydrated) {
-    return null
+    return null;
   }
 
   if (isLoading) {
-    return <LoadingAnimation />
+    return <LoadingAnimation />;
   }
 
   return (
@@ -256,17 +268,22 @@ const FibGame: React.FC = () => {
         {currQuestion.definition !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
+              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
+                mockDb.length
+              }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
 
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.definition !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+                formSubmitted &&
+                  currQuestion.definition !== "" &&
+                  "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
               onClick={() => {
-                if (formSubmitted && currQuestion.definition !== "") handleNext()
+                if (formSubmitted && currQuestion.definition !== "")
+                  handleNext();
               }}
             />
           </div>
@@ -303,24 +320,20 @@ const FibGame: React.FC = () => {
                 {` You scored ${score}/${mockDb.length}`}
               </div>
 
-              {score !== mockDb.length ? (
-                <Button
-                  className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
+              <Button
+                className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
                 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
-                  variant="default"
-                  onClick={handleRestart}>
-                  <RotateCcw className="mr-2" />
-                  Restart
-                </Button>
-              ) : (
-                <NextGameButton />
-              )}
+                variant="default"
+                onClick={handleRestart}>
+                <RotateCcw className="mr-2" />
+                Restart
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FibGame
+export default FibGame;

@@ -1,61 +1,61 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import MainMap from "@/app/map/_components/MainMap";
-import Link from "next/link"
-import { AnimatePresence, motion } from "framer-motion"
-import { signout } from "./actions"
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { signout } from "./actions";
 
 // Define the User type
 type User = {
-  payload: any
-}
+  payload: any;
+};
 
 export default function Home() {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [animationKey, setAnimationKey] = useState(0)
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [animationKey, setAnimationKey] = useState(0);
 
   const handleSignout = async () => {
     try {
-      const response = await signout()
+      const response = await signout();
       if (response.success) {
-        setUser(null)
-        setAnimationKey(prev => prev + 1)
+        setUser(null);
+        setAnimationKey(prev => prev + 1);
       } else {
-        console.error("Signout error", response.error)
+        console.error("Signout error", response.error);
       }
     } catch (error) {
-      console.error("Signout error", error)
+      console.error("Signout error", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetch("/api/user")
       .then(res => {
         if (!res.ok) {
-          throw new Error("Failed to fetch user data")
+          throw new Error("Failed to fetch user data");
         }
-        return res.json()
+        return res.json();
       })
       .then(data => {
-        console.log("DATA", data)
-        setUser(data)
-        setIsLoading(false)
+        console.log("DATA", data);
+        setUser(data);
+        setIsLoading(false);
       })
       .catch(error => {
-        console.error("ERROR", error)
-        setUser(null)
-        setIsLoading(false)
-      })
-  }, [])
+        console.error("ERROR", error);
+        setUser(null);
+        setIsLoading(false);
+      });
+  }, []);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-slate-900"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -68,7 +68,9 @@ export default function Home() {
         className="flex flex-col items-center justify-center text-center">
         {!user && (
           <>
-            <div className="text-4xl font-black">Welcome to Math Rosetta Stone</div>
+            <div className="text-4xl font-black">
+              Welcome to Math Rosetta Stone
+            </div>
 
             <div className="text-2xl font-black">
               <Link
@@ -97,16 +99,18 @@ export default function Home() {
 
         {user && (
           <>
-            <div className="text-4xl font-black">Hello, {user.payload.username}!</div>
+            <div className="text-4xl font-black">
+              Hello, {user.payload.username}!
+            </div>
 
             {/* <div className="max-w-40 text-wrap">{JSON.stringify(user)}</div> */}
 
-          <div className="text-2xl font-black">Welcome to Main Map</div>
+            <div className="text-2xl font-black">Welcome to Main Map</div>
 
             <MainMap />
 
             <Link
-              href="/game"
+              href="/map"
               className="ease-in-out duration-200
             text-slate-900 hover:text-slate-200
             hover:drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]
@@ -130,5 +134,5 @@ export default function Home() {
         )}
       </motion.div>
     </AnimatePresence>
-  )
+  );
 }
