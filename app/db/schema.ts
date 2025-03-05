@@ -6,19 +6,33 @@ import {
   primaryKey,
   unique,
   varchar,
+  boolean,
+  uniqueIndex,
+  timestamp,
 } from "drizzle-orm/mysql-core";
 
-export const user = mysqlTable("user", {
-  id: varchar("id", { length: 255 }).primaryKey(),
-  username: varchar("username", { length: 50 })
-    .$type<string>()
-    .unique()
-    .notNull(),
-  password_hash: varchar("password_hash", { length: 100 }).notNull(),
-  curr_branch_no: int("curr_branch_no").default(1),
-  curr_chapter_no: int("curr_chapter_no").default(1),
-  curr_level_no: int("curr_level_no").default(1),
-});
+export const user = mysqlTable(
+  "user",
+  {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    username: varchar("username", { length: 50 })
+      .$type<string>()
+      .unique()
+      .notNull(),
+    password_hash: varchar("password_hash", { length: 100 }).notNull(),
+    is_admin: boolean("is_admin").default(false).notNull(),
+    created_at: timestamp("created_at").defaultNow().notNull(),
+    updated_at: timestamp("updated_at").defaultNow().notNull(),
+    // curr_branch_no: int("curr_branch_no").default(1),
+    // curr_chapter_no: int("curr_chapter_no").default(1),
+    // curr_level_no: int("curr_level_no").default(1),
+  },
+  users => {
+    return {
+      usernameIdx: uniqueIndex("username_idx").on(users.username),
+    };
+  }
+);
 
 export const session = mysqlTable("session", {
   id: varchar("id", { length: 255 }).primaryKey(),
