@@ -7,7 +7,7 @@ import { withAuth } from "@/lib/withAuth";
 import { Matching } from "./_components/matching";
 
 import { termItemToRecord } from "@/app/practice/helpers";
-import { MOCK_DB } from "@/app/map/constants";
+import { MOCK_DB } from "@/app/map/constants/constants";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import { useUserData } from "@/app/hook/userdata";

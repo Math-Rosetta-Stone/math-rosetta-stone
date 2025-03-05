@@ -1,136 +1,153 @@
-"use client"
+"use client";
 
-import { useContext, useEffect, useState } from "react"
-import { cn, getOneRandom, shuffle } from "@/lib/utils"
-import { ArrowRight, RotateCcw } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
-import { Mcq } from "./_components/Mcq"
-import { Button } from "@/components/ui/button"
-import { PromptType } from "@/types/mcq"
-import { MOCK_DB } from "@/app/map/constants"
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
-import { useRouter } from "next/navigation"
-import { useUserData } from "@/app/hook/userdata"
-import LoadingAnimation from "@/components/ui/loadinganimation"
-import NextGameButton from "../permission/_components/nextgame"
+import { useContext, useEffect, useState } from "react";
+import { cn, getOneRandom, shuffle } from "@/lib/utils";
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Mcq } from "./_components/Mcq";
+import { Button } from "@/components/ui/button";
+import { PromptType } from "@/types/mcq";
+import { MOCK_DB } from "@/app/map/constants/constants";
+import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
+import { useRouter } from "next/navigation";
+import { useUserData } from "@/app/hook/userdata";
+import LoadingAnimation from "@/components/ui/loadinganimation";
+import NextGameButton from "../permission/_components/nextgame";
 
-const TIME_LIMIT = 10 // in seconds
+const TIME_LIMIT = 10; // in seconds
 
 const ListeningGame: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext)
-  const mockDb = gameMode === "practice" ? MOCK_DB.filter((_, index) => termsIndex.includes(index)) : MOCK_DB
+  const { gameMode, termsIndex } = useContext(PracticeModalContext);
+  const mockDb =
+    gameMode === "practice"
+      ? MOCK_DB.filter((_, index) => termsIndex.includes(index))
+      : MOCK_DB;
 
-  const [hydrated, setHydrated] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
-  const [timerStopped, setTimerStopped] = useState(false)
-  const [currQuestion, setCurrQuestion] = useState(getOneRandom(mockDb))
-  const [availableQuestions, setAvailableQuestions] = useState(mockDb.filter(item => item.term !== currQuestion.term))
-  const [formSubmitted, setFormSubmitted] = useState(false)
-  const [score, setScore] = useState(0)
+  const [hydrated, setHydrated] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  const [timerStopped, setTimerStopped] = useState(false);
+  const [currQuestion, setCurrQuestion] = useState(getOneRandom(mockDb));
+  const [availableQuestions, setAvailableQuestions] = useState(
+    mockDb.filter(item => item.term !== currQuestion.term)
+  );
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [score, setScore] = useState(0);
 
-  const { isLoading } = useUserData()
+  const { isLoading } = useUserData();
 
   const speakWord = (word: string) => {
-    const utterance = new SpeechSynthesisUtterance(word)
-    utterance.rate = 0.7
-    speechSynthesis.speak(utterance)
-  }
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.rate = 0.7;
+    speechSynthesis.speak(utterance);
+  };
 
   const getRandomPromptType = () => {
-    return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF
-  }
+    return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF;
+  };
 
-  const [currPromptType, setCurrPromptType] = useState(getRandomPromptType())
+  const [currPromptType, setCurrPromptType] = useState(getRandomPromptType());
 
-  const getChoices = (question: { term: string; definition: any }, choiceType: PromptType) => {
-    const wrongChoices = shuffle(mockDb.filter(item => item.term !== question.term)).slice(0, 3)
+  const getChoices = (
+    question: { term: string; definition: any },
+    choiceType: PromptType
+  ) => {
+    const wrongChoices = shuffle(
+      mockDb.filter(item => item.term !== question.term)
+    ).slice(0, 3);
     const choices = shuffle([
       {
         term: choiceType === PromptType.TERM ? question.term : undefined,
-        definition: choiceType === PromptType.DEF ? question.definition : undefined,
+        definition:
+          choiceType === PromptType.DEF ? question.definition : undefined,
       },
       ...wrongChoices.map(item => ({
         term: choiceType === PromptType.TERM ? item.term : undefined,
         definition: choiceType === PromptType.DEF ? item.definition : undefined,
       })),
-    ])
-    return choices
-  }
-  const [currChoices, setCurrChoices] = useState(getChoices(currQuestion, currPromptType))
+    ]);
+    return choices;
+  };
+  const [currChoices, setCurrChoices] = useState(
+    getChoices(currQuestion, currPromptType)
+  );
 
   const handleSubmit = () => {
-    setTimerStopped(true)
-    setFormSubmitted(true)
-  }
+    setTimerStopped(true);
+    setFormSubmitted(true);
+  };
 
   const handleResetTimer = () => {
-    setTimeLeft(TIME_LIMIT)
-    setTimerStopped(false)
-  }
+    setTimeLeft(TIME_LIMIT);
+    setTimerStopped(false);
+  };
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {
       // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({ ...currQuestion, term: "" })
+      setCurrQuestion({ ...currQuestion, term: "" });
 
       // stop the timer and set time left to 0 (purely aesthetic)
-      setTimerStopped(true)
-      setTimeLeft(0)
+      setTimerStopped(true);
+      setTimeLeft(0);
     } else {
       // get a new question from available questions
-      const newQuestion = getOneRandom(availableQuestions)
-      setCurrQuestion(newQuestion)
+      const newQuestion = getOneRandom(availableQuestions);
+      setCurrQuestion(newQuestion);
 
-      const newPromptType = getRandomPromptType()
-      setCurrPromptType(newPromptType)
+      const newPromptType = getRandomPromptType();
+      setCurrPromptType(newPromptType);
 
       // get new choices for the new question
-      setCurrChoices(getChoices(newQuestion, newPromptType))
+      setCurrChoices(getChoices(newQuestion, newPromptType));
 
       // update available questions
-      setAvailableQuestions(availableQuestions.filter(item => item.term !== newQuestion.term))
+      setAvailableQuestions(
+        availableQuestions.filter(item => item.term !== newQuestion.term)
+      );
 
       // reset timer
-      handleResetTimer()
+      handleResetTimer();
     }
 
     // reset form submitted
-    setFormSubmitted(false)
-  }
+    setFormSubmitted(false);
+  };
 
   const handleRestart = () => {
     // reset all states
-    handleResetTimer()
-    const newQuestion = getOneRandom(mockDb)
-    const newPromptType = getRandomPromptType()
-    setCurrQuestion(newQuestion)
-    setAvailableQuestions(mockDb.filter(item => item.term !== newQuestion.term))
-    setFormSubmitted(false)
-    setScore(0)
-    setCurrChoices(getChoices(newQuestion, newPromptType))
-    setCurrPromptType(newPromptType)
-  }
+    handleResetTimer();
+    const newQuestion = getOneRandom(mockDb);
+    const newPromptType = getRandomPromptType();
+    setCurrQuestion(newQuestion);
+    setAvailableQuestions(
+      mockDb.filter(item => item.term !== newQuestion.term)
+    );
+    setFormSubmitted(false);
+    setScore(0);
+    setCurrChoices(getChoices(newQuestion, newPromptType));
+    setCurrPromptType(newPromptType);
+  };
 
   useEffect(() => {
-    setHydrated(true)
+    setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
-        setTimeLeft(prevTime => prevTime - 1)
+        setTimeLeft(prevTime => prevTime - 1);
       } else if (timeLeft === 0 && !formSubmitted) {
-        handleSubmit() // Automatically submit when the timer reaches 0
+        handleSubmit(); // Automatically submit when the timer reaches 0
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [timerStopped, timeLeft])
+    return () => clearInterval(interval);
+  }, [timerStopped, timeLeft]);
 
   if (!hydrated) {
-    return null
+    return null;
   }
 
   if (isLoading) {
-    return <LoadingAnimation />
+    return <LoadingAnimation />;
   }
 
   return (
@@ -147,16 +164,20 @@ const ListeningGame: React.FC = () => {
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
+              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
+                mockDb.length
+              }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+                formSubmitted &&
+                  currQuestion.term !== "" &&
+                  "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
               onClick={() => {
-                if (formSubmitted && currQuestion.term !== "") handleNext()
+                if (formSubmitted && currQuestion.term !== "") handleNext();
               }}
             />
           </div>
@@ -209,7 +230,7 @@ const ListeningGame: React.FC = () => {
         </AnimatePresence>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ListeningGame
+export default ListeningGame;

@@ -1,7 +1,22 @@
 type LatLngBounds = [[number, number], [number, number]];
-export type Game = "hangman" | "mcq" | "matching" | "logo" | "fib" | "listen";
+import { PersonStanding, ClipboardList, Type } from "lucide-react";
+import { FaQuestion } from "react-icons/fa";
+import { GrShareOption } from "react-icons/gr";
+import { FaEarListen } from "react-icons/fa6";
+import { TbMathFunction } from "react-icons/tb";
 
-export const GAMES: Game[] = [
+export type Games = {
+  hangman: "hangman";
+  mcq: "mcq";
+  matching: "matching";
+  logo: "logo";
+  fib: "fib";
+  listen: "listen";
+};
+
+export type Game = keyof Games;
+
+export const GAMES: ReadonlyArray<Game> = [
   "hangman",
   "mcq",
   "matching",
@@ -9,6 +24,33 @@ export const GAMES: Game[] = [
   "fib",
   "listen",
 ];
+
+export type GamesWithRandom = Game | "random";
+export const GAMES_WITH_RANDOM: ReadonlyArray<GamesWithRandom> = [
+  ...GAMES,
+  "random",
+];
+
+export const BRANCH_ICON_PATHS: Record<number, string> = {
+  0: "/svg/icon/gitBranch.svg",
+  1: "/svg/icon/gitBranch.svg",
+  2: "/svg/icon/gitBranch.svg",
+  3: "/svg/icon/gitBranch.svg",
+  4: "/svg/icon/gitBranch.svg",
+  5: "/svg/icon/gitBranch.svg",
+  6: "/svg/icon/gitBranch.svg",
+  7: "/svg/icon/gitBranch.svg",
+};
+
+export const GAME_ICONS_PATHS: Record<GamesWithRandom, string> = {
+  hangman: "/svg/icon/personStanding.svg",
+  mcq: "/svg/icon/clipboardList.svg",
+  matching: "/svg/icon/manageSearch.svg",
+  logo: "/svg/icon/addPhotoAlternate.svg",
+  fib: "/svg/icon/type.svg",
+  listen: "/svg/icon/ear.svg",
+  random: "/svg/icon/question.svg",
+};
 
 export const MAP_BOUNDS: LatLngBounds = [
   [0, 0],

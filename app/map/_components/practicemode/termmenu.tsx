@@ -1,35 +1,41 @@
-"use client"
+"use client";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons"
-import { useState, useContext } from "react"
-import { MOCK_DB, TermItem } from "../../constants"
-import { PracticeModalContext } from "../../../contexts/practicemodelproviders"
-import { cn } from "@/lib/utils"
-import "./transition.css"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useState, useContext } from "react";
+import { MOCK_DB, TermItem } from "../../constants/constants";
+import { PracticeModalContext } from "../../../contexts/practicemodelproviders";
+import { cn } from "@/lib/utils";
+import "./transition.css";
 
 type TermMenuProps = {
-  setCurrView: React.Dispatch<React.SetStateAction<"selectTerms" | "selectGames">>
-}
+  setCurrView: React.Dispatch<
+    React.SetStateAction<"selectTerms" | "selectGames">
+  >;
+};
 
 export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
-  const { termsIndex, setTermsIndex } = useContext(PracticeModalContext)
-  const [selectedTerms, setSelectedTerms] = useState<number[]>(termsIndex)
-  const [screenShake, setScreenShake] = useState(false)
+  const { termsIndex, setTermsIndex } = useContext(PracticeModalContext);
+  const [selectedTerms, setSelectedTerms] = useState<number[]>(termsIndex);
+  const [screenShake, setScreenShake] = useState(false);
 
   const handleCheckboxChange = (index: number) => {
-    setSelectedTerms(prevState => (prevState.includes(index) ? prevState.filter(i => i !== index) : [...prevState, index]))
-  }
+    setSelectedTerms(prevState =>
+      prevState.includes(index)
+        ? prevState.filter(i => i !== index)
+        : [...prevState, index]
+    );
+  };
 
   const handleView = () => {
     if (selectedTerms.length === 0) {
-      setScreenShake(true)
-      setTimeout(() => setScreenShake(false), 500)
-      return
+      setScreenShake(true);
+      setTimeout(() => setScreenShake(false), 500);
+      return;
     }
-    setTermsIndex(selectedTerms)
-    setCurrView("selectGames")
-  }
+    setTermsIndex(selectedTerms);
+    setCurrView("selectGames");
+  };
 
   return (
     <div className={cn("w-full", screenShake && "shake")}>
@@ -57,5 +63,5 @@ export const TermMenu: React.FC<TermMenuProps> = ({ setCurrView }) => {
         <FontAwesomeIcon icon={faArrowRight} />
       </button>
     </div>
-  )
-}
+  );
+};

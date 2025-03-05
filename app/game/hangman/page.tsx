@@ -1,128 +1,148 @@
-"use client"
+"use client";
 
 // original hangman code with a little props modifications for incorporate the gameMode prop
 // only touched the props and added logic for choosing mockDb
-import React, { useState, useEffect, KeyboardEvent, useContext } from "react"
-import { useRouter } from "next/navigation"
-import Figure from "./_components/Figure"
-import WrongLetters from "./_components/WrongLetters"
-import Word from "./_components/Word"
-import Notification from "./_components/Notification"
-import { showNotification as show, checkWin } from "./helpers/helpers"
-import { cn, getOneRandom } from "@/lib/utils"
-import { ArrowRight, RotateCcw } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { MOCK_DB, TermItem } from "@/app/map/constants"
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
+import React, { useState, useEffect, KeyboardEvent, useContext } from "react";
+import { useRouter } from "next/navigation";
+import Figure from "./_components/Figure";
+import WrongLetters from "./_components/WrongLetters";
+import Word from "./_components/Word";
+import Notification from "./_components/Notification";
+import { showNotification as show, checkWin } from "./helpers/helpers";
+import { cn, getOneRandom } from "@/lib/utils";
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { MOCK_DB, TermItem } from "@/app/map/constants/constants";
+import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 
-import "./hangman.css"
-import { useUserData } from "@/app/hook/userdata"
-import LoadingAnimation from "@/components/ui/loadinganimation"
-import NextGameButton from "../permission/_components/nextgame"
+import "./hangman.css";
+import { useUserData } from "@/app/hook/userdata";
+import LoadingAnimation from "@/components/ui/loadinganimation";
+import NextGameButton from "../permission/_components/nextgame";
 
 const Hangman: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext)
-  const mockDb = gameMode === "regular" ? MOCK_DB : MOCK_DB.filter((_, index) => termsIndex.includes(index))
+  const { gameMode, termsIndex } = useContext(PracticeModalContext);
+  const mockDb =
+    gameMode === "regular"
+      ? MOCK_DB
+      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
 
-  const [playable, setPlayable] = useState<boolean>(true)
-  const [correctLetters, setCorrectLetters] = useState<string[]>([])
-  const [wrongLetters, setWrongLetters] = useState<string[]>([])
-  const [showNotification, setShowNotification] = useState<boolean>(false)
-  const [hydrated, setHydrated] = useState(false)
-  const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb))
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter(item => item.term !== currQuestion.term))
-  const [score, setScore] = useState(0)
-  const [formSubmitted, setFormSubmitted] = useState(false)
-  const [gameMessage, setGameMessage] = useState<string>("")
+  const [playable, setPlayable] = useState<boolean>(true);
+  const [correctLetters, setCorrectLetters] = useState<string[]>([]);
+  const [wrongLetters, setWrongLetters] = useState<string[]>([]);
+  const [showNotification, setShowNotification] = useState<boolean>(false);
+  const [hydrated, setHydrated] = useState(false);
+  const [currQuestion, setCurrQuestion] = useState<TermItem>(
+    getOneRandom(mockDb)
+  );
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
+    mockDb.filter(item => item.term !== currQuestion.term)
+  );
+  const [score, setScore] = useState(0);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [gameMessage, setGameMessage] = useState<string>("");
 
-  const { isLoading } = useUserData()
+  const { isLoading } = useUserData();
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {
       // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({ ...currQuestion, term: "" })
-      setCorrectLetters([])
-      setWrongLetters([])
-      setPlayable(true)
+      setCurrQuestion({ ...currQuestion, term: "" });
+      setCorrectLetters([]);
+      setWrongLetters([]);
+      setPlayable(true);
     } else {
       // get a new question from available questions
-      const newQuestion = getOneRandom(availableQuestions)
-      setCurrQuestion(newQuestion)
+      const newQuestion = getOneRandom(availableQuestions);
+      setCurrQuestion(newQuestion);
 
       // update available questions
-      setAvailableQuestions(prevAvailableQuestions => prevAvailableQuestions.filter(item => item.term !== newQuestion.term))
-      setFormSubmitted(false)
-      setGameMessage("")
-      setCorrectLetters([])
-      setWrongLetters([])
-      setPlayable(true)
+      setAvailableQuestions(prevAvailableQuestions =>
+        prevAvailableQuestions.filter(item => item.term !== newQuestion.term)
+      );
+      setFormSubmitted(false);
+      setGameMessage("");
+      setCorrectLetters([]);
+      setWrongLetters([]);
+      setPlayable(true);
     }
-  }
+  };
 
   const handleRestart = () => {
-    setPlayable(true)
-    setFormSubmitted(false)
+    setPlayable(true);
+    setFormSubmitted(false);
 
     // Empty Arrays
-    setCorrectLetters([])
-    setWrongLetters([])
+    setCorrectLetters([]);
+    setWrongLetters([]);
 
     // reset all states
-    const newQuestion = getOneRandom(mockDb)
-    setCurrQuestion(newQuestion)
-    setAvailableQuestions(mockDb.filter(item => item.term !== newQuestion.term))
-    setScore(0)
-    setGameMessage("")
-  }
+    const newQuestion = getOneRandom(mockDb);
+    setCurrQuestion(newQuestion);
+    setAvailableQuestions(
+      mockDb.filter(item => item.term !== newQuestion.term)
+    );
+    setScore(0);
+    setGameMessage("");
+  };
 
   useEffect(() => {
-    setHydrated(true)
+    setHydrated(true);
     const handleKeydown = (event: KeyboardEvent) => {
-      const { key, keyCode } = event
+      const { key, keyCode } = event;
       if (playable && keyCode >= 65 && keyCode <= 90) {
-        const letter = key.toLowerCase()
+        const letter = key.toLowerCase();
         if (currQuestion.term.includes(letter)) {
           if (!correctLetters.includes(letter)) {
-            setCorrectLetters(currentLetters => [...currentLetters, letter])
+            setCorrectLetters(currentLetters => [...currentLetters, letter]);
           } else {
-            show(setShowNotification)
+            show(setShowNotification);
           }
         } else {
           if (!wrongLetters.includes(letter)) {
-            setWrongLetters(currentLetters => [...currentLetters, letter])
+            setWrongLetters(currentLetters => [...currentLetters, letter]);
           } else {
-            show(setShowNotification)
+            show(setShowNotification);
           }
         }
       }
-    }
-    window.addEventListener("keydown", handleKeydown as unknown as EventListener)
+    };
+    window.addEventListener(
+      "keydown",
+      handleKeydown as unknown as EventListener
+    );
 
-    return () => window.removeEventListener("keydown", handleKeydown as unknown as EventListener)
-  }, [correctLetters, wrongLetters, playable])
+    return () =>
+      window.removeEventListener(
+        "keydown",
+        handleKeydown as unknown as EventListener
+      );
+  }, [correctLetters, wrongLetters, playable]);
 
   useEffect(() => {
-    const result = checkWin(correctLetters, wrongLetters, currQuestion.term)
+    const result = checkWin(correctLetters, wrongLetters, currQuestion.term);
     if (result === "win") {
-      setPlayable(false)
-      setFormSubmitted(true)
-      setScore(score + 1)
-      setGameMessage("Congratulations! You won! 😃")
+      setPlayable(false);
+      setFormSubmitted(true);
+      setScore(score + 1);
+      setGameMessage("Congratulations! You won! 😃");
     } else if (result === "lose") {
-      setPlayable(false)
-      setFormSubmitted(true)
-      setGameMessage(`Unfortunately you lost. 😕 The word was: ${currQuestion.term}`)
+      setPlayable(false);
+      setFormSubmitted(true);
+      setGameMessage(
+        `Unfortunately you lost. 😕 The word was: ${currQuestion.term}`
+      );
     }
-  }, [correctLetters, wrongLetters, currQuestion.term])
+  }, [correctLetters, wrongLetters, currQuestion.term]);
 
   if (!hydrated) {
-    return null
+    return null;
   }
 
   if (isLoading) {
-    return <LoadingAnimation />
+    return <LoadingAnimation />;
   }
 
   return (
@@ -146,17 +166,21 @@ const Hangman: React.FC = () => {
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
+              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
+                mockDb.length
+              }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
 
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+                formSubmitted &&
+                  currQuestion.term !== "" &&
+                  "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
               onClick={() => {
-                if (formSubmitted && currQuestion.term !== "") handleNext()
+                if (formSubmitted && currQuestion.term !== "") handleNext();
               }}
             />
           </div>
@@ -175,9 +199,14 @@ const Hangman: React.FC = () => {
                 <div className="mt-5 w-full game-container">
                   <Figure wrongLetters={wrongLetters} />
                   <WrongLetters wrongLetters={wrongLetters} />
-                  <Word selectedWord={currQuestion.term} correctLetters={correctLetters} />
+                  <Word
+                    selectedWord={currQuestion.term}
+                    correctLetters={correctLetters}
+                  />
                 </div>
-                {formSubmitted && gameMessage && currQuestion.term !== "" && <div>{gameMessage}</div>}
+                {formSubmitted && gameMessage && currQuestion.term !== "" && (
+                  <div>{gameMessage}</div>
+                )}
                 <Notification showNotification={showNotification} />
               </div>
             </motion.div>
@@ -211,7 +240,7 @@ const Hangman: React.FC = () => {
         </AnimatePresence>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Hangman
+export default Hangman;

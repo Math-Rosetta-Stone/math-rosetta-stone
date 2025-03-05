@@ -1,17 +1,17 @@
-import { TermItem } from "@/app/map/constants"
+import { TermItem } from "@/app/map/constants/constants";
 export function doubleAndNext(arr: number[]): number[] {
   return arr.reduce((result, num) => {
-    result.push(num * 2, num * 2 + 1)
-    return result
-  }, [] as number[])
+    result.push(num * 2, num * 2 + 1);
+    return result;
+  }, [] as number[]);
 }
 
 export function termItemToRecord(termItems: TermItem[]) {
-  const termRecord: Record<string, string> = {}
+  const termRecord: Record<string, string> = {};
 
   termItems.forEach(termItem => {
-    termRecord[termItem.term] = termItem.definition
-  })
+    termRecord[termItem.term] = termItem.definition;
+  });
 
-  return termRecord
+  return termRecord;
 }

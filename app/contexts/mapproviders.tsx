@@ -1,15 +1,15 @@
-"use client"
-import { Chapter, Land } from "@/types/map"
-import { createContext, useState, ReactNode } from "react"
-import { LAND_MAPS_PATHS } from "../map/constants"
+"use client";
+import { Chapter, Land } from "@/types/map";
+import { createContext, useState, ReactNode } from "react";
+import { LAND_MAPS_PATHS } from "../map/constants/constants";
 
 interface MapContextProps {
-  currLand: Land
-  currChapter: Chapter
-  currMapPath: string // Path to current map image (relative to /public/maps)
-  setCurrLand: (land: Land) => void
-  setCurrChapter: (chapter: Chapter) => void
-  setCurrMapPath: (path: string) => void
+  currLand: Land;
+  currChapter: Chapter;
+  currMapPath: string; // Path to current map image (relative to /public/maps)
+  setCurrLand: (land: Land) => void;
+  setCurrChapter: (chapter: Chapter) => void;
+  setCurrMapPath: (path: string) => void;
 }
 
 const MapContext = createContext<MapContextProps>({
@@ -19,12 +19,14 @@ const MapContext = createContext<MapContextProps>({
   setCurrLand: (land: Land) => {},
   setCurrChapter: (chapter: Chapter) => {},
   setCurrMapPath: (path: string) => {},
-})
+});
 
 const MapProviders = ({ children }: Readonly<{ children: ReactNode }>) => {
-  const [currChapter, setCurrChapter] = useState<Chapter>(1)
-  const [currLand, setCurrLand] = useState<Land>("InterMap")
-  const [currMapPath, setCurrMapPath] = useState<string>(LAND_MAPS_PATHS[currLand])
+  const [currChapter, setCurrChapter] = useState<Chapter>(1);
+  const [currLand, setCurrLand] = useState<Land>("InterMap");
+  const [currMapPath, setCurrMapPath] = useState<string>(
+    LAND_MAPS_PATHS[currLand]
+  );
 
   return (
     <MapContext.Provider
@@ -38,7 +40,7 @@ const MapProviders = ({ children }: Readonly<{ children: ReactNode }>) => {
       }}>
       {children}
     </MapContext.Provider>
-  )
-}
+  );
+};
 
-export { MapProviders, MapContext }
+export { MapProviders, MapContext };

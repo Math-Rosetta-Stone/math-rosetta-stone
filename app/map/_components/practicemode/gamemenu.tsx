@@ -1,46 +1,60 @@
-"use client"
-import { GAMES } from "../../constants"
-import { useState, useContext } from "react"
-import { PracticeModalContext } from "../../../contexts/practicemodelproviders"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"
-import { useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
-import "./transition.css"
+"use client";
+import { GAMES } from "../../constants/constants";
+import { useState, useContext } from "react";
+import { PracticeModalContext } from "../../../contexts/practicemodelproviders";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import "./transition.css";
 
 export const GameMenu: React.FC<{
-  setCurrView: React.Dispatch<React.SetStateAction<"selectTerms" | "selectGames">>
+  setCurrView: React.Dispatch<
+    React.SetStateAction<"selectTerms" | "selectGames">
+  >;
 }> = ({ setCurrView }) => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const { gamesIndex, setGamesIndex, setGameMode } = useContext(PracticeModalContext)
-  const [currSelectedGames, setCurrSelectedGame] = useState<number[]>(gamesIndex)
-  const [screenShake, setScreenShake] = useState(false)
+  const { gamesIndex, setGamesIndex, setGameMode } =
+    useContext(PracticeModalContext);
+  const [currSelectedGames, setCurrSelectedGame] =
+    useState<number[]>(gamesIndex);
+  const [screenShake, setScreenShake] = useState(false);
 
   const handleCheckboxChange = (index: number) => {
-    setCurrSelectedGame(prevState => (prevState.includes(index) ? prevState.filter(i => i !== index) : [...prevState, index]))
-  }
+    setCurrSelectedGame(prevState =>
+      prevState.includes(index)
+        ? prevState.filter(i => i !== index)
+        : [...prevState, index]
+    );
+  };
 
   const handleView = () => {
-    setGamesIndex(currSelectedGames)
-    setCurrView("selectTerms")
-  }
+    setGamesIndex(currSelectedGames);
+    setCurrView("selectTerms");
+  };
   const handleSave = () => {
     if (currSelectedGames.length === 0) {
-      setScreenShake(true)
-      setTimeout(() => setScreenShake(false), 500)
-      return
+      setScreenShake(true);
+      setTimeout(() => setScreenShake(false), 500);
+      return;
     }
-    setGamesIndex(currSelectedGames)
-    setGameMode("practice")
-    router.push("/practice")
-  }
+    setGamesIndex(currSelectedGames);
+    setGameMode("practice");
+    router.push("/practice");
+  };
 
   return (
-    <div className={cn("flex flex-col w-full h-full overflow-hidden", screenShake && "shake")}>
+    <div
+      className={cn(
+        "flex flex-col w-full h-full overflow-hidden",
+        screenShake && "shake"
+      )}>
       <div className="grid grid-cols-1 sm:grid-cols-2 overflow-y-auto flex-grow">
         {GAMES.map((game, index) => (
-          <label key={index} className="flex items-center bg-green-300 text-white font-bold m-5 rounded hover:bg-green-500 transition duration-300">
+          <label
+            key={index}
+            className="flex items-center bg-green-300 text-white font-bold m-5 rounded hover:bg-green-500 transition duration-300">
             <input
               type="checkbox"
               checked={currSelectedGames.includes(index)}
@@ -68,5 +82,5 @@ export const GameMenu: React.FC<{
         GO
       </button>
     </div>
-  )
-}
+  );
+};

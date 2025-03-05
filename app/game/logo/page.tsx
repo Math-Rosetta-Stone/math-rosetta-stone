@@ -1,116 +1,129 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useContext } from "react"
-import { TermItem, MOCK_DB } from "@/app/map/constants"
-import { cn, getOneRandom } from "@/lib/utils"
+import { useEffect, useState, useContext } from "react";
+import { TermItem, MOCK_DB } from "@/app/map/constants/constants";
+import { cn, getOneRandom } from "@/lib/utils";
 
-import { ArrowRight, RotateCcw } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
-import { Button } from "@/components/ui/button"
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders"
-import { useUserData } from "@/app/hook/userdata"
-import LoadingAnimation from "@/components/ui/loadinganimation"
-import NextGameButton from "../permission/_components/nextgame"
+import { Button } from "@/components/ui/button";
+import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
+import { useUserData } from "@/app/hook/userdata";
+import LoadingAnimation from "@/components/ui/loadinganimation";
+import NextGameButton from "../permission/_components/nextgame";
 
-const TIME_LIMIT = 10 // in seconds
+const TIME_LIMIT = 10; // in seconds
 
 const LogoQuizGame = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext)
-  const mockDb = gameMode === "regular" ? MOCK_DB : MOCK_DB.filter((_, index) => termsIndex.includes(index))
+  const { gameMode, termsIndex } = useContext(PracticeModalContext);
+  const mockDb =
+    gameMode === "regular"
+      ? MOCK_DB
+      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
 
-  const [hydrated, setHydrated] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT)
-  const [timerStopped, setTimerStopped] = useState(false)
-  const [currQuestion, setCurrQuestion] = useState<TermItem>(getOneRandom(mockDb))
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(mockDb.filter(item => item.term !== currQuestion.term))
-  const [formSubmitted, setFormSubmitted] = useState(false)
-  const [score, setScore] = useState(0)
-  const [userAnswer, setUserAnswer] = useState<string>("")
-  const [inputColor, setInputColor] = useState<string>("")
-  const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("")
+  const [hydrated, setHydrated] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  const [timerStopped, setTimerStopped] = useState(false);
+  const [currQuestion, setCurrQuestion] = useState<TermItem>(
+    getOneRandom(mockDb)
+  );
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
+    mockDb.filter(item => item.term !== currQuestion.term)
+  );
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [score, setScore] = useState(0);
+  const [userAnswer, setUserAnswer] = useState<string>("");
+  const [inputColor, setInputColor] = useState<string>("");
+  const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("");
 
-  const { isLoading } = useUserData()
+  const { isLoading } = useUserData();
 
   const handleSubmit = () => {
-    setTimerStopped(true)
-    setFormSubmitted(true)
-    if (userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()) {
-      setScore(score + 1)
-      setInputColor("green")
-      setShowCorrectAnswer("")
+    setTimerStopped(true);
+    setFormSubmitted(true);
+    if (
+      userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()
+    ) {
+      setScore(score + 1);
+      setInputColor("green");
+      setShowCorrectAnswer("");
     } else {
-      setInputColor("red")
-      setShowCorrectAnswer(currQuestion.term)
+      setInputColor("red");
+      setShowCorrectAnswer(currQuestion.term);
     }
-  }
+  };
 
   const handleResetTimer = () => {
-    setTimeLeft(TIME_LIMIT)
-    setTimerStopped(false)
-    setInputColor("")
-    setShowCorrectAnswer("")
-  }
+    setTimeLeft(TIME_LIMIT);
+    setTimerStopped(false);
+    setInputColor("");
+    setShowCorrectAnswer("");
+  };
 
   const handleNext = () => {
     if (availableQuestions.length === 0) {
       // if no more questions, stop the game
       // to mark no more questions left
-      setCurrQuestion({ ...currQuestion, term: "" })
+      setCurrQuestion({ ...currQuestion, term: "" });
 
       // stop the timer and set time left to 0 (purely aesthetic)
-      setTimerStopped(true)
-      setTimeLeft(0)
+      setTimerStopped(true);
+      setTimeLeft(0);
     } else {
       // get a new question from available questions
-      const newQuestion = getOneRandom(availableQuestions)
-      setCurrQuestion(newQuestion)
+      const newQuestion = getOneRandom(availableQuestions);
+      setCurrQuestion(newQuestion);
 
       // update available questions
-      setAvailableQuestions(prevAvailableQuestions => prevAvailableQuestions.filter(item => item.term !== newQuestion.term))
+      setAvailableQuestions(prevAvailableQuestions =>
+        prevAvailableQuestions.filter(item => item.term !== newQuestion.term)
+      );
 
       // reset timer
-      handleResetTimer()
+      handleResetTimer();
     }
 
     // reset form submitted
-    setFormSubmitted(false)
+    setFormSubmitted(false);
     // reset user answer
-    setUserAnswer("")
-  }
+    setUserAnswer("");
+  };
 
   const handleRestart = () => {
     // reset all states
-    handleResetTimer()
-    const newQuestion = getOneRandom(mockDb)
-    setCurrQuestion(newQuestion)
-    setAvailableQuestions(mockDb.filter(item => item.term !== newQuestion.term))
-    setFormSubmitted(false)
-    setScore(0)
-    setUserAnswer("")
-  }
+    handleResetTimer();
+    const newQuestion = getOneRandom(mockDb);
+    setCurrQuestion(newQuestion);
+    setAvailableQuestions(
+      mockDb.filter(item => item.term !== newQuestion.term)
+    );
+    setFormSubmitted(false);
+    setScore(0);
+    setUserAnswer("");
+  };
 
   useEffect(() => {
-    setHydrated(true)
+    setHydrated(true);
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
-        setTimeLeft(prevTime => prevTime - 1)
+        setTimeLeft(prevTime => prevTime - 1);
       } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
-        handleSubmit() // Automatically submit when the timer reaches 0
-        setInputColor("orange")
-        setShowCorrectAnswer(currQuestion.term)
+        handleSubmit(); // Automatically submit when the timer reaches 0
+        setInputColor("orange");
+        setShowCorrectAnswer(currQuestion.term);
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [timerStopped, timeLeft])
+    return () => clearInterval(interval);
+  }, [timerStopped, timeLeft]);
 
   if (!hydrated) {
-    return null
+    return null;
   }
 
   if (isLoading) {
-    return <LoadingAnimation />
+    return <LoadingAnimation />;
   }
 
   return (
@@ -138,17 +151,21 @@ const LogoQuizGame = () => {
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${mockDb.length}`}</div>
+              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
+                mockDb.length
+              }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
 
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
-                formSubmitted && currQuestion.term !== "" && "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
+                formSubmitted &&
+                  currQuestion.term !== "" &&
+                  "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
               onClick={() => {
-                if (formSubmitted && currQuestion.term !== "") handleNext()
+                if (formSubmitted && currQuestion.term !== "") handleNext();
               }}
             />
           </div>
@@ -164,7 +181,11 @@ const LogoQuizGame = () => {
               transition={{ duration: 0.3 }}>
               <div className="flex flex-col items-center justify-center w-full p-5">
                 <div className="flex flex-col items-center justify-center w-full">
-                  <img src={currQuestion.image.url} alt={currQuestion.image.title} className="w-1/2 h-auto" />
+                  <img
+                    src={currQuestion.image.url}
+                    alt={currQuestion.image.title}
+                    className="w-1/2 h-auto"
+                  />
                 </div>
                 <div className="mt-5 w-full">
                   <input
@@ -181,11 +202,20 @@ const LogoQuizGame = () => {
                   />
                 </div>
                 {formSubmitted && showCorrectAnswer && (
-                  <div className={cn("mt-2", inputColor === "red" && "text-red-500", inputColor === "orange" && "text-orange-500")}>
+                  <div
+                    className={cn(
+                      "mt-2",
+                      inputColor === "red" && "text-red-500",
+                      inputColor === "orange" && "text-orange-500"
+                    )}>
                     Correct Answer: {showCorrectAnswer}
                   </div>
                 )}
-                <Button className="mt-5" variant="default" onClick={handleSubmit} disabled={formSubmitted}>
+                <Button
+                  className="mt-5"
+                  variant="default"
+                  onClick={handleSubmit}
+                  disabled={formSubmitted}>
                   Submit
                 </Button>
               </div>
@@ -220,7 +250,7 @@ const LogoQuizGame = () => {
         </AnimatePresence>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LogoQuizGame
+export default LogoQuizGame;

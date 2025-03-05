@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { Marker } from "react-leaflet";
-import { DivIcon, LatLngExpression } from "leaflet";
+import { LatLngExpression } from "leaflet";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
+import { branchIcon } from "../../helpers/icon";
 
 interface BranchMarkerProps {
   location: { x: number; y: number };
@@ -19,10 +20,10 @@ export const BranchMarker: React.FC<BranchMarkerProps> = ({
   isAdmin,
 }) => {
   const { setGamePosition, setCurrBranch } = useContext(GamePositionContext);
-  const icon = new DivIcon({
-    className: "custom-div-icon",
-    html: `<div class="custom-marker" style="background-color: yellow; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;"></div>`,
-  });
+  // const icon = new DivIcon({
+  //   className: "custom-div-icon",
+  //   html: `<div class="custom-marker" style="background-color: yellow; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;"></div>`,
+  // });
 
   const position: LatLngExpression = [location.y, location.x];
   const handleClick = () => {
@@ -38,7 +39,7 @@ export const BranchMarker: React.FC<BranchMarkerProps> = ({
   return (
     <Marker
       position={position}
-      icon={icon}
+      icon={branchIcon(targetBranch)}
       draggable={isAdmin}
       eventHandlers={{
         click: handleClick,

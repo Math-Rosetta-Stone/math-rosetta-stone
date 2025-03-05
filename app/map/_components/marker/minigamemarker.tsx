@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Marker } from "react-leaflet";
 import { useRouter } from "next/navigation";
-import { DivIcon } from "leaflet";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { SelectLevel } from "@/app/db/schema";
 import { usePermission } from "@/app/hook/usePermission";
 import { selectRandomGame } from "../../helpers/selectgame";
 import { GamePosition } from "@/types/db";
+import { gameIcon } from "../../helpers/icon";
 
 interface MiniGameMarkerProps {
   level: SelectLevel;
@@ -54,13 +54,6 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
     return false;
   };
 
-  const iconColor = have_permission(permissions, level) ? "green" : "red";
-
-  const icon = new DivIcon({
-    className: "custom-div-icon",
-    html: `<div class="custom-marker" style="background-color: ${iconColor}; width: 20px; height: 20px; border-radius: 50%; cursor: pointer;"></div>`,
-  });
-
   const handleDragEnd = (event: L.DragEndEvent) => {
     if (isAdmin) {
       const marker = event.target;
@@ -83,7 +76,11 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
   return (
     <Marker
       position={[level.y, level.x]}
-      icon={icon}
+      icon={gameIcon(
+        level.level_no,
+        level.minigame_name,
+        have_permission(permissions, level)
+      )}
       draggable={isAdmin}
       eventHandlers={{
         click: handleClick,
