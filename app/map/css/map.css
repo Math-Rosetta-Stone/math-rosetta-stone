@@ -1,0 +1,11 @@
+.no-select {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+  }
+
+.leaflet-control-attribution,
+.leaflet-control-logo {
+  display: none !important;
+}

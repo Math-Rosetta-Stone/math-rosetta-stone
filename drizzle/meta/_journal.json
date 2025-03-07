@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1741319308494,
+      "tag": "0000_bouncy_vapor",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1741321543250,
+      "tag": "0001_fixed_jackpot",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1741321753681,
+      "tag": "0002_kind_jamie_braddock",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1741321795595,
+      "tag": "0003_black_odin",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1741322430527,
+      "tag": "0004_tiresome_the_watchers",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1741322515948,
+      "tag": "0005_clean_the_watchers",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1741322601630,
+      "tag": "0006_equal_nomad",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1741322729586,
+      "tag": "0007_powerful_goliath",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1741322813635,
+      "tag": "0008_strong_squirrel_girl",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1741323102895,
+      "tag": "0009_damp_gideon",
+      "breakpoints": true
+    }
+  ]
+}

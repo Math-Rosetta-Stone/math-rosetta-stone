@@ -3,12 +3,7 @@ import { PluginAPI } from "tailwindcss/types/config";
 
 const config = {
   darkMode: ["class"],
-  content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
     container: {
@@ -20,6 +15,10 @@ const config = {
     },
     extend: {
       colors: {
+        "nintendo-red": "#FF3D3D",
+        "nintendo-blue": "#0AB9E6",
+        "foggy-gray": "#262626",
+        cornsilk: "#FFFAE3",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -73,8 +72,14 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      maxHeight: {
+        "104": "32rem",
+      },
+      maxWidth: {
+        "5.5xl": "68rem",
+      },
       transitionProperty: {
-        "fib": "background-color, padding",
+        fib: "background-color, padding",
       },
     },
   },

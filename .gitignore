@@ -5,7 +5,12 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+pnpm-lock.yaml
+package-lock.json
+bun.lock
 
+#drizzle
+/drizzle
 # testing
 /coverage
 
@@ -34,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#extensions
+*.vscode
