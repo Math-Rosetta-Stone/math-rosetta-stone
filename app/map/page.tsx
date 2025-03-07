@@ -1,10 +1,10 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
   faChalkboardTeacher,
-  faFloppyDisk,
+  faUsersCog,
 } from "@fortawesome/free-solid-svg-icons";
 import "./css/map.css";
 import Dictionary from "./_components/dictionary";
@@ -12,78 +12,71 @@ import PracticeModal from "./_components/practicemode/practicemodal";
 import { GamePositionContext } from "../contexts/gamepositionproviders";
 import { withAuth } from "@/lib/withAuth";
 import GameMap from "./_components/gamemap";
-import { SelectLevel } from "../db/schema";
+import { SelectLevel, SelectUser } from "../db/schema";
+import Link from "next/link";
 
-const Map: React.FC = () => {
+interface MapProps {
+  user: SelectUser;
+}
+
+const Map: React.FC<MapProps> = ({ user }) => {
   const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">(
     "map"
   );
 
-  const { currBranch, gamePosition } = useContext(GamePositionContext);
   const [levels, setLevels] = useState<SelectLevel[]>([]);
-  const saveLevels = () => {
-    localStorage.setItem("levels", JSON.stringify(levels));
-  };
+
+  useEffect(() => {
+    console.log("admin", user.is_admin);
+  }, []);
 
   return (
-    <div className="w-screen h-screen bg-blue-900 flex flex-col">
-      <div className="flex-1 flex">
-        <div className="left-controller w-36 h-full bg-nintendo-red p-4 flex items-center justify-center"></div>
-        <div className="flex-1 flex flex-col items-center justify-center relative">
-          <div className="absolute z-10 top-4">
-            <h1 className="font-mono font-bold text-gray-200 text-4xl">
-              {gamePosition?.[currBranch]?.branch_no}-
-              {gamePosition?.[currBranch]?.chapter_no}
-            </h1>
-          </div>
-          <div className="relative w-full h-full max-w-6xl max-h-128 overflow-hidden bg-foggy-gray pl-4 pr-4 pt-16 pb-16">
-            {(() => {
-              switch (currScreen) {
-                case "dict":
-                  return <Dictionary />;
-                case "practice":
-                  return <PracticeModal />;
-                default:
-                  return (
-                    <GameMap
-                      isAdmin={true}
-                      levels={levels}
-                      setLevels={setLevels}
-                    />
-                  );
-              }
-            })()}
-          </div>
+    <div className="relative h-screen p-4 bg-gradient-to-br from-slate-100 to-slate-200">
+      <div className="flex flex-col h-full max-w-7xl mx-auto">
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <button
+            className={`py-2 px-4 rounded-lg ${
+              currScreen === "map" ? "bg-blue-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={() => setCurrScreen("map")}>
+            Map
+          </button>
+          <button
+            className={`py-2 px-4 rounded-lg ${
+              currScreen === "dict" ? "bg-blue-500 text-white" : "bg-gray-200"
+            }`}
+            onClick={() => setCurrScreen("dict")}>
+            <FontAwesomeIcon icon={faSearch} className="mr-2" />
+            Dictionary
+          </button>
+          <button
+            className={`py-2 px-4 rounded-lg ${
+              currScreen === "practice"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200"
+            }`}
+            onClick={() => setCurrScreen("practice")}>
+            <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" />
+            Practice
+          </button>
+
+          {/* Admin Panel Link - only shown to admins */}
+          {user.is_admin && (
+            <Link
+              href="/admin/map"
+              className="py-2 px-4 rounded-lg bg-purple-600 text-white ml-auto flex items-center">
+              <FontAwesomeIcon icon={faUsersCog} className="mr-2" />
+              Admin Panel
+            </Link>
+          )}
         </div>
-        <div className="right-controller w-36 h-full bg-nintendo-blue p-4 flex flex-col items-center justify-center">
-          <button
-            className="absolute top-4 right-4 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
-            title="Dictionary"
-            onClick={() =>
-              setCurrScreen(currScreen =>
-                currScreen === "map" ? "dict" : "map"
-              )
-            }>
-            <FontAwesomeIcon icon={faSearch} size="lg" />
-          </button>
-          <button
-            className="absolute top-4 right-20 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
-            title="Practice Mode"
-            onClick={() =>
-              setCurrScreen(currScreen =>
-                currScreen === "map" ? "practice" : "map"
-              )
-            }>
-            <FontAwesomeIcon icon={faChalkboardTeacher} size="lg" />
-          </button>
-          <button
-            className="absolute top-20 right-20 p-2 bg-blue-500 hover:bg-blue-300 text-white z-10 rounded-full w-12 h-12"
-            title="Admin Mode"
-            onClick={() => {
-              saveLevels();
-            }}>
-            <FontAwesomeIcon icon={faFloppyDisk} />
-          </button>
+
+        <div className="flex-1 rounded-lg overflow-hidden bg-white shadow-lg">
+          {currScreen === "map" && (
+            <GameMap levels={levels} setLevels={setLevels} />
+          )}
+          {currScreen === "dict" && <Dictionary />}
+          {currScreen === "practice" && <PracticeModal />}
         </div>
       </div>
     </div>

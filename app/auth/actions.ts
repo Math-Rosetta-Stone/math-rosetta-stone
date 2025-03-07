@@ -8,6 +8,52 @@ import { redirect } from "next/navigation";
 import { user } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { ActionResult } from "@/lib/form";
+import { hash } from "argon2";
+
+export async function signup(formData: FormData): Promise<ActionResult> {
+  const username = formData.get("username");
+  const password = formData.get("password");
+  const isAdmin = formData.get("isAdmin") === "true";
+
+  if (
+    typeof username !== "string" ||
+    username.length < 3 ||
+    typeof password !== "string" ||
+    password.length < 6
+  ) {
+    throw new Error("Invalid credentials");
+  }
+
+  const hashedPassword = await hash(password);
+
+  // TODO: check if username is already used
+  const existingUser = await db
+    .select()
+    .from(user)
+    .where(eq(user.username, username));
+  if (existingUser.length > 0) {
+    return {
+      error: "Username taken",
+    };
+  }
+
+  const userId = crypto.randomUUID();
+  await db.insert(user).values({
+    id: userId,
+    username,
+    password_hash: hashedPassword,
+    is_admin: isAdmin,
+  });
+
+  const session = await lucia.createSession(userId, {});
+  const sessionCookie = lucia.createSessionCookie(session.id);
+  cookies().set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes
+  );
+  return redirect("/");
+}
 
 export async function signin(formData: FormData): Promise<ActionResult> {
   const username = formData.get("username");

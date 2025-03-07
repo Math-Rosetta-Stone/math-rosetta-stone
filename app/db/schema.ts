@@ -1,16 +1,17 @@
 import {
+  boolean,
   datetime,
-  foreignKey,
   int,
   mysqlTable,
   primaryKey,
+  timestamp,
   unique,
   varchar,
-  boolean,
+  foreignKey,
   uniqueIndex,
-  timestamp,
 } from "drizzle-orm/mysql-core";
 
+// First, define tables without foreign keys
 export const user = mysqlTable(
   "user",
   {
@@ -23,9 +24,6 @@ export const user = mysqlTable(
     is_admin: boolean("is_admin").default(false).notNull(),
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at").defaultNow().notNull(),
-    // curr_branch_no: int("curr_branch_no").default(1),
-    // curr_chapter_no: int("curr_chapter_no").default(1),
-    // curr_level_no: int("curr_level_no").default(1),
   },
   users => {
     return {
@@ -34,25 +32,28 @@ export const user = mysqlTable(
   }
 );
 
-export const session = mysqlTable("session", {
-  id: varchar("id", { length: 255 }).primaryKey(),
-  userId: varchar("user_id", { length: 255 })
-    .notNull()
-    .references(() => user.id),
-  expiresAt: datetime("expires_at").notNull(),
-});
+export const branch = mysqlTable(
+  "branch",
+  {
+    branch_no: int("branch_no").primaryKey(),
+    no_of_chapters: int("no_of_chapters").notNull(),
+    map_name: varchar("map_name", { length: 100 }).notNull(),
+  },
+  table => {
+    return {
+      primaryKey: primaryKey({ columns: [table.branch_no] }),
+    };
+  }
+);
 
-export const branch = mysqlTable("branch", {
-  branch_no: int("branch_no").primaryKey(),
-  no_of_chapters: int("no_of_chapters").notNull(),
-  map_name: varchar("map_name", { length: 100 }).notNull(),
-});
-
+// Now define tables with foreign keys
 export const chapter = mysqlTable(
   "chapter",
   {
-    chapter_no: int("chapter_no").primaryKey(),
-    branch_no: int("branch_no").references(() => branch.branch_no),
+    chapter_no: int("chapter_no").notNull(),
+    branch_no: int("branch_no")
+      .references(() => branch.branch_no)
+      .notNull(),
     no_of_minigames: int("no_of_minigames").notNull(),
   },
   table => {
@@ -80,13 +81,35 @@ export const level = mysqlTable(
   table => {
     return {
       primaryKey: primaryKey({
-        columns: [table.level_no, table.chapter_no, table.branch_no],
+        columns: [table.branch_no, table.chapter_no, table.level_no],
       }),
       foreignKey: foreignKey({
+        name: "level_chapter_fk",
         columns: [table.chapter_no, table.branch_no],
         foreignColumns: [chapter.chapter_no, chapter.branch_no],
       }),
       unique: unique().on(table.chapter_no, table.branch_no, table.x, table.y),
+    };
+  }
+);
+
+export const session = mysqlTable(
+  "session",
+  {
+    id: varchar("id", { length: 255 }).primaryKey(),
+    userId: varchar("user_id", { length: 255 })
+      .notNull()
+      .references(() => user.id),
+    expiresAt: datetime("expires_at").notNull(),
+  },
+  table => {
+    return {
+      primaryKey: primaryKey({ columns: [table.id] }),
+      userFk: foreignKey({
+        name: "session_user_fk",
+        columns: [table.userId],
+        foreignColumns: [user.id],
+      }),
     };
   }
 );
@@ -107,6 +130,7 @@ export const permission = mysqlTable(
         columns: [table.user_id, table.curr_branch_no],
       }),
       foreignKey: foreignKey({
+        name: "permission_level_fk",
         columns: [
           table.curr_branch_no,
           table.curr_chapter_no,
@@ -118,11 +142,21 @@ export const permission = mysqlTable(
   }
 );
 
-export type SelectLevel = typeof level.$inferSelect;
-export type InsertLevel = typeof level.$inferInsert;
-export type SelectUser = typeof user.$inferSelect;
-export type InsertUser = typeof user.$inferInsert;
-export type SelectChapter = typeof chapter.$inferSelect;
-export type InsertChapter = typeof chapter.$inferInsert;
+// Add type exports at the end
 export type SelectBranch = typeof branch.$inferSelect;
 export type InsertBranch = typeof branch.$inferInsert;
+
+export type SelectChapter = typeof chapter.$inferSelect;
+export type InsertChapter = typeof chapter.$inferInsert;
+
+export type SelectLevel = typeof level.$inferSelect;
+export type InsertLevel = typeof level.$inferInsert;
+
+export type SelectUser = typeof user.$inferSelect;
+export type InsertUser = typeof user.$inferInsert;
+
+export type SelectSession = typeof session.$inferSelect;
+export type InsertSession = typeof session.$inferInsert;
+
+export type SelectPermission = typeof permission.$inferSelect;
+export type InsertPermission = typeof permission.$inferInsert;

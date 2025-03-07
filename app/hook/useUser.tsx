@@ -8,14 +8,14 @@ interface UserResponse {
 
 const fetchUserData = async (): Promise<UserResponse> => {
   try {
-    const res = await fetch("/api/users");
+    const res = await fetch("/api/user");
 
     if (!res.ok) {
       throw new Error("Failed to fetch user data");
     }
 
     const data = await res.json();
-    return { user: data };
+    return { user: data.payload };
   } catch (error) {
     console.error("Error fetching user:", error);
     return { user: null, error: "Failed to fetch user data" };

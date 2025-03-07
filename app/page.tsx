@@ -74,25 +74,14 @@ export default function Home() {
 
             <div className="text-2xl font-black">
               <Link
-                href="/signin"
+                href="/auth"
                 className="ease-in-out duration-200
               text-slate-900 hover:text-slate-200
               hover:drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]
               underline underline-offset-2 decoration-dashed decoration-1
               hover:no-underline">
-                Sign in
-              </Link>{" "}
-              to get back in action! Don&apos;t have an account ?{" "}
-              <Link
-                href="/signup"
-                className="ease-in-out duration-200
-              text-slate-900 hover:text-slate-200
-              hover:drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]
-              underline underline-offset-2 decoration-dashed decoration-1
-              hover:no-underline">
-                Sign up
-              </Link>{" "}
-              and start learning!
+                Sign in or Sign up to start learning!
+              </Link>
             </div>
           </>
         )}

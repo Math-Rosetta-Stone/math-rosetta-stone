@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, ImageOverlay } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import MiniGameMarker from "./marker/minigameMarker";
+import MiniGameMarker from "./marker/minigamemarker";
 import { BranchMarker } from "./marker/branchMarker";
 import MapComponent from "./mapcomponent";
 
@@ -12,26 +12,40 @@ import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { useGameData } from "@/app/hook/useGameData";
 import { SelectLevel } from "@/app/db/schema";
 
-const GameMap: React.FC<{
+interface GameMapProps {
   isAdmin?: boolean;
-  levels: SelectLevel[];
-  setLevels: React.Dispatch<React.SetStateAction<SelectLevel[]>>;
-}> = ({ isAdmin = false, levels, setLevels }) => {
+  levels?: SelectLevel[];
+  setLevels?: React.Dispatch<React.SetStateAction<SelectLevel[]>>;
+}
+
+const GameMap: React.FC<GameMapProps> = ({
+  isAdmin = false,
+  levels: propLevels,
+  setLevels: propSetLevels,
+}) => {
   const { currBranch, gamePosition } = useContext(GamePositionContext);
   const { levels: levelsData } = useGameData();
-  const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch); // force rerender when currBranch changes
+  const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch);
+  const [localLevels, setLocalLevels] = useState<SelectLevel[]>([]);
+
+  // Use either props or local state depending on isAdmin mode
+  const levels = propLevels || localLevels;
+  const setLevels = propSetLevels || setLocalLevels;
 
   useEffect(() => {
     if (isAdmin) {
-      setLevels(
-        JSON.parse(localStorage.getItem("levels") || "[]")
-          ? JSON.parse(localStorage.getItem("levels") || "[]")
-          : levelsData
-      );
+      const savedLevels = localStorage.getItem("levels");
+      if (savedLevels) {
+        setLevels(JSON.parse(savedLevels));
+      } else if (levelsData) {
+        setLevels(levelsData);
+      }
     } else {
-      setLevels(levelsData ?? []);
+      if (levelsData) {
+        setLevels(levelsData);
+      }
     }
-  }, [levelsData]);
+  }, [levelsData, isAdmin, setLevels]);
 
   return (
     <div className="relative w-full h-full overflow-hidden no-select">

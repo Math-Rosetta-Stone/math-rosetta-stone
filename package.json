@@ -9,6 +9,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "node --import tsx ./app/db/seed.ts",
     "db:reset": "node --import tsx ./app/db/drizzleResetScript.ts",
+    "db:push": "drizzle-kit push",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

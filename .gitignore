@@ -7,7 +7,10 @@
 .yarn/install-state.gz
 pnpm-lock.yaml
 package-lock.json
+bun.lock
 
+#drizzle
+/drizzle
 # testing
 /coverage
 
