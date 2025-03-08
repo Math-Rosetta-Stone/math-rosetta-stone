@@ -27,6 +27,11 @@ async function main() {
     "chapter",
     "branch",
     "user",
+    "classes",
+    "terms",
+    "translations",
+    "languages",
+    "termToClass",
   ];
 
   for (const table of tables) {
@@ -50,7 +55,7 @@ async function main() {
   await connection.end();
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error("Error:", error);
   process.exit(1);
 });
