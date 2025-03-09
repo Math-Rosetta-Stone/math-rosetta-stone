@@ -10,9 +10,8 @@ import {
   datetime,
   unique,
 } from "drizzle-orm/mysql-core";
-import { on } from "events";
 
-// First, define tables without foreign keys
+
 export const user = mysqlTable(
   "user",
   {
@@ -26,11 +25,9 @@ export const user = mysqlTable(
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at").defaultNow().notNull(),
   },
-  (users) => {
-    return {
-      usernameIdx: uniqueIndex("username_idx").on(users.username),
-    };
-  }
+  (table) => [
+    uniqueIndex("username_idx").on(table.username),
+  ]
 );
 
 export const branch = mysqlTable(
@@ -40,11 +37,9 @@ export const branch = mysqlTable(
     no_of_chapters: int("no_of_chapters").notNull(),
     map_name: varchar("map_name", { length: 100 }).notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({ columns: [table.branch_no] }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.branch_no] }),
+  ]
 );
 
 export const languages = mysqlTable(
@@ -53,11 +48,9 @@ export const languages = mysqlTable(
     lang_id: int("lang_id").primaryKey().autoincrement(),
     name: varchar("name", { length: 255 }).notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({ columns: [table.lang_id] }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.lang_id] }),
+  ]
 );
 
 export const classes = mysqlTable(
@@ -66,14 +59,11 @@ export const classes = mysqlTable(
     class_id: int("class_id").primaryKey().autoincrement(),
     name: varchar("name", { length: 255 }).notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({ columns: [table.class_id] }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.class_id] }),
+  ]
 );
 
-// Now define tables with foreign keys
 export const chapter = mysqlTable(
   "chapter",
   {
@@ -83,13 +73,11 @@ export const chapter = mysqlTable(
       .notNull(),
     no_of_minigames: int("no_of_minigames").notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({
-        columns: [table.chapter_no, table.branch_no],
-      }),
-    };
-  }
+  (table) => [
+    primaryKey({
+      columns: [table.chapter_no, table.branch_no],
+    }),
+  ]
 );
 
 export const level = mysqlTable(
@@ -105,19 +93,17 @@ export const level = mysqlTable(
     x: int("x").notNull(),
     y: int("y").notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({
-        columns: [table.branch_no, table.chapter_no, table.level_no],
-      }),
-      foreignKey: foreignKey({
-        name: "level_chapter_fk",
-        columns: [table.chapter_no, table.branch_no],
-        foreignColumns: [chapter.chapter_no, chapter.branch_no],
-      }),
-      unique: unique().on(table.chapter_no, table.branch_no, table.x, table.y),
-    };
-  }
+  (table) => [
+    primaryKey({
+      columns: [table.branch_no, table.chapter_no, table.level_no],
+    }),
+    foreignKey({
+      name: "level_chapter_fk",
+      columns: [table.chapter_no, table.branch_no],
+      foreignColumns: [chapter.chapter_no, chapter.branch_no],
+    }),
+    unique().on(table.chapter_no, table.branch_no, table.x, table.y),
+  ]
 );
 
 export const terms = mysqlTable(
@@ -132,11 +118,9 @@ export const terms = mysqlTable(
     definition: varchar("definition", { length: 255 }).notNull(),
     example: varchar("example", { length: 255 }).notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({ columns: [table.term_id] }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.term_id] }),
+  ]
 );
 
 export const translations = mysqlTable(
@@ -148,11 +132,9 @@ export const translations = mysqlTable(
       .notNull(),
     definition: varchar("definition", { length: 255 }).notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({ columns: [table.term_id, table.lang_id] }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.term_id, table.lang_id] }),
+  ]
 );
 
 export const termToClass = mysqlTable(
@@ -165,11 +147,9 @@ export const termToClass = mysqlTable(
       .references(() => classes.class_id)
       .notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({ columns: [table.term_id, table.class_id] }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.term_id, table.class_id] }),
+  ]
 );
 
 export const session = mysqlTable(
@@ -181,16 +161,14 @@ export const session = mysqlTable(
       .references(() => user.id),
     expiresAt: datetime("expires_at").notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({ columns: [table.id] }),
-      userFk: foreignKey({
-        name: "session_user_fk",
-        columns: [table.userId],
-        foreignColumns: [user.id],
-      }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.id] }),
+    foreignKey({
+      name: "session_user_fk",
+      columns: [table.userId],
+      foreignColumns: [user.id],
+    }),
+  ]
 );
 
 export const permission = mysqlTable(
@@ -203,25 +181,22 @@ export const permission = mysqlTable(
     curr_chapter_no: int("curr_chapter_no").notNull(),
     curr_level_no: int("curr_level_no").notNull(),
   },
-  (table) => {
-    return {
-      primaryKey: primaryKey({
-        columns: [table.user_id, table.curr_branch_no],
-      }),
-      foreignKey: foreignKey({
-        name: "permission_level_fk",
-        columns: [
-          table.curr_branch_no,
-          table.curr_chapter_no,
-          table.curr_level_no,
-        ],
-        foreignColumns: [level.branch_no, level.chapter_no, level.level_no],
-      }),
-    };
-  }
+  (table) => [
+    primaryKey({
+      columns: [table.user_id, table.curr_branch_no],
+    }),
+    foreignKey({
+      name: "permission_level_fk",
+      columns: [
+        table.curr_branch_no,
+        table.curr_chapter_no,
+        table.curr_level_no,
+      ],
+      foreignColumns: [level.branch_no, level.chapter_no, level.level_no],
+    }),
+  ]
 );
 
-// Add type exports at the end
 export type SelectBranch = typeof branch.$inferSelect;
 export type InsertBranch = typeof branch.$inferInsert;
 
