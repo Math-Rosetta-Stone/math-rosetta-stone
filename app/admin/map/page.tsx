@@ -15,7 +15,7 @@ import { withAdmin } from "@/lib/withAdmin";
 import GameMap from "../../map/_components/gamemap";
 import { SelectLevel } from "../../db/schema";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGameData } from "@/app/hook/useGameData";
+import { useGameData } from "@/app/hooks/useGameData";
 
 const AdminMap: React.FC = () => {
   const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">(

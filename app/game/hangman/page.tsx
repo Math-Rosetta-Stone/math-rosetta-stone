@@ -16,7 +16,7 @@ import { MOCK_DB, TermItem } from "@/app/map/constants/constants";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 
 import "./hangman.css";
-import { useUserData } from "@/app/hook/userdata";
+import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 
 const Hangman: React.FC = () => {

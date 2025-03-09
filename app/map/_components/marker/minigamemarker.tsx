@@ -3,7 +3,7 @@ import { Marker } from "react-leaflet";
 import { useRouter } from "next/navigation";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { SelectLevel } from "@/app/db/schema";
-import { usePermission } from "@/app/hook/usePermission";
+import { usePermission } from "@/app/hooks/usePermission";
 import { selectRandomGame } from "../../helpers/selectgame";
 import { GamePosition } from "@/types/db";
 import { gameIcon } from "../../helpers/icon";

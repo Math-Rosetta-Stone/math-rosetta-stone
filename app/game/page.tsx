@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useUserData } from "../hook/userdata"
+import { useUserData } from "../hooks/userdata"
 import LoadingAnimation from "@/components/ui/loadinganimation"
 
 const gamesList = [

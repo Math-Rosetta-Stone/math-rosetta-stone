@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { PromptType } from "@/types/mcq";
 import { MOCK_DB } from "@/app/map/constants/constants";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-import { useUserData } from "@/app/hook/userdata";
+import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 
 const TIME_LIMIT = 10; // in seconds

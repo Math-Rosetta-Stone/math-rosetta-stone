@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { GamePosition } from "@/types/db";
-import { useGameData } from "@/app/hook/useGameData";
+import { useGameData } from "@/app/hooks/useGameData";
 
 interface GamePositionContextProps {
   gamePosition: GamePosition[];

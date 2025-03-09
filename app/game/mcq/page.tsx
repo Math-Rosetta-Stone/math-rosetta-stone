@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { MOCK_DB } from "@/app/map/constants/constants";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import LoadingAnimation from "@/components/ui/loadinganimation";
-import { useUserData } from "@/app/hook/userdata";
+import { useUserData } from "@/app/hooks/userdata";
 
 const TIME_LIMIT = 5; // in seconds
 

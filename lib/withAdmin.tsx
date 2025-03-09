@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useUser } from "@/app/hook/useUser";
+import { useUser } from "@/app/hooks/useUser";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import { SelectUser } from "@/app/db/schema";
 

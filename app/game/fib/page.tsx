@@ -12,7 +12,7 @@ import { Fib } from "./_components/fib";
 import { TermItem } from "@/types/mcq";
 import { doubleAndNext } from "@/app/practice/helpers";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-import { useUserData } from "@/app/hook/userdata";
+import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 
 const TIME_LIMIT = 100; // in seconds
