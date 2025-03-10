@@ -3,6 +3,7 @@
 import { PracticeModalProvider } from "./practicemodelproviders";
 import { GamePositionProvider } from "./gamepositionproviders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ const AppProviders = ({ children }: AppProvidersProps) => {
       <GamePositionProvider>
         <PracticeModalProvider>{children}</PracticeModalProvider>
       </GamePositionProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };
