@@ -5,7 +5,6 @@ import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { SelectLevel } from "@/app/db/schema";
 import { usePermission } from "@/app/hooks/usePermission";
 import { selectRandomGame } from "../../helpers/selectgame";
-import { GamePosition } from "@/types/db";
 import { gameIcon } from "../../helpers/icon";
 
 interface MiniGameMarkerProps {
@@ -22,10 +21,9 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
   const router = useRouter();
   const { setGamePosition } = useContext(GamePositionContext);
   const { permissions } = usePermission();
+  const [locked, setLocked] = useState(true);
+  const [current, setCurrent] = useState(false);
   const { currBranch } = useContext(GamePositionContext);
-  useEffect(() => {
-    console.log("setLevels", setLevels);
-  }, [setLevels]);
 
   const handleClick = () => {
     setGamePosition({
@@ -41,17 +39,25 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
     }
   };
 
-  const have_permission = (permissions: GamePosition[], level: SelectLevel) => {
-    const permission = permissions.filter(
-      permission => permission.branch_no === currBranch
-    )[0];
-    if (
-      permission.chapter_no > level.chapter_no ||
-      (permission.chapter_no === level.chapter_no &&
-        permission.level_no > level.level_no)
-    )
-      return true;
-    return false;
+  const isLevelLocked = () => {
+    const {
+      chapter_no: highestUnlockedChapter,
+      level_no: highestUnlockedLevel
+    } = permissions.filter(perm => perm.branch_no === currBranch)[0];
+
+    return highestUnlockedChapter < level.chapter_no
+      || (highestUnlockedChapter === level.chapter_no
+        && highestUnlockedLevel < level.level_no);
+  };
+
+  const isLevelCurrent = () => {
+    const {
+      chapter_no: highestUnlockedChapter,
+      level_no: highestUnlockedLevel
+    } = permissions.filter(perm => perm.branch_no === currBranch)[0];
+
+
+    return highestUnlockedChapter === level.chapter_no && highestUnlockedLevel === level.level_no;
   };
 
   const handleDragEnd = (event: L.DragEndEvent) => {
@@ -73,17 +79,24 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
     }
   };
 
+  useEffect(() => {
+    setLocked(isLevelLocked());
+    setCurrent(isLevelCurrent())
+    console.log("UPDATED locked and current");
+  }, [permissions]);
+
   return (
     <Marker
       position={[level.y, level.x]}
       icon={gameIcon(
         level.level_no,
         level.minigame_name,
-        have_permission(permissions, level)
+        locked,
+        current
       )}
       draggable={isAdmin}
       eventHandlers={{
-        click: handleClick,
+        click: !locked ? handleClick : undefined,
         dragend: isAdmin ? handleDragEnd : undefined,
       }}
     />

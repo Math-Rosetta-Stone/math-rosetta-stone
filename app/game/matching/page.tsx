@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useContext } from "react";
 import { shuffle } from "@/lib/utils";
-import { withAuth } from "@/lib/withAuth";
 
 import { Matching } from "./_components/matching";
 

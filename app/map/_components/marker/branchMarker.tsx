@@ -20,11 +20,6 @@ export const BranchMarker: React.FC<BranchMarkerProps> = ({
   isAdmin,
 }) => {
   const { setGamePosition, setCurrBranch } = useContext(GamePositionContext);
-  // const icon = new DivIcon({
-  //   className: "custom-div-icon",
-  //   html: `<div class="custom-marker" style="background-color: yellow; width: 50px; height: 50px; border-radius: 50%; cursor: pointer;"></div>`,
-  // });
-
   const position: LatLngExpression = [location.y, location.x];
   const handleClick = () => {
     setImageOverlayKey(targetBranch);

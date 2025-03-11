@@ -13,6 +13,7 @@ import { MOCK_DB } from "@/app/map/constants/constants";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import { useUserData } from "@/app/hooks/userdata";
+import NextButton from "../_components/next-button";
 
 const TIME_LIMIT = 5; // in seconds
 
@@ -217,7 +218,8 @@ const McqGame = () => {
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>
-              )
+
+              <NextButton />
             </motion.div>
           )}
         </AnimatePresence>

@@ -14,6 +14,7 @@ import { doubleAndNext } from "@/app/practice/helpers";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
+import NextButton from "../_components/next-button";
 
 const TIME_LIMIT = 100; // in seconds
 
@@ -328,6 +329,8 @@ const FibGame: React.FC = () => {
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>
+
+              <NextButton />
             </motion.div>
           )}
         </AnimatePresence>

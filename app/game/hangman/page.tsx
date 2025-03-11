@@ -18,6 +18,7 @@ import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import "./hangman.css";
 import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
+import NextButton from "../_components/next-button";
 
 const Hangman: React.FC = () => {
   const { gameMode, termsIndex } = useContext(PracticeModalContext);
@@ -228,6 +229,8 @@ const Hangman: React.FC = () => {
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>
+
+              <NextButton />
             </motion.div>
           )}
         </AnimatePresence>

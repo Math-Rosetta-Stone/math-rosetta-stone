@@ -9,6 +9,7 @@ import { AnswerBox } from "./answer-box";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Shuffle } from "lucide-react";
+import NextButton from "../../_components/next-button";
 
 interface MatchingProps {
   questions: string[];
@@ -171,6 +172,8 @@ export const Matching = ({
               if (!formSubmitted) onShuffle();
             }}
           />
+
+          <NextButton />
         </div>
       </div>
     </DragDropContext>
