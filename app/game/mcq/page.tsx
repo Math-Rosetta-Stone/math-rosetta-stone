@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { PromptType, TermItem } from "@/types/mcq";
+import { PromptType, TermItem } from "@/types/game";
 import { cn, getOneRandom, shuffle } from "@/lib/utils";
 
 import { ArrowRight, RotateCcw } from "lucide-react";
@@ -14,24 +14,27 @@ import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import { useUserData } from "@/app/hooks/userdata";
 import NextButton from "../_components/next-button";
+import { useTerms } from "@/app/hooks/useTerms";
 
 const TIME_LIMIT = 5; // in seconds
 
 const McqGame = () => {
   const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const mockDb =
-    gameMode === "practice"
-      ? MOCK_DB.filter((_, index) => termsIndex.includes(index))
-      : MOCK_DB;
+  const termItems =
+    gameMode === "regular"
+      ? MOCK_DB
+      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
+  // const termItems = useTerms();
+  // const termItems: TermItem[] = [];
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(
-    getOneRandom(mockDb)
+    getOneRandom(termItems)
   );
   const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
-    mockDb.filter(item => item.term !== currQuestion.term)
+    termItems.filter(item => item.term !== currQuestion.term)
   );
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
@@ -40,7 +43,7 @@ const McqGame = () => {
 
   const getChoices = (question: TermItem) => {
     const wrongChoices = shuffle(
-      mockDb.filter(item => item.term !== question.term)
+      termItems.filter(item => item.term !== question.term)
     ).slice(0, 3);
     return shuffle([question, ...wrongChoices]);
   };
@@ -101,10 +104,10 @@ const McqGame = () => {
   const handleRestart = () => {
     // reset all states
     handleResetTimer();
-    const newQuestion = getOneRandom(mockDb);
+    const newQuestion = getOneRandom(termItems);
     setCurrQuestion(newQuestion);
     setAvailableQuestions(
-      mockDb.filter(item => item.term !== newQuestion.term)
+      termItems.filter(item => item.term !== newQuestion.term)
     );
     setFormSubmitted(false);
     setScore(0);
@@ -159,8 +162,8 @@ const McqGame = () => {
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
-                mockDb.length
+              <div>{`Round: ${termItems.length - availableQuestions.length}/${
+                termItems.length
               }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
@@ -208,7 +211,7 @@ const McqGame = () => {
               className="flex flex-col items-center  justify-center">
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
-                {` You scored ${score}/${mockDb.length}`}
+                {` You scored ${score}/${termItems.length}`}
               </div>
               <Button
                 className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300

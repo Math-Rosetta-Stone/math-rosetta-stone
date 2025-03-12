@@ -10,6 +10,7 @@ import { MOCK_DB } from "@/app/map/constants/constants";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import { useUserData } from "@/app/hooks/userdata";
+import { useTerms } from "@/app/hooks/useTerms";
 
 const TIME_LIMIT = 30; // in seconds
 
@@ -22,21 +23,22 @@ const TIME_LIMIT = 30; // in seconds
 
 const MatchingGame = () => {
   const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const termToDefinition =
+  const termItems =
     gameMode === "regular"
       ? termItemToRecord(MOCK_DB)
       : termItemToRecord(
           MOCK_DB.filter((_, index) => termsIndex.includes(index))
         );
+  // const termItems = termItemToRecord(useTerms());
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [randomizedTerms, setRandomizedTerms] = useState<string[]>(
-    shuffle(Object.keys(termToDefinition))
+    shuffle(Object.keys(termItems))
   );
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(
-    shuffle(Object.values(termToDefinition))
+    shuffle(Object.values(termItems))
   );
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -107,7 +109,7 @@ const MatchingGame = () => {
         <Matching
           questions={randomizedTerms}
           answers={randomizedDefinitions}
-          answerKey={termToDefinition}
+          answerKey={termItems}
           handleResetTimer={handleResetTimer}
           handleSubmit={handleSubmit}
           handleShuffle={handleShuffle}

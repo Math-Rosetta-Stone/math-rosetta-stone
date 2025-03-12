@@ -1,3 +1,4 @@
+import { TermItem } from "@/types/game";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -22,8 +23,16 @@ export const shuffle = (array: any[]) => {
 
 export const getOneRandom = (array: any[]) => {
   return array[Math.floor(Math.random() * array.length)];
-}
+};
 
 export const omitPassword = (array: any[]) => {
   return array.map(({ password_hash, ...rest }) => rest);
-}
+};
+
+export const parseTerms = (termsData): TermItem[] => {
+  return termsData.map(({ term, definition, image }) => ({
+    term,
+    definition,
+    image: image || "/term-not-found.svg",
+  }));
+};

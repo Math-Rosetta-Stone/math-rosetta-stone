@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { PromptType } from "@/types/mcq";
+import { PromptType } from "@/types/game";
 import { cn, getOneRandom } from "@/lib/utils";
 
 import { ArrowRight, RotateCcw } from "lucide-react";
@@ -9,153 +9,157 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Fib } from "./_components/fib";
 
-import { TermItem } from "@/types/mcq";
+import { TermItem } from "@/types/game";
 import { doubleAndNext } from "@/app/practice/helpers";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import NextButton from "../_components/next-button";
+import { useTerms } from "@/app/hooks/useTerms";
+import { MOCK_DB } from "@/app/map/constants/constants";
 
 const TIME_LIMIT = 100; // in seconds
 
-const MOCK_DB: TermItem[] = [
-  {
-    term: "derivative",
-    definition: "$rate$ of change",
-    image: {
-      title: "Derivative",
-      url: "/derivative.jpg",
-    },
-  },
-  {
-    term: "derivative",
-    definition: "rate of $change$",
-    image: {
-      title: "Derivative",
-      url: "/derivative.jpg",
-    },
-  },
-  {
-    term: "integral",
-    definition: "area under the $curve$",
-    image: {
-      title: "Integral",
-      url: "/integral.jpg",
-    },
-  },
-  {
-    term: "integral",
-    definition: "area $under$ the curve",
-    image: {
-      title: "Integral",
-      url: "/integral.jpg",
-    },
-  },
-  {
-    term: "integral",
-    definition: "$area$ under the curve",
-    image: {
-      title: "Integral",
-      url: "/integral.jpg",
-    },
-  },
-  {
-    term: "limit",
-    definition: "approaching a $value$",
-    image: {
-      title: "Limit",
-      url: "/limit.png",
-    },
-  },
-  {
-    term: "limit",
-    definition: "$approaching$ a value",
-    image: {
-      title: "Limit",
-      url: "/limit.png",
-    },
-  },
-  {
-    term: "function",
-    definition: "relation between $inputs$ and outputs",
-    image: {
-      title: "Function",
-      url: "/function.jpg",
-    },
-  },
-  {
-    term: "function",
-    definition: "relation between inputs and $outputs$",
-    image: {
-      title: "Function",
-      url: "/function.jpg",
-    },
-  },
-  {
-    term: "function",
-    definition: "$relation$ between inputs and outputs",
-    image: {
-      title: "Function",
-      url: "/function.jpg",
-    },
-  },
-  {
-    term: "slope",
-    definition: "steepness of a $line$",
-    image: {
-      title: "Slope",
-      url: "/slope.jpg",
-    },
-  },
-  {
-    term: "slope",
-    definition: "$steepness$ of a line",
-    image: {
-      title: "Slope",
-      url: "/slope.jpg",
-    },
-  },
-  {
-    term: "tangent",
-    definition: "line that touches a $curve$",
-    image: {
-      title: "Tangent",
-      url: "/tangent.png",
-    },
-  },
-  {
-    term: "tangent",
-    definition: "$line$ that touches a curve",
-    image: {
-      title: "Tangent",
-      url: "/tangent.png",
-    },
-  },
-  {
-    term: "tangent",
-    definition: "line that $touches$ a curve",
-    image: {
-      title: "Tangent",
-      url: "/tangent.png",
-    },
-  },
-];
+// const MOCK_DB: TermItem[] = [
+//   {
+//     term: "derivative",
+//     definition: "$rate$ of change",
+//     image: {
+//       title: "Derivative",
+//       url: "/derivative.jpg",
+//     },
+//   },
+//   {
+//     term: "derivative",
+//     definition: "rate of $change$",
+//     image: {
+//       title: "Derivative",
+//       url: "/derivative.jpg",
+//     },
+//   },
+//   {
+//     term: "integral",
+//     definition: "area under the $curve$",
+//     image: {
+//       title: "Integral",
+//       url: "/integral.jpg",
+//     },
+//   },
+//   {
+//     term: "integral",
+//     definition: "area $under$ the curve",
+//     image: {
+//       title: "Integral",
+//       url: "/integral.jpg",
+//     },
+//   },
+//   {
+//     term: "integral",
+//     definition: "$area$ under the curve",
+//     image: {
+//       title: "Integral",
+//       url: "/integral.jpg",
+//     },
+//   },
+//   {
+//     term: "limit",
+//     definition: "approaching a $value$",
+//     image: {
+//       title: "Limit",
+//       url: "/limit.png",
+//     },
+//   },
+//   {
+//     term: "limit",
+//     definition: "$approaching$ a value",
+//     image: {
+//       title: "Limit",
+//       url: "/limit.png",
+//     },
+//   },
+//   {
+//     term: "function",
+//     definition: "relation between $inputs$ and outputs",
+//     image: {
+//       title: "Function",
+//       url: "/function.jpg",
+//     },
+//   },
+//   {
+//     term: "function",
+//     definition: "relation between inputs and $outputs$",
+//     image: {
+//       title: "Function",
+//       url: "/function.jpg",
+//     },
+//   },
+//   {
+//     term: "function",
+//     definition: "$relation$ between inputs and outputs",
+//     image: {
+//       title: "Function",
+//       url: "/function.jpg",
+//     },
+//   },
+//   {
+//     term: "slope",
+//     definition: "steepness of a $line$",
+//     image: {
+//       title: "Slope",
+//       url: "/slope.jpg",
+//     },
+//   },
+//   {
+//     term: "slope",
+//     definition: "$steepness$ of a line",
+//     image: {
+//       title: "Slope",
+//       url: "/slope.jpg",
+//     },
+//   },
+//   {
+//     term: "tangent",
+//     definition: "line that touches a $curve$",
+//     image: {
+//       title: "Tangent",
+//       url: "/tangent.png",
+//     },
+//   },
+//   {
+//     term: "tangent",
+//     definition: "$line$ that touches a curve",
+//     image: {
+//       title: "Tangent",
+//       url: "/tangent.png",
+//     },
+//   },
+//   {
+//     term: "tangent",
+//     definition: "line that $touches$ a curve",
+//     image: {
+//       title: "Tangent",
+//       url: "/tangent.png",
+//     },
+//   },
+// ];
 
 const FibGame: React.FC = () => {
   const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const mockDb =
-    gameMode === "practice"
-      ? MOCK_DB.filter((_, index) => doubleAndNext(termsIndex).includes(index))
-      : MOCK_DB;
+  const termItems =
+    gameMode === "regular"
+      ? MOCK_DB
+      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
+  // const termItems = useTerms();
+  // const termItems: TermItem[] = [];
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(
-    getOneRandom(mockDb)
+    getOneRandom(termItems)
   );
   const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
-    mockDb.filter(item => item.definition !== currQuestion.definition)
+    termItems.filter(item => item.definition !== currQuestion.definition)
   );
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
@@ -213,10 +217,10 @@ const FibGame: React.FC = () => {
   const handleRestart = () => {
     // reset all states
     handleResetTimer();
-    const newQuestion = getOneRandom(mockDb);
+    const newQuestion = getOneRandom(termItems);
     setCurrQuestion(newQuestion);
     setAvailableQuestions(
-      mockDb.filter(item => item.definition !== newQuestion.definition)
+      termItems.filter(item => item.definition !== newQuestion.definition)
     );
     setFormSubmitted(false);
     setScore(0);
@@ -269,8 +273,8 @@ const FibGame: React.FC = () => {
         {currQuestion.definition !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
-                mockDb.length
+              <div>{`Round: ${termItems.length - availableQuestions.length}/${
+                termItems.length
               }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
@@ -318,7 +322,7 @@ const FibGame: React.FC = () => {
               className="flex flex-col items-center  justify-center">
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
-                {` You scored ${score}/${mockDb.length}`}
+                {` You scored ${score}/${termItems.length}`}
               </div>
 
               <Button

@@ -11,6 +11,9 @@ import MAP_LOCATIONS from "../constants/mapLocation.json";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { useGameData } from "@/app/hooks/useGameData";
 import { SelectLevel } from "@/app/db/schema";
+import { useQuery } from "@tanstack/react-query";
+import { usePermission } from "@/app/hooks/usePermission";
+import { useTerms } from "@/app/hooks/useTerms";
 
 interface GameMapProps {
   isAdmin?: boolean;
@@ -23,7 +26,9 @@ const GameMap: React.FC<GameMapProps> = ({
   levels: propLevels,
   setLevels: propSetLevels,
 }) => {
-  const { currBranch, gamePosition } = useContext(GamePositionContext);
+  const { gamePosition, currBranch } = useContext(GamePositionContext);
+  // const { permissions } = usePermission();
+
   const { levels: levelsData } = useGameData();
   const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch);
   const [localLevels, setLocalLevels] = useState<SelectLevel[]>([]);
@@ -31,6 +36,29 @@ const GameMap: React.FC<GameMapProps> = ({
   // Use either props or local state depending on isAdmin mode
   const levels = propLevels || localLevels;
   const setLevels = propSetLevels || setLocalLevels;
+
+  // const getUnlockedTerms = async () => {
+  //   let currLevel;
+  //   for (let perm of permissions) {
+  //     if (perm.branch_no === currBranch
+  //       && perm.chapter_no === gamePosition[currBranch].chapter_no) {
+  //       currLevel = perm.level_no;
+  //       console.log("perm", perm);
+  //       console.log("branch", currBranch);
+  //       console.log("level", currLevel);
+  //       break;
+  //     }
+  //   }
+  //   const response = await fetch(`/api/terms?branch=${currBranch}&level=${currLevel}`);
+  //   return (await response.json()).data;
+  // };
+
+  // const {data} = useQuery({
+  //   queryKey: ["unlockedTerms"],
+  //   queryFn: getUnlockedTerms,
+  //   enabled: currBranch > 0,
+  // });
+  useTerms();
 
   useEffect(() => {
     if (isAdmin) {

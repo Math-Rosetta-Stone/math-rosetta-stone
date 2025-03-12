@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PromptType, TermItem } from "@/types/mcq";
+import { PromptType, TermItem } from "@/types/game";
 
 import { ChoiceBox } from "../../mcq/_components/choice-box";
 import { Button } from "@/components/ui/button";

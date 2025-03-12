@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { PromptType, TermItem } from "@/types/mcq";
+import { PromptType, TermItem } from "@/types/game";
 
 import { CircleAlert } from "lucide-react";
 import Image from "next/image";

@@ -11,6 +11,9 @@ export async function GET(request: NextRequest) {
 
     const branch = Number(request.nextUrl.searchParams.get("branch"));
     const level = Number(request.nextUrl.searchParams.get("level"));
+    if (!branch || !level) {
+      return NextResponse.json({ error: "Missing/invalid fields" }, { status: 400 });
+    }
 
     const unlockedTerms = await db.query.terms.findMany({
       where: (terms, { and, eq, lte }) => and(eq(terms.branch_no, branch), lte(terms.rank, level)),
