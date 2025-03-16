@@ -7,12 +7,14 @@ import {
   SetStateAction,
   useState,
 } from "react";
-import { GamePosition } from "@/types/db";
+import { GamePosition } from "@/types/map";
 import { useGameData } from "@/app/hooks/useGameData";
 
 interface GamePositionContextProps {
   gamePosition: GamePosition[];
-  setGamePosition: (position: GamePosition) => void;
+  setGamePosition: (
+    position: Partial<GamePosition> & { branch_no: number }
+  ) => void;
   incrementGamePosition: (branch_no: number) => void;
   currBranch: number;
   setCurrBranch: Dispatch<SetStateAction<number>>;
@@ -76,10 +78,14 @@ function GamePositionProvider({ children }: { children: ReactNode }) {
   const [currBranch, setCurrBranch] = useState<number>(0);
   const { branches, chapters } = useGameData();
 
-  const setGamePosition = (newPosition: GamePosition) => {
+  const setGamePosition = (
+    newPosition: Partial<GamePosition> & { branch_no: number }
+  ) => {
     setGamePositionState(prev =>
       prev.map(pos =>
-        pos.branch_no === newPosition.branch_no ? newPosition : pos
+        pos.branch_no === newPosition.branch_no
+          ? { ...pos, ...newPosition }
+          : pos
       )
     );
   };

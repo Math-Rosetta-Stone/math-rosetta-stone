@@ -42,8 +42,8 @@ const seedData = async () => {
         chapter_no: 1,
         branch_no: 1,
         minigame_name: "hangman",
-        x: 710,
-        y: 88,
+        x: 712,
+        y: 79,
       },
       {
         level_no: 2,

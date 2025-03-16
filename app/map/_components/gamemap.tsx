@@ -2,18 +2,20 @@ import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, ImageOverlay } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import MiniGameMarker from "./marker/minigamemarker";
+import MiniGameMarker from "./marker/miniGameMarker";
 import { BranchMarker } from "./marker/branchMarker";
 import MapComponent from "./mapcomponent";
 
 import { MAP_BOUNDS, BRANCH_MAPS_PATHS } from "../constants/constants";
-import MAP_LOCATIONS from "../constants/mapLocation.json";
+import BRANCH_LOCATIONS from "../constants/branchLocation.json";
+import CHAPTER_LOCATIONS from "../constants/chapterLocation.json";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { useGameData } from "@/app/hooks/useGameData";
-import { SelectLevel } from "@/app/db/schema";
+import { level, SelectLevel } from "@/app/db/schema";
 import { useQuery } from "@tanstack/react-query";
 import { usePermission } from "@/app/hooks/usePermission";
 import { useTerms } from "@/app/hooks/useTerms";
+import { ChapterMarker } from "./marker/chapterMarker";
 
 interface GameMapProps {
   isAdmin?: boolean;
@@ -29,8 +31,8 @@ const GameMap: React.FC<GameMapProps> = ({
   const { gamePosition, currBranch } = useContext(GamePositionContext);
   // const { permissions } = usePermission();
 
-  const { levels: levelsData } = useGameData();
-  const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch);
+  const { levels: levelsData, branches: branchesData } = useGameData();
+  const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch); // for image overlay
   const [localLevels, setLocalLevels] = useState<SelectLevel[]>([]);
 
   // Use either props or local state depending on isAdmin mode
@@ -59,8 +61,13 @@ const GameMap: React.FC<GameMapProps> = ({
   //   enabled: currBranch > 0,
   // });
   useTerms();
+  // Find the current branch data
+  const currentBranchData = branchesData?.find(
+    branch => branch.branch_no === currBranch
+  );
 
   useEffect(() => {
+    console.log("currentBranchData", currentBranchData);
     if (isAdmin) {
       const savedLevels = localStorage.getItem("levels");
       if (savedLevels) {
@@ -81,44 +88,37 @@ const GameMap: React.FC<GameMapProps> = ({
         center={[500, 500]}
         zoom={1}
         className="w-full h-full"
-        crs={L.CRS.Simple} // Use Simple CRS for flat images
+        crs={L.CRS.Simple}
         maxBounds={MAP_BOUNDS}
-        maxBoundsViscosity={1.0} // Ensure the map stays within bounds
-      >
+        maxBoundsViscosity={1.0}>
         <MapComponent bounds={MAP_BOUNDS} />
         <ImageOverlay
           key={imageOverlayKey}
           url={`/${BRANCH_MAPS_PATHS[currBranch]}`}
           bounds={MAP_BOUNDS}
         />
-        {currBranch === 0 && (
-          <>
+        {currBranch === 0 &&
+          Array.from({ length: 4 }).map((_, index) => (
             <BranchMarker
-              location={MAP_LOCATIONS[0][0]}
-              targetBranch={1}
-              targetChapter={1}
+              key={index + 1}
+              location={BRANCH_LOCATIONS[index]}
+              targetBranch={index + 1}
               setImageOverlayKey={setImageOverlayKey}
             />
-            <BranchMarker
-              location={MAP_LOCATIONS[0][1]}
-              targetBranch={2}
-              targetChapter={1}
-              setImageOverlayKey={setImageOverlayKey}
-            />
-            <BranchMarker
-              location={MAP_LOCATIONS[0][2]}
-              targetBranch={3}
-              targetChapter={1}
-              setImageOverlayKey={setImageOverlayKey}
-            />
-            <BranchMarker
-              location={MAP_LOCATIONS[0][3]}
-              targetBranch={4}
-              targetChapter={1}
-              setImageOverlayKey={setImageOverlayKey}
-            />
-          </>
-        )}
+          ))}
+        {currBranch === 1 &&
+          gamePosition[currBranch].chapter_no === 0 &&
+          currentBranchData && // Only render if we have branch data
+          Array.from({ length: currentBranchData.no_of_chapters }).map(
+            (_, index) => (
+              <ChapterMarker
+                key={index + 1}
+                location={CHAPTER_LOCATIONS[index]}
+                targetChapter={index + 1}
+                isAdmin={isAdmin}
+              />
+            )
+          )}
         {currBranch !== 0 &&
           gamePosition[currBranch]?.chapter_no > 0 &&
           levels &&

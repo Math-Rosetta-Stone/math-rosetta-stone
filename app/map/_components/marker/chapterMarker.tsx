@@ -2,37 +2,36 @@ import React, { useContext } from "react";
 import { Marker } from "react-leaflet";
 import { LatLngExpression } from "leaflet";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
-import { branchIcon } from "../../helpers/icon";
+import { chapterIcon } from "../../helpers/icon";
 
-interface BranchMarkerProps {
+interface ChapterMarkerProps {
   location: { x: number; y: number };
-  targetBranch: number;
-  setImageOverlayKey: (key: number) => void;
+  targetChapter: number;
   isAdmin?: boolean;
 }
 
-export const BranchMarker: React.FC<BranchMarkerProps> = ({
+export const ChapterMarker: React.FC<ChapterMarkerProps> = ({
   location,
-  targetBranch,
-  setImageOverlayKey,
+  targetChapter,
   isAdmin,
 }) => {
-  const { setGamePosition, setCurrBranch } = useContext(GamePositionContext);
+  const { setGamePosition, currBranch } = useContext(GamePositionContext);
   const position: LatLngExpression = [location.y, location.x];
+
   const handleClick = () => {
-    setImageOverlayKey(targetBranch);
-    setCurrBranch(targetBranch);
+    // Include branch_no which is required by the updated type
     setGamePosition({
-      branch_no: targetBranch,
-      chapter_no: 0,
-      level_no: 0,
+      branch_no: currBranch,
+      chapter_no: targetChapter,
     });
+
+    console.log(`Clicked on Chapter ${targetChapter} in Branch ${currBranch}`);
   };
 
   return (
     <Marker
       position={position}
-      icon={branchIcon(targetBranch)}
+      icon={chapterIcon(targetChapter)}
       draggable={isAdmin}
       eventHandlers={{
         click: handleClick,

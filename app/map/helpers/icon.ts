@@ -32,7 +32,6 @@ const gameIcons: Record<GamesWithRandom, string> = {
   </svg>`,
 };
 
-
 export const gameIcon = (
   level: number,
   game: GamesWithRandom = "random",
@@ -41,9 +40,9 @@ export const gameIcon = (
 ) => {
   let bgColor;
   if (isLocked) {
-    bgColor = "#ff3d07"
+    bgColor = "#ff3d07";
   } else {
-    bgColor = isCurrent ? "#FFC107": "#02c71f";
+    bgColor = isCurrent ? "#FFC107" : "#02c71f";
   }
 
   // Create a unique ID for this icon
@@ -63,7 +62,7 @@ export const gameIcon = (
         #${uniqueId}.locked { pointer-events: none; }
       </style>
 
-      <g id="${uniqueId}" class="${isLocked ? 'locked' : ''}">
+      <g id="${uniqueId}" class="${isLocked ? "locked" : ""}">
         <!-- Level number (shown on hover) -->
         <circle class="level-bg" cx="25" cy="25" r="23" stroke="white" stroke-width="2"/>
         <text class="level-text" x="25" y="30" text-anchor="middle" font-size="18" font-weight="bold">${level}</text>
@@ -97,6 +96,21 @@ export const branchIcon = (branch: number) => {
     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
       <circle cx="25" cy="25" r="23" fill="#2196F3" stroke="white" stroke-width="2"/>
       <text x="25" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="white">${branch}</text>
+    </svg>
+  `;
+  return L.divIcon({
+    html: svgString,
+    className: "custom-svg-icon",
+    iconSize: [50, 50],
+    iconAnchor: [25, 25],
+  });
+};
+
+export const chapterIcon = (chapter: number) => {
+  const svgString = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+      <circle cx="25" cy="25" r="23" fill="#FFC107" stroke="white" stroke-width="2"/>
+      <text x="25" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="white">${chapter}</text>
     </svg>
   `;
   return L.divIcon({
