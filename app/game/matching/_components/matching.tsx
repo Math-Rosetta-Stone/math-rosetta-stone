@@ -10,13 +10,12 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Shuffle } from "lucide-react";
 import NextButton from "../../_components/next-button";
+import { TermItem } from "@/types/game";
 
 interface MatchingProps {
   questions: string[];
   answers: string[];
-  answerKey: {
-    [key: string]: string;
-  };
+  answerKey: TermItem[];
   handleResetTimer: () => void;
   handleSubmit: () => void;
   handleShuffle: (
@@ -40,6 +39,11 @@ export const Matching = ({
   const [minHeights, setMinHeights] = useState<number[]>([]);
   const [shuffleKey, setShuffleKey] = useState(0);
   const refs = useRef<HTMLDivElement[]>([]);
+
+  const answerKeyObj: {[key: string]: string} = {};
+  answerKey.forEach((term) => {
+    answerKeyObj[term.term] = term.definition;
+  });
 
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -74,7 +78,7 @@ export const Matching = ({
   // Helper function to check if all answers are correct
   const areAllAnswersCorrect = () => {
     return formQuestions.every(
-      (question, index) => answerKey[question] === formAnswers[index]
+      (question, index) => answerKeyObj[question] === formAnswers[index]
     );
   };
 
@@ -125,7 +129,7 @@ export const Matching = ({
                         variant={
                           !formSubmitted
                             ? "unsubmitted"
-                            : answerKey[formQuestions[index]] === answer
+                            : answerKeyObj[formQuestions[index]] === answer
                             ? "correct"
                             : "incorrect"
                         }

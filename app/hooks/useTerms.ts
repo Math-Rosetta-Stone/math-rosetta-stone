@@ -9,21 +9,16 @@ export const useTerms = () => {
   const { permissions } = usePermission();
 
   const getUnlockedTerms = async () => {
-    console.log("branch", currBranch);
     let currLevel;
     for (let perm of permissions) {
       if (perm.branch_no === currBranch) {
         currLevel = perm.level_no;
-        console.log("perm", perm);
-        console.log("level", currLevel);
         break;
       }
     }
     const response = await fetch(`/api/terms?branch=${currBranch}&level=${currLevel}`);
     return (await response.json()).data;
   };
-
-  // console.log("currBranch (NOT in getUnlockedTerms)", currBranch);
 
   const {data, isPending} = useQuery({
     queryKey: ["unlockedTerms"],

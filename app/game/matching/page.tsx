@@ -1,44 +1,27 @@
 "use client";
 
-import { useEffect, useState, useContext } from "react";
-import { shuffle } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
 
 import { Matching } from "./_components/matching";
-
-import { termItemToRecord } from "@/app/practice/helpers";
-import { MOCK_DB } from "@/app/map/constants/constants";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import LoadingAnimation from "@/components/ui/loadinganimation";
-import { useUserData } from "@/app/hooks/userdata";
-import { useTerms } from "@/app/hooks/useTerms";
+
+import { shuffle } from "@/lib/utils";
 
 const TIME_LIMIT = 30; // in seconds
 
-// const termToDefinition: { [key: string]: string } = {
-//   derivative: "rate of change",
-//   integral: "area under the curve",
-//   limit: "approaching a value",
-//   function: "relation between inputs and outputs",
-// }
-
 const MatchingGame = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const termItems =
-    gameMode === "regular"
-      ? termItemToRecord(MOCK_DB)
-      : termItemToRecord(
-          MOCK_DB.filter((_, index) => termsIndex.includes(index))
-        );
-  // const termItems = termItemToRecord(useTerms());
+  const { data: termItems } = useTerms();
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [randomizedTerms, setRandomizedTerms] = useState<string[]>(
-    shuffle(Object.keys(termItems))
+    shuffle(termItems.map((termItem) => termItem.term))
   );
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(
-    shuffle(Object.values(termItems))
+    shuffle(termItems.map((termItem) => termItem.definition))
   );
   const [formSubmitted, setFormSubmitted] = useState(false);
 

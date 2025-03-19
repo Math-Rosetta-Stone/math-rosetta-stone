@@ -81,7 +81,6 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
   useEffect(() => {
     setLocked(isLevelLocked());
     setCurrent(isLevelCurrent())
-    // console.log("UPDATED locked and current");
   }, [permissions]);
 
   return (

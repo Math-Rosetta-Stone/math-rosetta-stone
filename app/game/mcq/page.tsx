@@ -1,25 +1,24 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { PromptType, TermItem } from "@/types/game";
-import { cn, getOneRandom, shuffle } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
 
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Mcq } from "./_components/mcq";
 import { Button } from "@/components/ui/button";
-import { MOCK_DB } from "@/app/map/constants/constants";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
 import LoadingAnimation from "@/components/ui/loadinganimation";
-import { useUserData } from "@/app/hooks/userdata";
 import NextButton from "../_components/next-button";
-import { useTerms } from "@/app/hooks/useTerms";
+
+import { cn, getOneRandom, shuffle } from "@/lib/utils";
+import { PromptType, TermItem } from "@/types/game";
 
 const TIME_LIMIT = 5; // in seconds
 
 const McqGame = () => {
-  const { data: termItems, isPending } = useTerms();
+  const { data: termItems } = useTerms();
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);

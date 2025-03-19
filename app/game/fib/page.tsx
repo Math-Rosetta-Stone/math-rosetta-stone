@@ -1,27 +1,24 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { PromptType } from "@/types/game";
-import { cn, getOneRandom } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
 
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+
 import { Button } from "@/components/ui/button";
 import { Fib } from "./_components/fib";
-
-import { TermItem } from "@/types/game";
-import { doubleAndNext } from "@/app/practice/helpers";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import NextButton from "../_components/next-button";
-import { useTerms } from "@/app/hooks/useTerms";
-import { MOCK_DB } from "@/app/map/constants/constants";
+
+import { cn, getOneRandom } from "@/lib/utils";
+import { PromptType, TermItem } from "@/types/game";
 
 const TIME_LIMIT = 100; // in seconds
 
 const FibGame: React.FC = () => {
-  const { data: termItems, isPending } = useTerms();
+  const { data: termItems } = useTerms();
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
