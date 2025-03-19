@@ -27,7 +27,6 @@ const GameMap: React.FC<GameMapProps> = ({
   setLevels: propSetLevels,
 }) => {
   const { gamePosition, currBranch } = useContext(GamePositionContext);
-  // const { permissions } = usePermission();
 
   const { levels: levelsData } = useGameData();
   const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch);
@@ -37,27 +36,6 @@ const GameMap: React.FC<GameMapProps> = ({
   const levels = propLevels || localLevels;
   const setLevels = propSetLevels || setLocalLevels;
 
-  // const getUnlockedTerms = async () => {
-  //   let currLevel;
-  //   for (let perm of permissions) {
-  //     if (perm.branch_no === currBranch
-  //       && perm.chapter_no === gamePosition[currBranch].chapter_no) {
-  //       currLevel = perm.level_no;
-  //       console.log("perm", perm);
-  //       console.log("branch", currBranch);
-  //       console.log("level", currLevel);
-  //       break;
-  //     }
-  //   }
-  //   const response = await fetch(`/api/terms?branch=${currBranch}&level=${currLevel}`);
-  //   return (await response.json()).data;
-  // };
-
-  // const {data} = useQuery({
-  //   queryKey: ["unlockedTerms"],
-  //   queryFn: getUnlockedTerms,
-  //   enabled: currBranch > 0,
-  // });
   useTerms();
 
   useEffect(() => {
@@ -131,7 +109,8 @@ const GameMap: React.FC<GameMapProps> = ({
                 isAdmin={isAdmin}
                 setLevels={setLevels}
               />
-            ))}
+            ))
+        }
       </MapContainer>
     </div>
   );

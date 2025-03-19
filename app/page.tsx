@@ -39,7 +39,7 @@ export default function Home() {
         return res.json();
       })
       .then(data => {
-        console.log("DATA", data);
+        // console.log("DATA", data);
         setUser(data);
         setIsLoading(false);
       })

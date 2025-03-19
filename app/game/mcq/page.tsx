@@ -19,13 +19,7 @@ import { useTerms } from "@/app/hooks/useTerms";
 const TIME_LIMIT = 5; // in seconds
 
 const McqGame = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const termItems =
-    gameMode === "regular"
-      ? MOCK_DB
-      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
-  // const termItems = useTerms();
-  // const termItems: TermItem[] = [];
+  const { data: termItems, isPending } = useTerms();
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);

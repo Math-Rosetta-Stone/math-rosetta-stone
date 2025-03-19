@@ -23,13 +23,7 @@ import { useTerms } from "@/app/hooks/useTerms";
 import { TermItem } from "@/types/game";
 
 const Hangman: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const termItems =
-    gameMode === "regular"
-      ? MOCK_DB
-      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
-  // const termItems = useTerms();
-  // const termItems: TermItem[] = [];
+  const { data: termItems, isPending } = useTerms();
 
   const [playable, setPlayable] = useState<boolean>(true);
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
