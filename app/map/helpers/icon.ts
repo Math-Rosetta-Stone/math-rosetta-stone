@@ -32,39 +32,54 @@ const gameIcons: Record<GamesWithRandom, string> = {
   </svg>`,
 };
 
+
 export const gameIcon = (
   level: number,
   game: GamesWithRandom = "random",
-  isCompleted: boolean = false
+  isLocked: boolean,
+  isCurrent: boolean
 ) => {
-  const bgColor = isCompleted ? "#4CAF50" : "#FFC107";
+  let bgColor;
+  if (isLocked) {
+    bgColor = "#ff3d07"
+  } else {
+    bgColor = isCurrent ? "#FFC107": "#02c71f";
+  }
 
   // Create a unique ID for this icon
   const uniqueId = `game-icon-${level}-${game}-${Date.now()}`;
 
   const svgString = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" class="game-icon" id="${uniqueId}">
-      <defs>
-        <style>
-          .game-icon .level-bg { fill: ${bgColor}; transition: opacity 0.3s; opacity: 0; }
-          .game-icon .level-text { fill: white; transition: opacity 0.3s; opacity: 0; }
-          .game-icon .icon-bg { fill: ${bgColor}; transition: opacity 0.3s; opacity: 1; }
-          .game-icon .icon-path { fill: white; transition: opacity 0.3s; opacity: 1; }
-          .game-icon:hover .level-bg { opacity: 1; }
-          .game-icon:hover .level-text { opacity: 1; }
-          .game-icon:hover .icon-bg { opacity: 0; }
-          .game-icon:hover .icon-path { opacity: 0; }
-        </style>
-      </defs>
-      
-      <!-- Level number (shown on hover) -->
-      <circle class="level-bg" cx="25" cy="25" r="23" stroke="white" stroke-width="2"/>
-      <text class="level-text" x="25" y="30" text-anchor="middle" font-size="18" font-weight="bold">${level}</text>
-      
-      <!-- Game icon (default view) -->
-      <circle class="icon-bg" cx="25" cy="25" r="23" stroke="white" stroke-width="2"/>
-      <g class="icon-path" transform="translate(13, 13)">
-        ${gameIcons[game]}
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" class="game-icon">
+      <style>
+        #${uniqueId} .level-bg { fill: ${bgColor}; transition: opacity 0.3s; opacity: 0; }
+        #${uniqueId} .level-text { fill: white; transition: opacity 0.3s; opacity: 0; }
+        #${uniqueId} .icon-bg { fill: ${bgColor}; transition: opacity 0.3s; opacity: 1; }
+        #${uniqueId} .icon-path { fill: white; transition: opacity 0.3s; opacity: 1; }
+        #${uniqueId}:hover .level-bg { opacity: 1; }
+        #${uniqueId}:hover .level-text { opacity: 1; }
+        #${uniqueId}:hover .icon-bg { opacity: 0; }
+        #${uniqueId}:hover .icon-path { opacity: 0; }
+        #${uniqueId}.locked { pointer-events: none; }
+      </style>
+
+      <g id="${uniqueId}" class="${isLocked ? 'locked' : ''}">
+        <!-- Level number (shown on hover) -->
+        <circle class="level-bg" cx="25" cy="25" r="23" stroke="white" stroke-width="2"/>
+        <text class="level-text" x="25" y="30" text-anchor="middle" font-size="18" font-weight="bold">${level}</text>
+
+        <!-- Game icon (default view) -->
+        <circle
+          class="icon-bg"
+          cx="25"
+          cy="25"
+          r="23"
+          stroke="white"
+          stroke-width="${isCurrent ? 4 : 2}"
+        />
+        <g class="icon-path" transform="translate(13, 13)">
+          ${gameIcons[game]}
+        </g>
       </g>
     </svg>
   `;

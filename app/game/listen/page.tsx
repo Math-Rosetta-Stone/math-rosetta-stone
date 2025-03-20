@@ -1,32 +1,31 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { cn, getOneRandom, shuffle } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
+
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+
 import { Mcq } from "./_components/Mcq";
 import { Button } from "@/components/ui/button";
-import { PromptType } from "@/types/mcq";
-import { MOCK_DB } from "@/app/map/constants/constants";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-import { useUserData } from "@/app/hook/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
+import NextButton from "../_components/next-button";
+
+import { cn, getOneRandom, shuffle } from "@/lib/utils";
+import { PromptType } from "@/types/game";
 
 const TIME_LIMIT = 10; // in seconds
 
 const ListeningGame: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const mockDb =
-    gameMode === "practice"
-      ? MOCK_DB.filter((_, index) => termsIndex.includes(index))
-      : MOCK_DB;
+  const { data: termItems } = useTerms();
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
-  const [currQuestion, setCurrQuestion] = useState(getOneRandom(mockDb));
+  const [currQuestion, setCurrQuestion] = useState(getOneRandom(termItems));
   const [availableQuestions, setAvailableQuestions] = useState(
-    mockDb.filter(item => item.term !== currQuestion.term)
+    termItems.filter(item => item.term !== currQuestion.term)
   );
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
@@ -50,7 +49,7 @@ const ListeningGame: React.FC = () => {
     choiceType: PromptType
   ) => {
     const wrongChoices = shuffle(
-      mockDb.filter(item => item.term !== question.term)
+      termItems.filter(item => item.term !== question.term)
     ).slice(0, 3);
     const choices = shuffle([
       {
@@ -115,11 +114,11 @@ const ListeningGame: React.FC = () => {
   const handleRestart = () => {
     // reset all states
     handleResetTimer();
-    const newQuestion = getOneRandom(mockDb);
+    const newQuestion = getOneRandom(termItems);
     const newPromptType = getRandomPromptType();
     setCurrQuestion(newQuestion);
     setAvailableQuestions(
-      mockDb.filter(item => item.term !== newQuestion.term)
+      termItems.filter(item => item.term !== newQuestion.term)
     );
     setFormSubmitted(false);
     setScore(0);
@@ -162,8 +161,8 @@ const ListeningGame: React.FC = () => {
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
-                mockDb.length
+              <div>{`Round: ${termItems.length - availableQuestions.length}/${
+                termItems.length
               }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
@@ -209,7 +208,7 @@ const ListeningGame: React.FC = () => {
               className="flex flex-col items-center justify-center">
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
-                {` You scored ${score}/${mockDb.length}`}
+                {` You scored ${score}/${termItems.length}`}
               </div>
               <Button
                 className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
@@ -219,6 +218,8 @@ const ListeningGame: React.FC = () => {
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>
+
+              <NextButton />
             </motion.div>
           )}
         </AnimatePresence>

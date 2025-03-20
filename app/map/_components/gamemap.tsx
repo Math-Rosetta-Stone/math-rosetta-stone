@@ -9,8 +9,11 @@ import MapComponent from "./mapcomponent";
 import { MAP_BOUNDS, BRANCH_MAPS_PATHS } from "../constants/constants";
 import MAP_LOCATIONS from "../constants/mapLocation.json";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
-import { useGameData } from "@/app/hook/useGameData";
+import { useGameData } from "@/app/hooks/useGameData";
 import { SelectLevel } from "@/app/db/schema";
+import { useQuery } from "@tanstack/react-query";
+import { usePermission } from "@/app/hooks/usePermission";
+import { useTerms } from "@/app/hooks/useTerms";
 
 interface GameMapProps {
   isAdmin?: boolean;
@@ -23,7 +26,8 @@ const GameMap: React.FC<GameMapProps> = ({
   levels: propLevels,
   setLevels: propSetLevels,
 }) => {
-  const { currBranch, gamePosition } = useContext(GamePositionContext);
+  const { gamePosition, currBranch } = useContext(GamePositionContext);
+
   const { levels: levelsData } = useGameData();
   const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch);
   const [localLevels, setLocalLevels] = useState<SelectLevel[]>([]);
@@ -31,6 +35,8 @@ const GameMap: React.FC<GameMapProps> = ({
   // Use either props or local state depending on isAdmin mode
   const levels = propLevels || localLevels;
   const setLevels = propSetLevels || setLocalLevels;
+
+  useTerms();
 
   useEffect(() => {
     if (isAdmin) {
@@ -103,7 +109,8 @@ const GameMap: React.FC<GameMapProps> = ({
                 isAdmin={isAdmin}
                 setLevels={setLevels}
               />
-            ))}
+            ))
+        }
       </MapContainer>
     </div>
   );

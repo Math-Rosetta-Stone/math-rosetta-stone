@@ -1,6 +1,6 @@
 "use client";
 
-import { TermItem, PromptType } from "@/types/mcq";
+import { TermItem, PromptType } from "@/types/game";
 import Image from "next/image";
 
 interface QuestionBoxProps {

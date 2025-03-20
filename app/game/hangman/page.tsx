@@ -1,30 +1,27 @@
 "use client";
 
-// original hangman code with a little props modifications for incorporate the gameMode prop
-// only touched the props and added logic for choosing mockDb
-import React, { useState, useEffect, KeyboardEvent, useContext } from "react";
+import React, { useState, useEffect, KeyboardEvent } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
+
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+import LoadingAnimation from "@/components/ui/loadinganimation";
 import Figure from "./_components/Figure";
 import WrongLetters from "./_components/WrongLetters";
 import Word from "./_components/Word";
 import Notification from "./_components/Notification";
-import { showNotification as show, checkWin } from "./helpers/helpers";
-import { cn, getOneRandom } from "@/lib/utils";
-import { ArrowRight, RotateCcw } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { MOCK_DB, TermItem } from "@/app/map/constants/constants";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-
+import NextButton from "../_components/next-button";
 import "./hangman.css";
-import { useUserData } from "@/app/hook/userdata";
-import LoadingAnimation from "@/components/ui/loadinganimation";
+
+import { cn, getOneRandom } from "@/lib/utils";
+import { showNotification as show, checkWin } from "./helpers/helpers";
+import { TermItem } from "@/types/game";
 
 const Hangman: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const mockDb =
-    gameMode === "regular"
-      ? MOCK_DB
-      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
+  const { data: termItems } = useTerms();
 
   const [playable, setPlayable] = useState<boolean>(true);
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
@@ -32,10 +29,11 @@ const Hangman: React.FC = () => {
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [hydrated, setHydrated] = useState(false);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(
-    getOneRandom(mockDb)
+    getOneRandom(termItems)
   );
+
   const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
-    mockDb.filter(item => item.term !== currQuestion.term)
+    termItems.filter(item => item.term !== currQuestion.term)
   );
   const [score, setScore] = useState(0);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -77,10 +75,10 @@ const Hangman: React.FC = () => {
     setWrongLetters([]);
 
     // reset all states
-    const newQuestion = getOneRandom(mockDb);
+    const newQuestion = getOneRandom(termItems);
     setCurrQuestion(newQuestion);
     setAvailableQuestions(
-      mockDb.filter(item => item.term !== newQuestion.term)
+      termItems.filter(item => item.term !== newQuestion.term)
     );
     setScore(0);
     setGameMessage("");
@@ -164,8 +162,8 @@ const Hangman: React.FC = () => {
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
-              <div>{`Round: ${mockDb.length - availableQuestions.length}/${
-                mockDb.length
+              <div>{`Round: ${termItems.length - availableQuestions.length}/${
+                termItems.length
               }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
@@ -218,7 +216,7 @@ const Hangman: React.FC = () => {
               className="flex flex-col items-center justify-center">
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
-                {` You scored ${score - 1}/${mockDb.length}`}
+                {` You scored ${score - 1}/${termItems.length}`}
               </div>
               <Button
                 className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
@@ -228,6 +226,8 @@ const Hangman: React.FC = () => {
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>
+
+              <NextButton />
             </motion.div>
           )}
         </AnimatePresence>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PromptType, TermItem } from "@/types/mcq";
+import { PromptType, TermItem } from "@/types/game";
 
 import { BlankInput } from "./blank-input";
 import { Button } from "@/components/ui/button";
