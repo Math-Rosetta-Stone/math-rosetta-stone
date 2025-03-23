@@ -7,19 +7,12 @@ import { usePermission } from "./usePermission";
 export const useTerms = () => {
   const { gamePosition, currBranch } = useContext(GamePositionContext);
   const { permissions } = usePermission();
-  // const {data} = useQuery({
-  //   queryKey: ["unlockedTerms"],
-  // });
 
   const getUnlockedTerms = async () => {
     let currLevel;
     for (let perm of permissions) {
-      if (perm.branch_no === currBranch
-        && perm.chapter_no === gamePosition[currBranch].chapter_no) {
+      if (perm.branch_no === currBranch) {
         currLevel = perm.level_no;
-        console.log("perm", perm);
-        console.log("branch", currBranch);
-        console.log("level", currLevel);
         break;
       }
     }
@@ -27,11 +20,14 @@ export const useTerms = () => {
     return (await response.json()).data;
   };
 
-  const {data} = useQuery({
+  const {data, isPending} = useQuery({
     queryKey: ["unlockedTerms"],
     queryFn: getUnlockedTerms,
     enabled: currBranch > 0,
   });
 
-  return data ? parseTerms(data) : [];
+  return {
+    data: data ? parseTerms(data) : [],
+    isPending,
+  };
 };

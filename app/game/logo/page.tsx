@@ -1,29 +1,23 @@
 "use client";
 
-import { useEffect, useState, useContext } from "react";
-import { TermItem, MOCK_DB } from "@/app/map/constants/constants";
-import { cn, getOneRandom } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
 
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import NextButton from "../_components/next-button";
-import { useTerms } from "@/app/hooks/useTerms";
+
+import { cn, getOneRandom } from "@/lib/utils";
+import { TermItem } from "@/types/game";
 
 const TIME_LIMIT = 10; // in seconds
 
 const LogoQuizGame = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const termItems =
-    gameMode === "regular"
-      ? MOCK_DB
-      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
-  // const termItems = useTerms();
-  // const termItems: TermItem[] = [];
+  const { data: termItems } = useTerms();
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);

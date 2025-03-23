@@ -19,11 +19,10 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
   setLevels,
 }) => {
   const router = useRouter();
-  const { setGamePosition } = useContext(GamePositionContext);
+  const { currBranch, setGamePosition } = useContext(GamePositionContext);
   const { permissions } = usePermission();
   const [locked, setLocked] = useState(true);
   const [current, setCurrent] = useState(false);
-  const { currBranch } = useContext(GamePositionContext);
 
   const handleClick = () => {
     setGamePosition({

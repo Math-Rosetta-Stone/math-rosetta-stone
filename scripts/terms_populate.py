@@ -49,16 +49,16 @@ ROW_HEADERS = 1  # Row containing headers
 ROW_START = 2  # First row of data
 ROW_END = 287  # Last row of data
 
-# Escapes SQL's special characters from a string
-def escape_special_characters(string):
-    if not string:
-        return string
-    # Define special characters to escape (based on SQL docs)
-    special_characters = r'''!@&*[]{}^:=/><-()%+?;'~|"\\'''
-    # Escape each special character
-    for char in special_characters:
-        string = string.replace(char, f"\\{char}")
-    return string
+# # Escapes SQL's special characters from a string
+# def escape_special_characters(string):
+#     if not string:
+#         return string
+#     # Define special characters to escape (based on SQL docs)
+#     special_characters = r'''!@&*[]{}^:=/><-()%+?;'~|"\\'''
+#     # Escape each special character
+#     for char in special_characters:
+#         string = string.replace(char, f"\\{char}")
+#     return string
 
 # Insert languages into the `languages` table
 def insert_languages():
@@ -184,6 +184,9 @@ def insert_excel_data_into_sql_tables():
         field = ws.cell(row, field_col).value
         level = ws.cell(row, level_col).value
         example = ws.cell(row, example_col).value
+        
+        # Debug print statements
+        # print(f"Row {row}: term={term}, definition={definition}, field={field}, level={level}, example={example}")
 
         # Check for missing or invalid data
         if term is None or term == "0" or term == 0:
@@ -204,10 +207,10 @@ def insert_excel_data_into_sql_tables():
 
         branch_number = branch_id_map.get(field)
 
-        # Escape special characters
-        term = escape_special_characters(term)
-        definition = escape_special_characters(definition)
-        example = escape_special_characters(example)
+        # # Escape special characters
+        # term = escape_special_characters(term)
+        # definition = escape_special_characters(definition)
+        # example = escape_special_characters(example)
 
         # Print term details for debugging
         print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
@@ -231,7 +234,7 @@ def insert_excel_data_into_sql_tables():
         for lang_col, lang_name in language_cols:
             translation = ws.cell(row, lang_col).value
             if translation:
-                translation = escape_special_characters(translation)
+                # translation = escape_special_characters(translation)
                 # Check if the combination of term_id and lang_id already exists
                 cursor.execute("""
                 SELECT COUNT(*) FROM translations WHERE term_id = %s AND lang_id = %s

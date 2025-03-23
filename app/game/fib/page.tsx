@@ -1,156 +1,24 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { PromptType } from "@/types/game";
-import { cn, getOneRandom } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
 
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+
 import { Button } from "@/components/ui/button";
 import { Fib } from "./_components/fib";
-
-import { TermItem } from "@/types/game";
-import { doubleAndNext } from "@/app/practice/helpers";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-import { useUserData } from "@/app/hooks/userdata";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import NextButton from "../_components/next-button";
-import { useTerms } from "@/app/hooks/useTerms";
-import { MOCK_DB } from "@/app/map/constants/constants";
+
+import { cn, getOneRandom } from "@/lib/utils";
+import { PromptType, TermItem } from "@/types/game";
 
 const TIME_LIMIT = 100; // in seconds
 
-// const MOCK_DB: TermItem[] = [
-//   {
-//     term: "derivative",
-//     definition: "$rate$ of change",
-//     image: {
-//       title: "Derivative",
-//       url: "/derivative.jpg",
-//     },
-//   },
-//   {
-//     term: "derivative",
-//     definition: "rate of $change$",
-//     image: {
-//       title: "Derivative",
-//       url: "/derivative.jpg",
-//     },
-//   },
-//   {
-//     term: "integral",
-//     definition: "area under the $curve$",
-//     image: {
-//       title: "Integral",
-//       url: "/integral.jpg",
-//     },
-//   },
-//   {
-//     term: "integral",
-//     definition: "area $under$ the curve",
-//     image: {
-//       title: "Integral",
-//       url: "/integral.jpg",
-//     },
-//   },
-//   {
-//     term: "integral",
-//     definition: "$area$ under the curve",
-//     image: {
-//       title: "Integral",
-//       url: "/integral.jpg",
-//     },
-//   },
-//   {
-//     term: "limit",
-//     definition: "approaching a $value$",
-//     image: {
-//       title: "Limit",
-//       url: "/limit.png",
-//     },
-//   },
-//   {
-//     term: "limit",
-//     definition: "$approaching$ a value",
-//     image: {
-//       title: "Limit",
-//       url: "/limit.png",
-//     },
-//   },
-//   {
-//     term: "function",
-//     definition: "relation between $inputs$ and outputs",
-//     image: {
-//       title: "Function",
-//       url: "/function.jpg",
-//     },
-//   },
-//   {
-//     term: "function",
-//     definition: "relation between inputs and $outputs$",
-//     image: {
-//       title: "Function",
-//       url: "/function.jpg",
-//     },
-//   },
-//   {
-//     term: "function",
-//     definition: "$relation$ between inputs and outputs",
-//     image: {
-//       title: "Function",
-//       url: "/function.jpg",
-//     },
-//   },
-//   {
-//     term: "slope",
-//     definition: "steepness of a $line$",
-//     image: {
-//       title: "Slope",
-//       url: "/slope.jpg",
-//     },
-//   },
-//   {
-//     term: "slope",
-//     definition: "$steepness$ of a line",
-//     image: {
-//       title: "Slope",
-//       url: "/slope.jpg",
-//     },
-//   },
-//   {
-//     term: "tangent",
-//     definition: "line that touches a $curve$",
-//     image: {
-//       title: "Tangent",
-//       url: "/tangent.png",
-//     },
-//   },
-//   {
-//     term: "tangent",
-//     definition: "$line$ that touches a curve",
-//     image: {
-//       title: "Tangent",
-//       url: "/tangent.png",
-//     },
-//   },
-//   {
-//     term: "tangent",
-//     definition: "line that $touches$ a curve",
-//     image: {
-//       title: "Tangent",
-//       url: "/tangent.png",
-//     },
-//   },
-// ];
-
 const FibGame: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const termItems =
-    gameMode === "regular"
-      ? MOCK_DB
-      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
-  // const termItems = useTerms();
-  // const termItems: TermItem[] = [];
+  const { data: termItems } = useTerms();
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);

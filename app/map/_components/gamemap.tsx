@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { MapContainer, ImageOverlay } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import MiniGameMarker from "./marker/miniGameMarker";
+import MiniGameMarker from "./marker/minigamemarker";
 import { BranchMarker } from "./marker/branchMarker";
 import MapComponent from "./mapcomponent";
+import HomeButton from "./HomeButton";
 
 import { MAP_BOUNDS, BRANCH_MAPS_PATHS } from "../constants/constants";
 import BRANCH_LOCATIONS from "../constants/branchLocation.json";
@@ -29,7 +30,6 @@ const GameMap: React.FC<GameMapProps> = ({
   setLevels: propSetLevels,
 }) => {
   const { gamePosition, currBranch } = useContext(GamePositionContext);
-  // const { permissions } = usePermission();
 
   const { levels: levelsData, branches: branchesData } = useGameData();
   const [imageOverlayKey, setImageOverlayKey] = useState<number>(currBranch); // for image overlay
@@ -39,27 +39,6 @@ const GameMap: React.FC<GameMapProps> = ({
   const levels = propLevels || localLevels;
   const setLevels = propSetLevels || setLocalLevels;
 
-  // const getUnlockedTerms = async () => {
-  //   let currLevel;
-  //   for (let perm of permissions) {
-  //     if (perm.branch_no === currBranch
-  //       && perm.chapter_no === gamePosition[currBranch].chapter_no) {
-  //       currLevel = perm.level_no;
-  //       console.log("perm", perm);
-  //       console.log("branch", currBranch);
-  //       console.log("level", currLevel);
-  //       break;
-  //     }
-  //   }
-  //   const response = await fetch(`/api/terms?branch=${currBranch}&level=${currLevel}`);
-  //   return (await response.json()).data;
-  // };
-
-  // const {data} = useQuery({
-  //   queryKey: ["unlockedTerms"],
-  //   queryFn: getUnlockedTerms,
-  //   enabled: currBranch > 0,
-  // });
   useTerms();
   // Find the current branch data
   const currentBranchData = branchesData?.find(
@@ -92,6 +71,7 @@ const GameMap: React.FC<GameMapProps> = ({
         maxBounds={MAP_BOUNDS}
         maxBoundsViscosity={1.0}>
         <MapComponent bounds={MAP_BOUNDS} />
+        <HomeButton />
         <ImageOverlay
           key={imageOverlayKey}
           url={`/${BRANCH_MAPS_PATHS[currBranch]}`}

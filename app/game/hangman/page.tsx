@@ -1,35 +1,27 @@
 "use client";
 
-// original hangman code with a little props modifications for incorporate the gameMode prop
-// only touched the props and added logic for choosing mockDb
-import React, { useState, useEffect, KeyboardEvent, useContext } from "react";
+import React, { useState, useEffect, KeyboardEvent } from "react";
+import { useTerms } from "@/app/hooks/useTerms";
+import { useUserData } from "@/app/hooks/userdata";
+
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+import LoadingAnimation from "@/components/ui/loadinganimation";
 import Figure from "./_components/Figure";
 import WrongLetters from "./_components/WrongLetters";
 import Word from "./_components/Word";
 import Notification from "./_components/Notification";
-import { showNotification as show, checkWin } from "./helpers/helpers";
-import { cn, getOneRandom } from "@/lib/utils";
-import { ArrowRight, RotateCcw } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { MOCK_DB } from "@/app/map/constants/constants";
-import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-
-import "./hangman.css";
-import { useUserData } from "@/app/hooks/userdata";
-import LoadingAnimation from "@/components/ui/loadinganimation";
 import NextButton from "../_components/next-button";
-import { useTerms } from "@/app/hooks/useTerms";
+import "./hangman.css";
+
+import { cn, getOneRandom } from "@/lib/utils";
+import { showNotification as show, checkWin } from "./helpers/helpers";
 import { TermItem } from "@/types/game";
 
 const Hangman: React.FC = () => {
-  const { gameMode, termsIndex } = useContext(PracticeModalContext);
-  const termItems =
-    gameMode === "regular"
-      ? MOCK_DB
-      : MOCK_DB.filter((_, index) => termsIndex.includes(index));
-  // const termItems = useTerms();
-  // const termItems: TermItem[] = [];
+  const { data: termItems } = useTerms();
 
   const [playable, setPlayable] = useState<boolean>(true);
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
