@@ -103,7 +103,11 @@ const GameMap: React.FC<GameMapProps> = ({
           gamePosition[currBranch]?.chapter_no > 0 &&
           levels &&
           levels
-            .filter(level => level.branch_no === currBranch)
+            .filter(
+              level =>
+                level.branch_no === currBranch &&
+                level.chapter_no === gamePosition[currBranch].chapter_no
+            )
             .map(level => (
               <MiniGameMarker
                 key={level.level_no}

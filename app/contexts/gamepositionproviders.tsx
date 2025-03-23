@@ -78,7 +78,7 @@ function GamePositionProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(CUR_BRANCH_KEY, JSON.stringify(currBranch));
   }, [currBranch]);
 
-  const setGamePosition = (newPosition: GamePosition) => {
+  const setGamePosition = (newPosition: Partial<GamePosition>) => {
     setGamePositionState(prev =>
       prev.map(pos =>
         pos.branch_no === newPosition.branch_no
@@ -105,12 +105,14 @@ function GamePositionProvider({ children }: { children: ReactNode }) {
         chapters?.[newPosition.chapter_no]?.no_of_minigames ===
         newPosition.level_no;
 
-      newPosition.level_no =
-        isLastLevel && !isLastChapter ? 1 : newPosition.level_no + 1;
-      newPosition.chapter_no =
-        isLastLevel && !isLastChapter ? 1 : newPosition.chapter_no + 1;
-
-      newGamePos[positionIndex] = newPosition;
+      if (isLastChapter && isLastLevel) {
+        return prevGamePos;
+      } else if (isLastLevel) {
+        newPosition.level_no = 1;
+        newPosition.chapter_no = newPosition.chapter_no + 1;
+      } else {
+        newPosition.level_no = newPosition.level_no + 1;
+      }
 
       localStorage.setItem(GAME_POS_KEY, JSON.stringify(newGamePos)); // Sync to localStorage
       return newGamePos;
