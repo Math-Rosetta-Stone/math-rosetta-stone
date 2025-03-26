@@ -6,6 +6,8 @@ import { PromptType, TermItem } from "@/types/game";
 import { ChoiceBox } from "../../mcq/_components/choice-box";
 import { Button } from "@/components/ui/button";
 
+import { SpeechService } from "@/lib/speech";
+
 interface McqProps {
   question: TermItem;
   choices: TermItem[];
@@ -13,7 +15,6 @@ interface McqProps {
   handleSubmit: () => void;
   formSubmitted: boolean;
   updateScore: () => void;
-  speakWord: (word: string) => void;
 }
 
 export const Mcq = ({
@@ -23,7 +24,6 @@ export const Mcq = ({
   handleSubmit,
   formSubmitted,
   updateScore,
-  speakWord,
 }: McqProps) => {
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
 
@@ -62,16 +62,15 @@ export const Mcq = ({
             Choose the correct <span className="font-medium underline underline-offset-2">term/definition</span>
           </div>
           <div>
-            <Button onClick={() => speakWord("The term is:"+question.term)}>Listen to the term</Button>
+            <Button onClick={() => SpeechService.speak("The term is:" + question.term)}>Listen to the term</Button>
             {choiceType === PromptType.DEF && (
               <Button onClick={() => {
-                  speakWord("The choices are: ");
+                  SpeechService.cancel();
+                  SpeechService.speakSequence(["The choices are: "]);
                   choices.forEach((choice, index) => {
-                  const label = String.fromCharCode(65 + index);
-                  //seperated so there is a pause
-                  speakWord(`${label}.`);
-                  speakWord(`${choice.definition}`);
-                });
+                    const label = String.fromCharCode(65 + index);
+                    SpeechService.speakSequence([`${label}.`, `${choice.definition}`]);
+                  });
               }}>Listen to the choices</Button>
             )}
           </div>
