@@ -14,6 +14,7 @@ import NextButton from "../_components/next-button";
 
 import { cn, getOneRandom, shuffle } from "@/lib/utils";
 import { PromptType } from "@/types/game";
+import { SpeechService } from "@/lib/speech";
 
 const TIME_LIMIT = 10; // in seconds
 
@@ -31,12 +32,6 @@ const ListeningGame: React.FC = () => {
   const [score, setScore] = useState(0);
 
   const { isLoading } = useUserData();
-
-  const speakWord = (word: string) => {
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.rate = 0.7;
-    speechSynthesis.speak(utterance);
-  };
 
   const getRandomPromptType = () => {
     return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF;
@@ -79,6 +74,8 @@ const ListeningGame: React.FC = () => {
   };
 
   const handleNext = () => {
+    SpeechService.cancel();  // Clear speech utterance queue before going to the next round
+
     if (availableQuestions.length === 0) {
       // if no more questions, stop the game
       // to mark no more questions left
@@ -195,7 +192,6 @@ const ListeningGame: React.FC = () => {
                 handleSubmit={handleSubmit}
                 formSubmitted={formSubmitted}
                 updateScore={() => setScore(score + 1)}
-                speakWord={speakWord} // Pass speakWord function to Mcq component
               />
             </motion.div>
           ) : (
