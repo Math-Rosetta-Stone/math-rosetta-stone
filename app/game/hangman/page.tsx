@@ -90,6 +90,11 @@ const Hangman: React.FC = () => {
       const { key, keyCode } = event;
       if (playable && keyCode >= 65 && keyCode <= 90) {
         const letter = key.toLowerCase();
+        // Skip if the letter is a space
+        if (letter === " ") {
+          return;
+        }
+
         if (currQuestion.term.includes(letter)) {
           if (!correctLetters.includes(letter)) {
             setCorrectLetters(currentLetters => [...currentLetters, letter]);

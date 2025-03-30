@@ -1,56 +1,103 @@
 "use client";
 
-import { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { usePermission } from "@/app/hooks/usePermission";
-import { Button } from "@/components/ui/button";
 import { FaStairs } from "react-icons/fa6";
+import { GamePosition } from "@/types/map";
 
-const NextButton = () => {
-  const { gamePosition, incrementGamePosition, currBranch } = useContext(GamePositionContext);
-  const { permissions, updatePermission } = usePermission();
+export default function NextButton() {
+  const { gamePosition, currBranch } = useContext(GamePositionContext);
+  const {
+    permissions,
+    incrementPermissionWithBranch,
+    isLoading,
+    refetchPermissions,
+  } = usePermission();
   const router = useRouter();
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleNextLevel = () => {
-    for (let perm of permissions) {
-      if (perm.branch_no === currBranch) {
-        /* TODO: add logic to:
-        * 1. check chapter bounds (if goes above then increment chapter)
-        * 2. handle level overflow (incrementing more than )
-        */
+  // Force refetch permissions when the component mounts
+  useEffect(() => {
+    console.log("NextButton mounted - refetching permissions");
+    refetchPermissions();
+  }, [refetchPermissions]);
 
-        const currentLevel = gamePosition[currBranch].level_no;
-        const highestUnlockedLevel = perm.level_no;
-        let updatedPerm = {
-          ...perm,
-          level_no: currentLevel === highestUnlockedLevel ? (
-            highestUnlockedLevel + 1
-          ) : (
-            Math.max(
-              currentLevel + 1,
-              highestUnlockedLevel
-            )
-          )
-        };
-        updatePermission(updatedPerm);
-        break;
-      }
+  // Debug logging
+  useEffect(() => {
+    console.log("NextButton - Current permissions:", permissions);
+    console.log("NextButton - Current branch:", currBranch);
+    console.log("NextButton - Current game position:", gamePosition);
+  }, [permissions, currBranch, gamePosition]);
+
+  const handleNextLevel = async () => {
+    // Refetch permissions first to ensure we have the latest data
+    await refetchPermissions();
+    console.log("Permissions refetched before handling next level");
+
+    if (!gamePosition || !Array.isArray(gamePosition)) {
+      console.error("Game position is missing or invalid");
+      return;
     }
-    incrementGamePosition(currBranch);
-    router.push("/map");
+
+    // Get the current level information from gamePosition array
+    const currentLevelPos = gamePosition.find(
+      pos => pos.branch_no === currBranch
+    );
+
+    if (!currentLevelPos) {
+      console.error("Current level position not found for branch", currBranch);
+      return;
+    }
+
+    // Find current permission for this branch
+    const currentPermission = permissions.find(
+      (p: GamePosition) => p.branch_no === currBranch
+    );
+
+    if (!currentPermission) {
+      console.error("No permission found for branch", currBranch);
+      return;
+    }
+
+    console.log("Current level position:", currentLevelPos);
+    console.log("Current permission:", currentPermission);
+
+    setIsProcessing(true);
+
+    try {
+      // Need to increment permission for this branch
+      console.log("Incrementing permission for branch", currBranch);
+
+      // Pass the whole permission object to include branch_no
+      await incrementPermissionWithBranch({
+        branch_no: currBranch,
+        chapter_no: currentLevelPos.chapter_no,
+        level_no: currentLevelPos.level_no,
+      });
+
+      // Refetch permissions after increment to ensure data is up-to-date
+      await refetchPermissions();
+      console.log("Permission incremented and refetched, redirecting to map");
+
+      router.push("/map");
+    } catch (error) {
+      console.error("Error handling next level:", error);
+      setIsProcessing(false);
+    }
   };
+
+  const buttonText = isProcessing ? "Processing..." : "Next Level";
 
   return (
     <Button
-      className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
-      ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
-      variant="default"
-      onClick={handleNextLevel}>
+      onClick={handleNextLevel}
+      disabled={isLoading || isProcessing}
+      className="w-full md:w-auto">
       <FaStairs className="mr-2" />
-      Next Level
+      {buttonText}
     </Button>
   );
-};
-
-export default NextButton;
+}
