@@ -4,6 +4,9 @@ import React from "react"
 import { useState, useEffect } from "react"
 
 
+
+// This is a client component
+// This function fetches data from the server
 const getLevelData = async (branchNo: number, chapterNo: number) => {
   const response = await fetch(`/api`,
     {
