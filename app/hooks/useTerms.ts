@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { GamePositionContext } from "../contexts/gamepositionproviders";
 import { usePermission } from "./usePermission";
+import { SelectTerms } from "../db/schema";
 
 export const useTerms = () => {
   const { gamePosition, currBranch } = useContext(GamePositionContext);
@@ -16,18 +17,28 @@ export const useTerms = () => {
         break;
       }
     }
-    const response = await fetch(`/api/terms?branch=${currBranch}&level=${currLevel}`);
+    const response = await fetch(
+      `/api/terms?branch=${currBranch}&level=${currLevel}`
+    );
     return (await response.json()).data;
   };
 
-  const {data, isPending} = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["unlockedTerms"],
     queryFn: getUnlockedTerms,
     enabled: currBranch > 0,
   });
 
   return {
-    data: data ? parseTerms(data) : [],
+    data: data ? parseTerms(getRandomAmountOfTerms(data, 1)) : [],
     isPending,
   };
+};
+
+const getRandomAmountOfTerms = (data: SelectTerms[], amount: number) => {
+  const indexes: number[] = [];
+  Array.from({ length: amount }, (_, i) =>
+    indexes.push(Math.floor(Math.random() * data.length - 1))
+  );
+  return data.filter((_, index) => indexes.includes(index));
 };
