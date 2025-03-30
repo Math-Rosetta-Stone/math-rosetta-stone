@@ -5,6 +5,7 @@ import { useLanguages } from "../../hooks/useLanguages";
 import { useAllTerms } from "../../hooks/useAllTerms";
 import { useTranslations } from "../../hooks/useTranslations";
 
+// Todo: Fetech branch names from the db instead of hardcoding them
 // Map branch_no to branch names
 const BRANCH_NAMES: Record<number, string> = {
   1: "Calculus",
