@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useLanguages } from "../../hooks/useLanguages";
 import { useAllTerms } from "../../hooks/useAllTerms";
+import { useTranslations } from "../../hooks/useTranslations";
 
 // Map branch_no to branch names
 const BRANCH_NAMES: Record<number, string> = {
@@ -18,9 +19,11 @@ const BRANCH_NAMES: Record<number, string> = {
 
 const Dictionary: React.FC = () => {
   const [currTermItem, setCurrTermItem] = useState<any | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("English"); // Default language
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("French"); // Default language set to French
   const { languages, isLoading: isLoadingLanguages, isError: isErrorLanguages } = useLanguages();
   const { terms, isLoading: isLoadingTerms, isError: isErrorTerms } = useAllTerms();
+  const { translations, isLoading: isLoadingTranslations, isError: isErrorTranslations } =
+    useTranslations(selectedLanguage);
 
   return (
     <div className="w-full h-full bg-cornsilk p-4 overflow-auto">
@@ -53,6 +56,9 @@ const Dictionary: React.FC = () => {
               termItem={currTermItem}
               goBack={() => setCurrTermItem(null)}
               selectedLanguage={selectedLanguage}
+              translations={translations}
+              isLoadingTranslations={isLoadingTranslations}
+              isErrorTranslations={isErrorTranslations}
             />
           ) : (
             <TermMenu
@@ -92,49 +98,66 @@ const DictItem: React.FC<{
   termItem: any;
   goBack: () => void;
   selectedLanguage: string;
-}> = ({ termItem, goBack, selectedLanguage }) => {
-  const { term, definition, example, branch_no, translations } = termItem;
+  translations: { term: string; translation: string }[];
+  isLoadingTranslations: boolean;
+  isErrorTranslations: boolean;
+}> = ({
+  termItem,
+  goBack,
+  selectedLanguage,
+  translations,
+  isLoadingTranslations,
+  isErrorTranslations,
+}) => {
+    const { term, definition, example, branch_no } = termItem;
 
-  // Map branch_no to branch name
-  const branchName = BRANCH_NAMES[branch_no] || "Unknown";
+    // Map branch_no to branch name
+    const branchName = BRANCH_NAMES[branch_no] || "Unknown";
 
-  // Remove spaces from the term and convert it to lowercase for the image URL
-  const sanitizedTerm = term.toLowerCase().replace(/\s+/g, "");
+    // Remove spaces from the term and convert it to lowercase for the image URL
+    const sanitizedTerm = term.toLowerCase().replace(/\s+/g, "");
 
-  // Construct the image URL dynamically using branch name and sanitized term
-  const imageUrl = `/terms/${branchName}/regular/${sanitizedTerm}_julius.png`;
+    // Construct the image URL dynamically using branch name and sanitized term
+    const imageUrl = `/terms/${branchName}/regular/${sanitizedTerm}_julius.png`;
 
-  return (
-    <div className="flex flex-col w-full h-full overflow-auto">
-      <button
-        onClick={goBack}
-        className="absolute left-8 top-4 text-2xl text-gray-500 font-bold py-2 px-4 rounded hover:text-white transition duration-300">
-        <FontAwesomeIcon icon={faArrowLeft} />
-      </button>
-      <div className="flex flex-col items-center justify-center flex-grow p-6">
-        <h1 className="font-mono font-bold text-gray-800 text-4xl mb-2">
-          {/* Safely access translations and provide a fallback */}
-          {translations?.[selectedLanguage] || term}
-        </h1>
-        <p className="text-gray-600 mb-4 text-2xl">
-          <span className="font-semibold text-gray-800">Definition:</span>{" "}
-          {translations?.[selectedLanguage] || definition}
-        </p>
-        <p className="text-gray-600 mb-4 text-2xl">
-          <span className="font-semibold text-gray-800">Example:</span>{" "}
-          {example}
-        </p>
-        {/* Display the dynamically constructed image */}
-        <img
-          src={imageUrl}
-          alt={term}
-          height={500}
-          width={400}
-          className="max-w-xs max-h-xs rounded-lg"
-        />
+    // Find the translated definition for the current term
+    const translatedDefinition =
+      translations.find((t) => t.term === term)?.translation || "Translation not available";
+
+    return (
+      <div className="flex flex-col w-full h-full overflow-auto">
+        <button
+          onClick={goBack}
+          className="absolute left-8 top-4 text-2xl text-gray-500 font-bold py-2 px-4 rounded hover:text-white transition duration-300">
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <div className="flex flex-col items-center justify-center flex-grow p-6">
+          <h1 className="font-mono font-bold text-gray-800 text-4xl mb-2">{term}</h1>
+          <p className="text-gray-600 mb-4 text-2xl">
+            <span className="font-semibold text-gray-800">Definition (English):</span> {definition}
+          </p>
+          {isLoadingTranslations && <p>Loading translation...</p>}
+          {isErrorTranslations && <p>Error loading translation.</p>}
+          {!isLoadingTranslations && !isErrorTranslations && (
+            <p className="text-gray-600 mb-4 text-2xl">
+              <span className="font-semibold text-gray-800">Translated Definition:</span>{" "}
+              {translatedDefinition}
+            </p>
+          )}
+          <p className="text-gray-600 mb-4 text-2xl">
+            <span className="font-semibold text-gray-800">Example:</span> {example}
+          </p>
+          {/* Display the dynamically constructed image */}
+          <img
+            src={imageUrl}
+            alt={term}
+            height={500}
+            width={400}
+            className="max-w-xs max-h-xs rounded-lg"
+          />
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default Dictionary;
