@@ -1,22 +1,35 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { MOCK_DB, TermItem } from "../constants/constants";
 import { useLanguages } from "../../hooks/useLanguages";
+import { useAllTerms } from "../../hooks/useAllTerms";
+
+// Map branch_no to branch names
+const BRANCH_NAMES: Record<number, string> = {
+  1: "Calculus",
+  2: "Algebra",
+  3: "Geometry",
+  4: "Trigonometry",
+  5: "Statistics",
+  6: "Probability",
+  7: "LinearAlgebra",
+  // Add more mappings as needed
+};
 
 const Dictionary: React.FC = () => {
-  const [currTermItem, setCurrTermItem] = useState<TermItem | null>(null);
+  const [currTermItem, setCurrTermItem] = useState<any | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("English"); // Default language
-  const { languages, isLoading, isError } = useLanguages();
+  const { languages, isLoading: isLoadingLanguages, isError: isErrorLanguages } = useLanguages();
+  const { terms, isLoading: isLoadingTerms, isError: isErrorTerms } = useAllTerms();
 
   return (
     <div className="w-full h-full bg-cornsilk p-4 overflow-auto">
       {/* Language Selector */}
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Select Language</h2>
-        {isLoading && <p>Loading languages...</p>}
-        {isError && <p>Error loading languages. Please try again.</p>}
-        {!isLoading && !isError && (
+        {isLoadingLanguages && <p>Loading languages...</p>}
+        {isErrorLanguages && <p>Error loading languages. Please try again.</p>}
+        {!isLoadingLanguages && !isErrorLanguages && (
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -30,29 +43,38 @@ const Dictionary: React.FC = () => {
         )}
       </div>
 
-      {currTermItem ? (
-        <DictItem
-          termItem={currTermItem}
-          goBack={() => setCurrTermItem(null)}
-          selectedLanguage={selectedLanguage}
-        />
-      ) : (
-        <TermMenu
-          setCurrTermItem={setCurrTermItem}
-          selectedLanguage={selectedLanguage}
-        />
+      {/* Terms List */}
+      {isLoadingTerms && <p>Loading terms...</p>}
+      {isErrorTerms && <p>Error loading terms. Please try again.</p>}
+      {!isLoadingTerms && !isErrorTerms && (
+        <>
+          {currTermItem ? (
+            <DictItem
+              termItem={currTermItem}
+              goBack={() => setCurrTermItem(null)}
+              selectedLanguage={selectedLanguage}
+            />
+          ) : (
+            <TermMenu
+              terms={terms}
+              setCurrTermItem={setCurrTermItem}
+              selectedLanguage={selectedLanguage}
+            />
+          )}
+        </>
       )}
     </div>
   );
 };
 
 const TermMenu: React.FC<{
-  setCurrTermItem: (termItem: TermItem) => void;
+  terms: any[];
+  setCurrTermItem: (termItem: any) => void;
   selectedLanguage: string;
-}> = ({ setCurrTermItem, selectedLanguage }) => {
+}> = ({ terms, setCurrTermItem, selectedLanguage }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {MOCK_DB.map((termItem: TermItem, index: React.Key | null | undefined) => (
+      {terms.map((termItem, index) => (
         <button
           key={index}
           className="bg-amber-300 text-white font-bold py-2 px-4 rounded hover:bg-amber-500 transition duration-300"
@@ -65,12 +87,22 @@ const TermMenu: React.FC<{
     </div>
   );
 };
+
 const DictItem: React.FC<{
-  termItem: TermItem;
+  termItem: any;
   goBack: () => void;
   selectedLanguage: string;
 }> = ({ termItem, goBack, selectedLanguage }) => {
-  const { term, definition, example, image, translations } = termItem;
+  const { term, definition, example, branch_no, translations } = termItem;
+
+  // Map branch_no to branch name
+  const branchName = BRANCH_NAMES[branch_no] || "Unknown";
+
+  // Remove spaces from the term and convert it to lowercase for the image URL
+  const sanitizedTerm = term.toLowerCase().replace(/\s+/g, "");
+
+  // Construct the image URL dynamically using branch name and sanitized term
+  const imageUrl = `/terms/${branchName}/regular/${sanitizedTerm}_julius.png`;
 
   return (
     <div className="flex flex-col w-full h-full overflow-auto">
@@ -92,15 +124,14 @@ const DictItem: React.FC<{
           <span className="font-semibold text-gray-800">Example:</span>{" "}
           {example}
         </p>
-        {image && (
-          <img
-            src={image.url}
-            alt={term}
-            height={300}
-            width={200}
-            className="max-w-xs max-h-xs rounded-lg"
-          />
-        )}
+        {/* Display the dynamically constructed image */}
+        <img
+          src={imageUrl}
+          alt={term}
+          height={500}
+          width={400}
+          className="max-w-xs max-h-xs rounded-lg"
+        />
       </div>
     </div>
   );
