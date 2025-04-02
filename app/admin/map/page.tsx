@@ -1,30 +1,32 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
   faChalkboardTeacher,
   faFloppyDisk,
   faUsers,
+  faPlus,
+  faTrash,
+  faSave,
+  faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import "../../map/css/map.css";
 import Dictionary from "../../map/_components/dictionary";
 import PracticeModal from "../../map/_components/practicemode/practicemodal";
-import { GamePositionContext } from "../../contexts/gamepositionproviders";
 import { withAdmin } from "@/lib/withAdmin";
 import GameMap from "../../map/_components/gamemap";
-import { SelectLevel } from "../../db/schema";
-import { useQueryClient } from "@tanstack/react-query";
+import { SelectLevel, SelectUser } from "../../db/schema";
 import { useGameData } from "@/app/hooks/useGameData";
+import { revertUserPermissions } from "../actions";
+import { Button } from "@/components/ui/button";
 
-const AdminMap: React.FC = () => {
+const AdminMap: React.FC<{ user: SelectUser }> = ({ user }) => {
   const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">(
     "map"
   );
-  const { currBranch, gamePosition } = useContext(GamePositionContext);
   const [levels, setLevels] = useState<SelectLevel[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const queryClient = useQueryClient();
   const { refreshGameData } = useGameData();
 
   const saveLevels = async () => {
@@ -64,6 +66,10 @@ const AdminMap: React.FC = () => {
     }
   };
 
+  if (!user?.is_admin) {
+    return <div>Access denied</div>;
+  }
+
   return (
     <div className="relative h-screen p-4 bg-gradient-to-br from-slate-100 to-slate-200">
       <div className="flex flex-col h-full max-w-7xl mx-auto">
@@ -96,22 +102,27 @@ const AdminMap: React.FC = () => {
             </button>
           </div>
 
+          <div className="flex gap-2">
+            <Button
+              onClick={async () => {
+                await revertUserPermissions(user.id);
+                window.location.reload();
+              }}
+              className="bg-red-500 hover:bg-red-600">
+              Revert Permissions
+            </Button>
+            <Button onClick={saveLevels}>
+              <FontAwesomeIcon icon={faSave} className="mr-2" />
+              Save Changes
+            </Button>
+          </div>
+
           <div className="flex items-center">
             <span className="font-semibold text-xl text-purple-700 mr-2">
               ADMIN MODE
             </span>
             <FontAwesomeIcon icon={faUsers} className="text-purple-700" />
           </div>
-
-          <button
-            className={`py-2 px-4 rounded-lg ${
-              isSaving ? "bg-gray-500" : "bg-green-500"
-            } text-white`}
-            onClick={saveLevels}
-            disabled={isSaving}>
-            <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-            {isSaving ? "Saving..." : "Save Changes"}
-          </button>
         </div>
 
         <div className="flex-1 rounded-lg overflow-hidden bg-white shadow-lg">

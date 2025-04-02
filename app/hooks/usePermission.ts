@@ -72,7 +72,7 @@ export const usePermission = () => {
 
         if (!data.payload || data.payload.length === 0) {
           console.log(
-            "No permissions in database payload, using initial permissions"
+            `No permissions in database payload, using initial permissions " + "status: ${data.status}`
           );
           return INITIAL_PERMISSIONS;
         }
