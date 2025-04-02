@@ -7,7 +7,6 @@ import { branchIcon } from "../../helpers/icon";
 interface BranchMarkerProps {
   location: { x: number; y: number };
   targetBranch: number;
-  targetChapter: number;
   setImageOverlayKey: (key: number) => void;
   isAdmin?: boolean;
 }
@@ -15,7 +14,6 @@ interface BranchMarkerProps {
 export const BranchMarker: React.FC<BranchMarkerProps> = ({
   location,
   targetBranch,
-  targetChapter,
   setImageOverlayKey,
   isAdmin,
 }) => {
@@ -26,7 +24,7 @@ export const BranchMarker: React.FC<BranchMarkerProps> = ({
     setCurrBranch(targetBranch);
     setGamePosition({
       branch_no: targetBranch,
-      chapter_no: targetChapter,
+      chapter_no: 0,
       level_no: 0,
     });
   };

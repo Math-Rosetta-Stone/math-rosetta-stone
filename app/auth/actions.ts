@@ -5,7 +5,7 @@ import { verify } from "argon2";
 import { cookies } from "next/headers";
 import { lucia } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { user } from "../db/schema";
+import { user, permission } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { ActionResult } from "@/lib/form";
 import { hash } from "argon2";
@@ -44,6 +44,17 @@ export async function signup(formData: FormData): Promise<ActionResult> {
     password_hash: hashedPassword,
     is_admin: isAdmin,
   });
+
+  // // Insert initial permissions for all 7 branches
+  // // We know that level 1,1,1 exists for each branch from the seed data
+  // await db.insert(permission).values(
+  //   Array.from({ length: 7 }, (_, i) => ({
+  //     user_id: userId,
+  //     curr_branch_no: i + 1,
+  //     curr_chapter_no: 1,
+  //     curr_level_no: 1,
+  //   }))
+  // );
 
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);

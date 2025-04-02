@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface WordProps {
   selectedWord: string;
@@ -8,13 +8,13 @@ interface WordProps {
 const Word: React.FC<WordProps> = ({ selectedWord, correctLetters }) => {
   return (
     <div className="word">
-      {selectedWord.split('').map((letter, i) => (
-        <span className="letter" key={i}>
-          {correctLetters.includes(letter) ? letter : ''}
+      {selectedWord.split("").map((letter, i) => (
+        <span className={`letter ${letter === " " ? "space" : ""}`} key={i}>
+          {letter === " " ? " " : correctLetters.includes(letter) ? letter : ""}
         </span>
       ))}
     </div>
   );
-}
+};
 
 export default Word;

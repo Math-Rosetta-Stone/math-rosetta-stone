@@ -1,14 +1,16 @@
 import { SelectTerms } from "@/app/db/schema";
 import { TermItem } from "@/types/game";
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const shuffle = (array: any[]) => {
-  let currIndex = array.length, randIndex, tempValue;
+  let currIndex = array.length,
+    randIndex,
+    tempValue;
 
   while (currIndex !== 0) {
     randIndex = Math.floor(Math.random() * currIndex);
@@ -31,12 +33,13 @@ export const omitPassword = (array: any[]) => {
 };
 
 export const parseTerms = (termsData: SelectTerms[]): TermItem[] => {
-  return termsData.map((term) => ({
-    term: term.term,
+  return termsData.map(term => ({
+    term: term.term.trim().toLowerCase(), // Remove leading and trailing whitespace and convert to lowercase
     definition: term.definition,
     image: {
       title: "Not found",
-      url: "/term-not-found.svg"},
+      url: "/term-not-found.svg",
+    },
     example: term.example,
   }));
 };

@@ -8,12 +8,15 @@ import {
   useState,
   useEffect,
 } from "react";
-import { GamePosition } from "@/types/db";
+import { GamePosition } from "@/types/map";
 import { useGameData } from "@/app/hooks/useGameData";
+import { incrementGamePositionHelper } from "../map/helpers/gamePositionHelpers";
 
 interface GamePositionContextProps {
   gamePosition: GamePosition[];
-  setGamePosition: (position: GamePosition) => void;
+  setGamePosition: (
+    position: Partial<GamePosition> & { branch_no: number }
+  ) => void;
   incrementGamePosition: (branch_no: number) => void;
   currBranch: number;
   setCurrBranch: Dispatch<SetStateAction<number>>;
@@ -76,39 +79,26 @@ function GamePositionProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(CUR_BRANCH_KEY, JSON.stringify(currBranch));
   }, [currBranch]);
 
-  const setGamePosition = (newPosition: GamePosition) => {
+  const setGamePosition = (newPosition: Partial<GamePosition>) => {
     setGamePositionState(prev =>
       prev.map(pos =>
-        pos.branch_no === newPosition.branch_no ? newPosition : pos
+        pos.branch_no === newPosition.branch_no
+          ? { ...pos, ...newPosition }
+          : pos
       )
     );
   };
 
   const incrementGamePosition = (branch_no: number) => {
     setGamePositionState(prevGamePos => {
-      const newGamePos = [...prevGamePos];
-      const positionIndex = newGamePos.findIndex(
-        pos => pos.branch_no === branch_no
+      const newGamePos = incrementGamePositionHelper(
+        prevGamePos,
+        branch_no,
+        branches,
+        chapters
       );
-      if (positionIndex === -1) return prevGamePos;
-
-      const newPosition = { ...newGamePos[positionIndex] };
-
-      const isLastChapter =
-        branches?.[newPosition.branch_no]?.no_of_chapters ===
-        newPosition.chapter_no;
-      const isLastLevel =
-        chapters?.[newPosition.chapter_no]?.no_of_minigames ===
-        newPosition.level_no;
-
-      newPosition.level_no =
-        isLastLevel && !isLastChapter ? 1 : newPosition.level_no + 1;
-      newPosition.chapter_no =
-        isLastLevel && !isLastChapter ? 1 : newPosition.chapter_no + 1;
-
-      newGamePos[positionIndex] = newPosition;
-
-      localStorage.setItem(GAME_POS_KEY, JSON.stringify(newGamePos)); // Sync to localStorage
+      console.log("newGamePos", newGamePos);
+      localStorage.setItem(GAME_POS_KEY, JSON.stringify(newGamePos));
       return newGamePos;
     });
   };
