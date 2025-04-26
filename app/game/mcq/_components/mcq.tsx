@@ -52,6 +52,10 @@ export const Mcq = ({
         correctChoice = question.image.title;
         chosenChoice = choice.image.title;
         break;
+      case PromptType.EXMP:
+        correctChoice = question.example;
+        chosenChoice = choice.example;
+        break;
       default:
         return null;
     }

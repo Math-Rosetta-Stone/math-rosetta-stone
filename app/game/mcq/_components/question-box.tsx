@@ -28,6 +28,9 @@ export const QuestionBox = ({
             height={120} width={120}
           />
         );
+      case PromptType.EXMP:
+        const example = question.example;
+        return example[example.length - 1] === "." ? example : example + ".";
       default:
         return null;
     }
@@ -41,18 +44,23 @@ export const QuestionBox = ({
     >
       <div>
         <span className="font-semibold underline underline-offset-2">
-          {questionType === PromptType.TERM ? "Term" : questionType === PromptType.DEF ? "Definition" : "Image"}
+          {questionType === PromptType.TERM ? "Term" : questionType === PromptType.DEF ? "Definition" : questionType === PromptType.EXMP ? "Example" : "Image"}
         </span>: {getQuestionContent()}
       </div>
 
       <div>
         Choose the correct <span className="font-medium underline underline-offset-2">
           {answerType === PromptType.TERM ? (
-            "term") : (
-              answerType === PromptType.DEF ? (
-                "definition") : (
-                  "image"
-          ))}
+            "term"
+          ) : (
+            answerType === PromptType.DEF ? (
+              "definition"
+            ) : (
+              answerType === PromptType.EXMP ? (
+                "example"
+              ) : (
+                "image"
+          )))}
         </span>:
       </div>
     </div>

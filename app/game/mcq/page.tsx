@@ -45,7 +45,7 @@ const McqGame = () => {
   );
 
   const getGameType = () => {
-    let possibleQATypes = [PromptType.TERM, PromptType.DEF, PromptType.IMG];
+    let possibleQATypes = [PromptType.TERM, PromptType.DEF, PromptType.IMG, PromptType.EXMP];
     const typeToRemove = getOneRandom(possibleQATypes);
     return shuffle(possibleQATypes.filter(type => type !== typeToRemove));
   };

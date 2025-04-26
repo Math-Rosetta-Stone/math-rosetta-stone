@@ -58,8 +58,11 @@ export const ChoiceBox = ({
           choiceType === PromptType.DEF ? (
             choice.definition
           ) : (
-            <Image src={choice.image.url} alt={choice.image.title} height={120} width={120} />
-        ))}
+            choiceType === PromptType.EXMP ? (
+              choice.example
+            ) : (
+              <Image src={choice.image.url} alt={choice.image.title} height={120} width={120} />
+        )))}
       </div>
     </div>
   );
