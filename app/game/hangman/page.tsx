@@ -19,6 +19,7 @@ import "./hangman.css";
 import { cn, getOneRandom } from "@/lib/utils";
 import { showNotification as show, checkWin } from "./helpers/helpers";
 import { TermItem } from "@/types/game";
+import LatexRenderer from "@/components/ui/latex-renderer";
 
 const Hangman: React.FC = () => {
   const { data: termItems } = useTerms();
@@ -191,7 +192,10 @@ const Hangman: React.FC = () => {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}>
               <div className="flex flex-col items-center justify-center w-full p-5">
-                <p>Definition: {currQuestion.definition}</p>
+                <p>
+                  Definition:{" "}
+                  <LatexRenderer content={currQuestion.definition} />
+                </p>
                 <div className="mt-5 w-full game-container">
                   <Figure wrongLetters={wrongLetters} />
                   <WrongLetters wrongLetters={wrongLetters} />

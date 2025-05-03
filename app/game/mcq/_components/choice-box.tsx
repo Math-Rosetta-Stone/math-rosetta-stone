@@ -2,8 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { PromptType, TermItem } from "@/types/game";
+import LatexRenderer from "@/components/ui/latex-renderer";
 
-import { CircleAlert } from "lucide-react";
 import Image from "next/image";
 
 const choiceIds = ["A.", "B.", "C.", "D."];
@@ -25,6 +25,29 @@ export const ChoiceBox = ({
   onClick,
   disabled = false,
 }: ChoiceBoxProps) => {
+  const getChoiceContent = () => {
+    switch (choiceType) {
+      case PromptType.TERM:
+        return choice.term;
+      case PromptType.DEF:
+        const definition = choice.definition[choice.definition.length - 1] === "." ? choice.definition : choice.definition + ".";
+        return <LatexRenderer content={definition} />;
+      case PromptType.IMG:
+        return (
+          <Image
+            src={choice.image.url}
+            alt={choice.image.title}
+            height={120} width={120}
+          />
+        );
+      case PromptType.EXMP:
+        const example = choice.example[choice.example.length - 1] === "." ? choice.example : choice.example + ".";
+        return <LatexRenderer content={example} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -52,17 +75,7 @@ export const ChoiceBox = ({
       </div>
 
       <div className="m-3 flex flex-col justify-center">
-        {choiceType === PromptType.TERM ? (
-          choice.term
-        ) : (
-          choiceType === PromptType.DEF ? (
-            choice.definition
-          ) : (
-            choiceType === PromptType.EXMP ? (
-              choice.example
-            ) : (
-              <Image src={choice.image.url} alt={choice.image.title} height={120} width={120} />
-        )))}
+        {getChoiceContent()}
       </div>
     </div>
   );

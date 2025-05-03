@@ -1,6 +1,8 @@
 "use client";
 
 import { TermItem, PromptType } from "@/types/game";
+import LatexRenderer from "@/components/ui/latex-renderer";
+
 import Image from "next/image";
 
 interface QuestionBoxProps {
@@ -19,7 +21,8 @@ export const QuestionBox = ({
       case PromptType.TERM:
         return question.term;
       case PromptType.DEF:
-        return question.definition + ".";
+        const definition = question.definition[question.definition.length - 1] === "." ? question.definition : question.definition + ".";
+        return <LatexRenderer content={definition} />;
       case PromptType.IMG:
         return (
           <Image
@@ -29,8 +32,8 @@ export const QuestionBox = ({
           />
         );
       case PromptType.EXMP:
-        const example = question.example;
-        return example[example.length - 1] === "." ? example : example + ".";
+        const example = question.example[question.example.length - 1] === "." ? question.example : question.example + ".";
+        return <LatexRenderer content={example} />;
       default:
         return null;
     }

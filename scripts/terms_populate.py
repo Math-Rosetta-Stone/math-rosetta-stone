@@ -3,7 +3,6 @@ from mysql.connector import errorcode
 from openpyxl import load_workbook
 from dotenv import load_dotenv
 import os
-import json
 import re
 
 # Get the root directory (one level up from the script's directory)
@@ -19,7 +18,7 @@ print(f"DB_NAME: {os.getenv('DB_NAME')}")
 
 # Configs for MySQL connection
 config = {
-    'user': os.getenv('DB_USER'), 
+    'user': os.getenv('DB_USER'),
     'password': os.getenv('DB_PASSWORD'),  # Replace with your MySQL password
     'host': os.getenv('DB_HOST'),  # Replace with your MySQL host (e.g., 'localhost')
     'database': os.getenv('DB_NAME'),  # Replace with your MySQL database name
@@ -49,18 +48,27 @@ ROW_HEADERS = 1  # Row containing headers
 ROW_START = 2  # First row of data
 ROW_END = 287  # Last row of data
 
-# # Escapes SQL's special characters from a string
-# def escape_special_characters(string):
-#     if not string:
-#         return string
-#     # Define special characters to escape (based on SQL docs)
-#     special_characters = r'''!@&*[]{}^:=/><-()%+?;'~|"\\'''
-#     # Escape each special character
-#     for char in special_characters:
-#         string = string.replace(char, f"\\{char}")
-#     return string
+def clean_text(text: str) -> str:
+    # None/empty string is unchanged
+    if not text:
+        text
 
-# Insert languages into the `languages` table
+    # Remove leading and trailing whitespace
+    text = text.strip()
+
+    # Remove quotations if the whole text is wrapped in quotes
+    if ((text.startswith('"') and text.endswith('"')) or
+        (text.startswith("'") and text.endswith("'"))):
+        inner = text[1:-1]
+        if not re.search(r'(^| )["\'].*["\']( |$)', inner):
+            text = inner.strip()
+
+    # If doesn't end with punctuation, assume it's a statement and add a period
+    if not re.search(r'[.?!…]$', text):
+        text += '.'
+
+    return text
+
 def insert_languages():
     languages = ["French", "Chinese (simple)", "Spanish", "Portuguese", "Hindi", "Farsi", "Marathi"]
     for lang in languages:
@@ -71,8 +79,6 @@ def insert_languages():
         cursor.execute(insert_language_query, (lang,))
     conn.commit()
     print("Successfully inserted languages...\n")
-    
-    
 
 def insert_branches():
     branches = [
@@ -95,8 +101,7 @@ def insert_branches():
         cursor.execute(insert_branch_query, branch)
     conn.commit()
     print("Successfully inserted branches...\n")
-    
-# Insert classes into the `classes` table
+
 def insert_classes():
     classes = [
         "MATA02", "MATA22", "MATA23", "MATA29", "MATA30",
@@ -184,9 +189,6 @@ def insert_excel_data_into_sql_tables():
         field = ws.cell(row, field_col).value
         level = ws.cell(row, level_col).value
         example = ws.cell(row, example_col).value
-        
-        # Debug print statements
-        # print(f"Row {row}: term={term}, definition={definition}, field={field}, level={level}, example={example}")
 
         # Check for missing or invalid data
         if term is None or term == "0" or term == 0:
@@ -205,12 +207,11 @@ def insert_excel_data_into_sql_tables():
             print(f"Skipping row {row}: Missing or invalid example")
             continue
 
-        branch_number = branch_id_map.get(field)
+        # Sanitize definition and example
+        definition = clean_text(definition)
+        example = clean_text(example)
 
-        # # Escape special characters
-        # term = escape_special_characters(term)
-        # definition = escape_special_characters(definition)
-        # example = escape_special_characters(example)
+        branch_number = branch_id_map.get(field)
 
         # Print term details for debugging
         print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
@@ -269,9 +270,7 @@ def insert_excel_data_into_sql_tables():
                         class_id_map[class_name]  # class_id from the database
                     ))
                     conn.commit()
-                    
-                    
-# Drop and recreate tables
+
 def recreate_tables():
     drop_tables = [
         "DROP TABLE IF EXISTS permission",
@@ -374,18 +373,11 @@ def recreate_tables():
     conn.commit()
     print("Successfully recreated tables...\n")
 
-# Main function
+
 def main():
-    # Recreate tables
     recreate_tables()
-    
-    # Insert languages
     insert_languages()
-    
-    # Insert classes
     insert_classes()
-    
-    # Insert branches
     insert_branches()
 
     # Insert data from Excel into MySQL tables

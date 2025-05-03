@@ -9,6 +9,7 @@ import {
   CircleAlert,
 } from "lucide-react";
 import Image from "next/image";
+import LatexRenderer from "@/components/ui/latex-renderer";
 
 interface AnswerBoxProps {
   answer?: string;
@@ -56,7 +57,7 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
 
       {answer ? (
         <div className="m-3">
-          {answer}
+          <LatexRenderer content={answer} />
         </div>
       ) : (imageUrl && imageTitle) ? (
         <Image src={imageUrl} alt={imageTitle} height={120} width={120} />
