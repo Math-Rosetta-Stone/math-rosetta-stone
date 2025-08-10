@@ -6,7 +6,9 @@ import mysql from "mysql2/promise";
 import * as schema from "./schema";
 import { sql } from "drizzle-orm";
 
-configDotenv({ path: ".env.local" });
+const envFile = process.env.ENV_FILE || ".env.app";
+configDotenv({ path: envFile });
+
 const connection = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,

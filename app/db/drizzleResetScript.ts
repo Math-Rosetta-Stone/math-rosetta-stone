@@ -1,8 +1,8 @@
 import mysql from "mysql2/promise";
-import * as dotenv from "dotenv";
+import { configDotenv } from "dotenv";
 
-// Load environment variables from .env.local
-dotenv.config({ path: ".env.local" });
+const envFile = process.env.ENV_FILE || ".env.app";
+configDotenv({ path: envFile });
 
 async function main() {
   // Create connection
