@@ -51,7 +51,7 @@ export const Response = ({
           <div className="flex flex-col gap-1">
             <div className="flex flex-row justify-start items-center gap-1 font-bold">
               <AlarmClock className="h-4 w-4" />
-              Time's up!
+              Time&apos;s up!
             </div>
             <span>Correct answer: {correctAnswer}</span>
           </div>

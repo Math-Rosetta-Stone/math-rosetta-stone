@@ -47,10 +47,6 @@ async function main() {
   console.log("Re-enabling foreign key checks...");
   await connection.query("SET FOREIGN_KEY_CHECKS=1;");
 
-  console.log(
-    "All tables dropped successfully. You can now run 'npx drizzle-kit push:mysql' to recreate them."
-  );
-
   // Close connection
   await connection.end();
 }

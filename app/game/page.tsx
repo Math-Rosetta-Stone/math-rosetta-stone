@@ -51,6 +51,7 @@ export default function Games() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-5">
           {gamesList.map(game => (
             <Link
+              key={game.name}
               href={`${basePath}/${game.route}`}
               className="flex flex-col place-content-center aspect-square p-3
               rounded-xl shadow-sm border border-neutral-300

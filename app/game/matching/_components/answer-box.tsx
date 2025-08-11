@@ -66,3 +66,5 @@ export const AnswerBox = React.forwardRef<HTMLDivElement, AnswerBoxProps>(({
     </div>
   );
 });
+
+AnswerBox.displayName = "AnswerBox";

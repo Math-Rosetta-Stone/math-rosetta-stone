@@ -73,6 +73,7 @@ export const Mcq = ({
 
       {choices.map((choice, index) => (
         <ChoiceBox
+          key={`${choice}-${index}`}
           choiceId={index}
           choice={choice}
           choiceType={choiceType}
