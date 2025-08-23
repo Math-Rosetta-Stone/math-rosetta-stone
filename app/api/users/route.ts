@@ -36,7 +36,13 @@ export async function POST(request: Request) {
 
     // Sign up user
     const hashedPassword = await argon2.hash(password);
-    await db.insert(user).values({ username: userName, password_hash: hashedPassword });
+    const userId = crypto.randomUUID();
+    await db.insert(user).values({
+      id: userId,
+      username: userName,
+      password_hash: hashedPassword,
+      is_admin: false,
+    });
 
     // Verify registration was successful
     const insertedUser = await db.select().from(user).where(eq(user.username, userName));

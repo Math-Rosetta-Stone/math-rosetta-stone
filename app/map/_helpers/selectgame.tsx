@@ -1,4 +1,4 @@
-import { Game, GAMES } from "../constants/constants";
+import { Game, GAMES } from "../_constants/constants";
 export type SelectGameMethod = () => Game;
 
 export const selectRandomGame: SelectGameMethod = () => {

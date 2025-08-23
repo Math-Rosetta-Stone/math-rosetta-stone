@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { MOCK_DB, TermItem } from "../constants/constants";
+import { MOCK_DB, TermItem } from "../_constants/constants";
 
 const Dictionary: React.FC = () => {
   const [currTermItem, setCurrTermItem] = useState<TermItem | null>(null);

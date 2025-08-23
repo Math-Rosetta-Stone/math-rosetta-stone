@@ -1,4 +1,4 @@
-import { TermItem } from "@/app/map/constants/constants";
+import { TermItem } from "@/app/map/_constants/constants";
 export function doubleAndNext(arr: number[]): number[] {
   return arr.reduce((result, num) => {
     result.push(num * 2, num * 2 + 1);

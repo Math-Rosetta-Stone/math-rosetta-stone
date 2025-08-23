@@ -6,8 +6,8 @@ import MiniGameMarker from "./marker/minigamemarker";
 import { BranchMarker } from "./marker/branchMarker";
 import MapComponent from "./mapcomponent";
 
-import { MAP_BOUNDS, BRANCH_MAPS_PATHS } from "../constants/constants";
-import MAP_LOCATIONS from "../constants/mapLocation.json";
+import { MAP_BOUNDS, BRANCH_MAPS_PATHS } from "../_constants/constants";
+import MAP_LOCATIONS from "../_constants/mapLocation.json";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { useGameData } from "@/app/hooks/useGameData";
 import { SelectLevel } from "@/app/db/schema";

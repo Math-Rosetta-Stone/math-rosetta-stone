@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { SelectLevel } from "@/app/db/schema";
 import { usePermission } from "@/app/hooks/usePermission";
-import { selectRandomGame } from "../../helpers/selectgame";
-import { gameIcon } from "../../helpers/icon";
+import { selectRandomGame } from "../../_helpers/selectgame";
+import { gameIcon } from "../../_helpers/icon";
 
 interface MiniGameMarkerProps {
   level: SelectLevel;

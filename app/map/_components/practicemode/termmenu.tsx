@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useState, useContext } from "react";
-import { MOCK_DB, TermItem } from "../../constants/constants";
+import { MOCK_DB, TermItem } from "../../_constants/constants";
 import { PracticeModalContext } from "../../../contexts/practicemodelproviders";
 import { cn } from "@/lib/utils";
 import "./transition.css";

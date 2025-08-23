@@ -1,5 +1,7 @@
+"use client";
+
 import L from "leaflet";
-import { GamesWithRandom } from "../constants/constants";
+import { GamesWithRandom } from "../_constants/constants";
 
 // Define game icons as SVG strings
 const gameIcons: Record<GamesWithRandom, string> = {

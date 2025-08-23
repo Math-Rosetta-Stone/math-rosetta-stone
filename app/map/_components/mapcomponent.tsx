@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 
@@ -8,7 +10,7 @@ const MapComponent: React.FC<{ bounds: LatLngBounds }> = ({ bounds }) => {
 
   const handleResize = () => {
     map.invalidateSize();
-      
+
     const containerWidth = map.getSize().x;
     const containerHeight = map.getSize().y;
     const mapWidth = bounds[1][1] - bounds[0][1];

@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Marker } from "react-leaflet";
 import { LatLngExpression } from "leaflet";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
-import { branchIcon } from "../../helpers/icon";
+import { branchIcon } from "../../_helpers/icon";
 
 interface BranchMarkerProps {
   location: { x: number; y: number };

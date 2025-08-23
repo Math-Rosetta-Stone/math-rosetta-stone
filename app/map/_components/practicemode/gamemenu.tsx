@@ -1,5 +1,5 @@
 "use client";
-import { GAMES } from "../../constants/constants";
+import { GAMES } from "../../_constants/constants";
 import { useState, useContext } from "react";
 import { PracticeModalContext } from "../../../contexts/practicemodelproviders";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

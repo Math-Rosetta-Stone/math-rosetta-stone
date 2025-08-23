@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useContext, useState } from "react";
 import { PracticeModalContext } from "@/app/contexts/practicemodelproviders";
-import { GAMES } from "../map/constants/constants";
+import { GAMES } from "../map/_constants/constants";
 
 const PracticeRedirectPage = () => {
   const [message, setMessage] = useState<string>("Redirecting...");
