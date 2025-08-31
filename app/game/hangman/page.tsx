@@ -33,7 +33,7 @@ const Hangman: React.FC = () => {
   );
 
   const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
-    termItems.filter(item => item.term !== currQuestion.term)
+    termItems.filter(item => item?.term !== currQuestion?.term)
   );
   const [score, setScore] = useState(0);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -56,7 +56,7 @@ const Hangman: React.FC = () => {
 
       // update available questions
       setAvailableQuestions(prevAvailableQuestions =>
-        prevAvailableQuestions.filter(item => item.term !== newQuestion.term)
+        prevAvailableQuestions.filter(item => item?.term !== newQuestion?.term)
       );
       setFormSubmitted(false);
       setGameMessage("");
@@ -78,7 +78,7 @@ const Hangman: React.FC = () => {
     const newQuestion = getOneRandom(termItems);
     setCurrQuestion(newQuestion);
     setAvailableQuestions(
-      termItems.filter(item => item.term !== newQuestion.term)
+      termItems.filter(item => item?.term !== newQuestion?.term)
     );
     setScore(0);
     setGameMessage("");
@@ -90,7 +90,7 @@ const Hangman: React.FC = () => {
       const { key, keyCode } = event;
       if (playable && keyCode >= 65 && keyCode <= 90) {
         const letter = key.toLowerCase();
-        if (currQuestion.term.includes(letter)) {
+        if (currQuestion?.term.includes(letter)) {
           if (!correctLetters.includes(letter)) {
             setCorrectLetters(currentLetters => [...currentLetters, letter]);
           } else {
@@ -105,20 +105,25 @@ const Hangman: React.FC = () => {
         }
       }
     };
-    window.addEventListener(
-      "keydown",
-      handleKeydown as unknown as EventListener
-    );
-
-    return () =>
-      window.removeEventListener(
+    if (typeof window !== "undefined") {
+      window.addEventListener(
         "keydown",
         handleKeydown as unknown as EventListener
       );
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener(
+          "keydown",
+          handleKeydown as unknown as EventListener
+        );
+      }
+    }
   }, [correctLetters, wrongLetters, playable]);
 
   useEffect(() => {
-    const result = checkWin(correctLetters, wrongLetters, currQuestion.term);
+    const result = checkWin(correctLetters, wrongLetters, currQuestion?.term);
     if (result === "win") {
       setPlayable(false);
       setFormSubmitted(true);
@@ -128,10 +133,10 @@ const Hangman: React.FC = () => {
       setPlayable(false);
       setFormSubmitted(true);
       setGameMessage(
-        `Unfortunately you lost. 😕 The word was: ${currQuestion.term}`
+        `Unfortunately you lost. 😕 The word was: ${currQuestion?.term}`
       );
     }
-  }, [correctLetters, wrongLetters, currQuestion.term]);
+  }, [correctLetters, wrongLetters, currQuestion?.term]);
 
   if (!hydrated) {
     return null;
@@ -159,7 +164,7 @@ const Hangman: React.FC = () => {
           text-sm font-medium">
           Identify the term corresponding to the definition.
         </div>
-        {currQuestion.term !== "" && (
+        {currQuestion?.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
               <div>{`Round: ${termItems.length - availableQuestions.length}/${
@@ -172,20 +177,20 @@ const Hangman: React.FC = () => {
               className={cn(
                 "text-slate-300 ease-in duration-150",
                 formSubmitted &&
-                  currQuestion.term !== "" &&
+                  currQuestion?.term !== "" &&
                   "text-slate-900 hover:cursor-pointer hover:bg-slate-50"
               )}
               onClick={() => {
-                if (formSubmitted && currQuestion.term !== "") handleNext();
+                if (formSubmitted && currQuestion?.term !== "") handleNext();
               }}
             />
           </div>
         )}
 
         <AnimatePresence mode="wait">
-          {currQuestion.term !== "" ? (
+          {currQuestion?.term !== "" ? (
             <motion.div
-              key={currQuestion.term}
+              key={currQuestion?.term}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -196,11 +201,11 @@ const Hangman: React.FC = () => {
                   <Figure wrongLetters={wrongLetters} />
                   <WrongLetters wrongLetters={wrongLetters} />
                   <Word
-                    selectedWord={currQuestion.term}
+                    selectedWord={currQuestion?.term}
                     correctLetters={correctLetters}
                   />
                 </div>
-                {formSubmitted && gameMessage && currQuestion.term !== "" && (
+                {formSubmitted && gameMessage && currQuestion?.term !== "" && (
                   <div>{gameMessage}</div>
                 )}
                 <Notification showNotification={showNotification} />

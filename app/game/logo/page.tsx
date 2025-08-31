@@ -13,6 +13,7 @@ import NextButton from "../_components/next-button";
 
 import { cn, getOneRandom } from "@/lib/utils";
 import { TermItem } from "@/types/game";
+import Image from "next/image";
 
 const TIME_LIMIT = 10; // in seconds
 
@@ -178,7 +179,7 @@ const LogoQuizGame = () => {
               transition={{ duration: 0.3 }}>
               <div className="flex flex-col items-center justify-center w-full p-5">
                 <div className="flex flex-col items-center justify-center w-full">
-                  <img
+                  <Image
                     src={currQuestion.image.url}
                     alt={currQuestion.image.title}
                     className="w-1/2 h-auto"

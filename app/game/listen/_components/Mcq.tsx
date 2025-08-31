@@ -6,7 +6,7 @@ import { PromptType, TermItem } from "@/types/game";
 import { ChoiceBox } from "../../mcq/_components/choice-box";
 import { Button } from "@/components/ui/button";
 
-import { SpeechService } from "@/lib/speech";
+import { getSpeechService } from "@/lib/speech";
 
 interface McqProps {
   question: TermItem;
@@ -54,6 +54,8 @@ export const Mcq = ({
     return correctChoice === chosenChoice;
   };
 
+  const speech = getSpeechService();
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 w-full items-center gap-5 p-5">
       <div className="col-span-1 sm:col-span-2">
@@ -62,16 +64,22 @@ export const Mcq = ({
             Choose the correct <span className="font-medium underline underline-offset-2">term/definition</span>
           </div>
           <div>
-            <Button onClick={() => SpeechService.speak("The term is:" + question.term)}>Listen to the term</Button>
+            <Button onClick={() => speech?.speak("The term is: " + question.term)}>
+              Listen to the term
+            </Button>
             {choiceType === PromptType.DEF && (
-              <Button onClick={() => {
-                  SpeechService.cancel();
-                  SpeechService.speakSequence(["The choices are: "]);
+              <Button
+                onClick={() => {
+                  speech?.cancel();
+                  speech?.speakSequence(["The choices are: "]);
                   choices.forEach((choice, index) => {
                     const label = String.fromCharCode(65 + index);
-                    SpeechService.speakSequence([`${label}.`, `${choice.definition}`]);
+                    speech?.speakSequence([`${label}.`, `${choice.definition}`]);
                   });
-              }}>Listen to the choices</Button>
+                }}
+              >
+                Listen to the choices
+              </Button>
             )}
           </div>
         </div>
@@ -98,9 +106,7 @@ export const Mcq = ({
                   : "notPicked"
                 : "notPicked"
             }
-            onClick={() => {
-              select(index);
-            }}
+            onClick={() => select(index)}
             disabled={formSubmitted}
           />
         </div>

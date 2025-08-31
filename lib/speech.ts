@@ -1,16 +1,18 @@
 class SpeechSingleton {
-  private static instance: SpeechSingleton;
-  private utterance: SpeechSynthesisUtterance;
-  private isSpeakingQueue: boolean = false;
+  private static instance: SpeechSingleton | null = null;
+  private utterance: SpeechSynthesisUtterance | null = null;
+  private isSpeakingQueue = false;
   private queue: string[] = [];
 
   private constructor() {
-    this.utterance = new SpeechSynthesisUtterance();
-    this.utterance.rate = 0.7
-    this.utterance.onend = () => {
-      this.isSpeakingQueue = false;
-      this.processQueue();
-    };
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      this.utterance = new window.SpeechSynthesisUtterance();
+      this.utterance.rate = 0.7;
+      this.utterance.onend = () => {
+        this.isSpeakingQueue = false;
+        this.processQueue();
+      };
+    }
   }
 
   static getInstance(): SpeechSingleton {
@@ -21,6 +23,7 @@ class SpeechSingleton {
   }
 
   speak(text: string) {
+    if (!this.utterance) return;
     this.cancel();
     this.utterance.text = text;
     speechSynthesis.speak(this.utterance);
@@ -34,6 +37,7 @@ class SpeechSingleton {
   }
 
   private processQueue() {
+    if (!this.utterance) return;
     if (this.queue.length > 0 && !this.isSpeakingQueue) {
       this.isSpeakingQueue = true;
       this.utterance.text = this.queue.shift()!;
@@ -48,4 +52,6 @@ class SpeechSingleton {
   }
 }
 
-export const SpeechService = SpeechSingleton.getInstance();
+export const getSpeechService = () => {
+  return SpeechSingleton.getInstance();
+}

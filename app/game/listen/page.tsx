@@ -14,7 +14,7 @@ import NextButton from "../_components/next-button";
 
 import { cn, getOneRandom, shuffle } from "@/lib/utils";
 import { PromptType } from "@/types/game";
-import { SpeechService } from "@/lib/speech";
+import { getSpeechService } from "@/lib/speech";
 
 const TIME_LIMIT = 10; // in seconds
 
@@ -74,7 +74,8 @@ const ListeningGame: React.FC = () => {
   };
 
   const handleNext = () => {
-    SpeechService.cancel();  // Clear speech utterance queue before going to the next round
+    const speech = getSpeechService();
+    speech?.cancel(); // clear speech utterance queue
 
     if (availableQuestions.length === 0) {
       // if no more questions, stop the game
@@ -136,13 +137,8 @@ const ListeningGame: React.FC = () => {
     return () => clearInterval(interval);
   }, [timerStopped, timeLeft]);
 
-  if (!hydrated) {
-    return null;
-  }
-
-  if (isLoading) {
-    return <LoadingAnimation />;
-  }
+  if (!hydrated) return null;
+  if (isLoading) return <LoadingAnimation />;
 
   return (
     <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
@@ -183,7 +179,8 @@ const ListeningGame: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}>
+              transition={{ duration: 0.3 }}
+            >
               <Mcq
                 key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
                 question={currQuestion}
@@ -201,7 +198,8 @@ const ListeningGame: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center">
+              className="flex flex-col items-center justify-center"
+            >
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
                 {` You scored ${score}/${termItems.length}`}
@@ -210,7 +208,8 @@ const ListeningGame: React.FC = () => {
                 className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
                 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
-                onClick={handleRestart}>
+                onClick={handleRestart}
+              >
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>

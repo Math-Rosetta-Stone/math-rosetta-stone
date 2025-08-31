@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { MOCK_DB, TermItem } from "../_constants/constants";
+import Image from "next/image";
 
 const Dictionary: React.FC = () => {
   const [currTermItem, setCurrTermItem] = useState<TermItem | null>(null);
@@ -64,7 +65,7 @@ const DictItem: React.FC<{ termItem: TermItem; goBack: () => void }> = ({
           {example}
         </p>
         {image && (
-          <img
+          <Image
             src={image.url}
             alt={term}
             height={300}
