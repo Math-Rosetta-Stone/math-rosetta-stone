@@ -11,7 +11,6 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # Load environment variables from the .env.local file in the root directory
 load_dotenv(dotenv_path=os.path.join(root_dir, '.env.local'))
-
 print(f"DB_HOST: {os.getenv('DB_HOST')}")
 print(f"DB_USER: {os.getenv('DB_USER')}")
 print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
@@ -25,7 +24,8 @@ config = {
     'database': os.getenv('DB_NAME'),  # Replace with your MySQL database name
     'port': 3306,  # Replace with your MySQL port (default is 3306)
     'charset': 'utf8mb4',  # Provides support for a larger range of characters
-    'use_unicode': True  # Prevents conversion of Unicode characters to escape sequences
+    'use_unicode': True,  # Prevents conversion of Unicode characters to escape sequences
+    'ssl_disabled': True  # Disable SSL to avoid compatibility issues with Python 3.12+
 }
 
 # Connect to MySQL server
