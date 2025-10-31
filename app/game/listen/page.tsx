@@ -24,10 +24,8 @@ const ListeningGame: React.FC = () => {
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
-  const [currQuestion, setCurrQuestion] = useState(getOneRandom(termItems));
-  const [availableQuestions, setAvailableQuestions] = useState(
-    termItems.filter(item => item.term !== currQuestion.term)
-  );
+  const [currQuestion, setCurrQuestion] = useState(termItems[0] || { term: "", definition: "", image: { url: "", title: "" } });
+  const [availableQuestions, setAvailableQuestions] = useState<typeof termItems>([]);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
@@ -37,7 +35,7 @@ const ListeningGame: React.FC = () => {
     return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF;
   };
 
-  const [currPromptType, setCurrPromptType] = useState(getRandomPromptType());
+  const [currPromptType, setCurrPromptType] = useState(PromptType.TERM);
 
   const getChoices = (
     question: { term: string; definition: any },
@@ -59,9 +57,7 @@ const ListeningGame: React.FC = () => {
     ]);
     return choices;
   };
-  const [currChoices, setCurrChoices] = useState(
-    getChoices(currQuestion, currPromptType)
-  );
+  const [currChoices, setCurrChoices] = useState<any[]>([]);
 
   const handleSubmit = () => {
     setTimerStopped(true);
@@ -125,7 +121,20 @@ const ListeningGame: React.FC = () => {
   };
 
   useEffect(() => {
-    setHydrated(true);
+    if (termItems.length > 0 && !hydrated) {
+      const initialQuestion = getOneRandom(termItems);
+      const initialPromptType = getRandomPromptType();
+      setCurrQuestion(initialQuestion);
+      setAvailableQuestions(
+        termItems.filter(item => item.term !== initialQuestion.term)
+      );
+      setCurrPromptType(initialPromptType);
+      setCurrChoices(getChoices(initialQuestion, initialPromptType));
+      setHydrated(true);
+    }
+  }, [termItems, hydrated]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft(prevTime => prevTime - 1);
@@ -135,7 +144,7 @@ const ListeningGame: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timerStopped, timeLeft]);
+  }, [timerStopped, timeLeft, formSubmitted]);
 
   if (!hydrated) return null;
   if (isLoading) return <LoadingAnimation />;
@@ -179,8 +188,7 @@ const ListeningGame: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
+              transition={{ duration: 0.3 }}>
               <Mcq
                 key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
                 question={currQuestion}
@@ -198,8 +206,7 @@ const ListeningGame: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center"
-            >
+              className="flex flex-col items-center justify-center">
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
                 {` You scored ${score}/${termItems.length}`}
@@ -208,8 +215,7 @@ const ListeningGame: React.FC = () => {
                 className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300
                 ease-in duration-150 disabled:bg-slate-300 disabled:text-slate-900"
                 variant="default"
-                onClick={handleRestart}
-              >
+                onClick={handleRestart}>
                 <RotateCcw className="mr-2" />
                 Restart
               </Button>

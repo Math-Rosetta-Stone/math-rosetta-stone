@@ -40,9 +40,13 @@ const GameMap: React.FC<GameMapProps> = ({
 
   useEffect(() => {
     if (isAdmin) {
-      const savedLevels = localStorage.getItem("levels");
-      if (savedLevels) {
-        setLevels(JSON.parse(savedLevels));
+      if (typeof window !== "undefined") {
+        const savedLevels = localStorage.getItem("levels");
+        if (savedLevels) {
+          setLevels(JSON.parse(savedLevels));
+        } else if (levelsData) {
+          setLevels(levelsData);
+        }
       } else if (levelsData) {
         setLevels(levelsData);
       }

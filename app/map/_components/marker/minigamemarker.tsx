@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Marker } from "react-leaflet";
 import { useRouter } from "next/navigation";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
@@ -38,7 +38,7 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
     }
   };
 
-  const isLevelLocked = () => {
+  const isLevelLocked = useCallback(() => {
     const {
       chapter_no: highestUnlockedChapter,
       level_no: highestUnlockedLevel
@@ -47,9 +47,9 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
     return highestUnlockedChapter < level.chapter_no
       || (highestUnlockedChapter === level.chapter_no
         && highestUnlockedLevel < level.level_no);
-  };
+  }, [permissions, currBranch, level.chapter_no, level.level_no]);
 
-  const isLevelCurrent = () => {
+  const isLevelCurrent = useCallback(() => {
     const {
       chapter_no: highestUnlockedChapter,
       level_no: highestUnlockedLevel
@@ -57,7 +57,7 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
 
 
     return highestUnlockedChapter === level.chapter_no && highestUnlockedLevel === level.level_no;
-  };
+  }, [permissions, currBranch, level.chapter_no, level.level_no]);
 
   const handleDragEnd = (event: L.DragEndEvent) => {
     if (isAdmin) {
@@ -81,7 +81,7 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
   useEffect(() => {
     setLocked(isLevelLocked());
     setCurrent(isLevelCurrent())
-  }, [permissions]);
+  }, [permissions, isLevelLocked, isLevelCurrent]);
 
   return (
     <Marker

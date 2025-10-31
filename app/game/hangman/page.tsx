@@ -119,15 +119,15 @@ const Hangman: React.FC = () => {
           handleKeydown as unknown as EventListener
         );
       }
-    }
-  }, [correctLetters, wrongLetters, playable]);
+    };
+  }, [correctLetters, wrongLetters, playable, currQuestion?.term, score]);
 
   useEffect(() => {
     const result = checkWin(correctLetters, wrongLetters, currQuestion?.term);
     if (result === "win") {
       setPlayable(false);
       setFormSubmitted(true);
-      setScore(score + 1);
+      setScore(s => s + 1);
       setGameMessage("Congratulations! You won! 😃");
     } else if (result === "lose") {
       setPlayable(false);

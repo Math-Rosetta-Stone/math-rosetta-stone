@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 
 type LatLngBounds = [[number, number], [number, number]];
@@ -8,7 +8,7 @@ type LatLngBounds = [[number, number], [number, number]];
 const MapComponent: React.FC<{ bounds: LatLngBounds }> = ({ bounds }) => {
   const map = useMap();
 
-  const handleResize = () => {
+  const handleResize = useCallback(() => {
     map.invalidateSize();
 
     const containerWidth = map.getSize().x;
@@ -24,7 +24,7 @@ const MapComponent: React.FC<{ bounds: LatLngBounds }> = ({ bounds }) => {
     map.fitBounds(bounds);
 
     map.setMaxBounds(bounds);
-  };
+  }, [map, bounds]);
 
   useEffect(() => {
 
@@ -43,7 +43,7 @@ const MapComponent: React.FC<{ bounds: LatLngBounds }> = ({ bounds }) => {
         window.removeEventListener('resize', handleResize);
       }
     };
-  }, [map, bounds]);
+  }, [map, bounds, handleResize]);
 
   return null;
 };

@@ -12,9 +12,13 @@ import Dictionary from "./_components/dictionary";
 import PracticeModal from "./_components/practicemode/practicemodal";
 import { GamePositionContext } from "../contexts/gamepositionproviders";
 import { withAuth } from "@/lib/withAuth";
-import GameMap from "./_components/gamemap";
 import { SelectLevel, SelectUser } from "../db/schema";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const GameMap = dynamic(() => import("./_components/gamemap"), {
+  ssr: false,
+});
 
 interface MapProps {
   user: SelectUser;
@@ -29,7 +33,7 @@ const Map: React.FC<MapProps> = ({ user }) => {
 
   useEffect(() => {
     console.log("admin", user.is_admin);
-  }, []);
+  }, [user.is_admin]);
 
   return (
     <div className="relative h-screen p-4 bg-gradient-to-br from-slate-100 to-slate-200">

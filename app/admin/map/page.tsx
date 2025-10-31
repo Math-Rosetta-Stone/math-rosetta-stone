@@ -13,10 +13,14 @@ import Dictionary from "../../map/_components/dictionary";
 import PracticeModal from "../../map/_components/practicemode/practicemodal";
 import { GamePositionContext } from "../../contexts/gamepositionproviders";
 import { withAdmin } from "@/lib/withAdmin";
-import GameMap from "../../map/_components/gamemap";
 import { SelectLevel } from "../../db/schema";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGameData } from "@/app/hooks/useGameData";
+import dynamic from "next/dynamic";
+
+const GameMap = dynamic(() => import("../../map/_components/gamemap"), {
+  ssr: false,
+});
 
 const AdminMap: React.FC = () => {
   const [currScreen, setCurrScreen] = useState<"map" | "dict" | "practice">(
@@ -33,7 +37,9 @@ const AdminMap: React.FC = () => {
       setIsSaving(true);
 
       // Save to localStorage as a backup
-      localStorage.setItem("levels", JSON.stringify(levels));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("levels", JSON.stringify(levels));
+      }
 
       // Save to database
       const response = await fetch("/api/levels/bulk-update", {

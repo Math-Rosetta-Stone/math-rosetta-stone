@@ -53,5 +53,8 @@ class SpeechSingleton {
 }
 
 export const getSpeechService = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
   return SpeechSingleton.getInstance();
 }

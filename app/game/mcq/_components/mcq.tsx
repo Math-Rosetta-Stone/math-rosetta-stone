@@ -61,9 +61,7 @@ export const Mcq = ({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 w-full items-center gap-5 p-5">
-      <div
-        className="col-span-1 sm:col-span-2"
-      >
+      <div className="col-span-1 sm:col-span-2">
         <QuestionBox
           question={question}
           questionType={questionType}
@@ -77,20 +75,24 @@ export const Mcq = ({
           choiceId={index}
           choice={choice}
           choiceType={choiceType}
-          variant={formSubmitted ? (
-            (index === selectedChoice) ? (
-              isCorrectChoice(choice) ? ("correct") : ("incorrect")
-            ) : (
-              (selectedChoice === null) ? (
-                isCorrectChoice(choice) ? ("timeoutCorrect") : ("notPicked")
-              ) : (
-                isCorrectChoice(choice) ? ("correct") : ("notPicked")
-              )
-            )
-          ) : (
-            "notPicked"
-          )}
-          onClick={() => {select(index)}}
+          variant={
+            formSubmitted
+              ? index === selectedChoice
+                ? isCorrectChoice(choice)
+                  ? "correct"
+                  : "incorrect"
+                : selectedChoice === null
+                ? isCorrectChoice(choice)
+                  ? "timeoutCorrect"
+                  : "notPicked"
+                : isCorrectChoice(choice)
+                ? "correct"
+                : "notPicked"
+              : "notPicked"
+          }
+          onClick={() => {
+            select(index);
+          }}
           disabled={formSubmitted}
         />
       ))}

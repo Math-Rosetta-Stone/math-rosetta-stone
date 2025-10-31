@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTerms } from "@/app/hooks/useTerms";
 import { useUserData } from "@/app/hooks/userdata";
 
@@ -18,19 +18,19 @@ const MatchingGame = () => {
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [randomizedTerms, setRandomizedTerms] = useState<string[]>(
-    shuffle(termItems.map((termItem) => termItem.term))
+    shuffle(termItems.map(termItem => termItem.term))
   );
   const [randomizedDefinitions, setRandomizedDefinitions] = useState<string[]>(
-    shuffle(termItems.map((termItem) => termItem.definition))
+    shuffle(termItems.map(termItem => termItem.definition))
   );
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const { isLoading } = useUserData();
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     setTimerStopped(true);
     setFormSubmitted(true);
-  };
+  }, []);
 
   const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
@@ -57,7 +57,7 @@ const MatchingGame = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timerStopped, timeLeft]);
+  }, [timerStopped, timeLeft, formSubmitted, handleSubmit]);
 
   if (!hydrated) {
     return null;

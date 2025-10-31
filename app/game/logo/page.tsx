@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTerms } from "@/app/hooks/useTerms";
 import { useUserData } from "@/app/hooks/userdata";
 
@@ -24,11 +24,9 @@ const LogoQuizGame = () => {
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
   const [currQuestion, setCurrQuestion] = useState<TermItem>(
-    getOneRandom(termItems)
+    termItems[0] || { term: "", definition: "", image: { url: "", title: "" } }
   );
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>(
-    termItems.filter(item => item.term !== currQuestion.term)
-  );
+  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>([]);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -37,20 +35,20 @@ const LogoQuizGame = () => {
 
   const { isLoading } = useUserData();
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     setTimerStopped(true);
     setFormSubmitted(true);
     if (
       userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()
     ) {
-      setScore(score + 1);
+      setScore(s => s + 1);
       setInputColor("green");
       setShowCorrectAnswer("");
     } else {
       setInputColor("red");
       setShowCorrectAnswer(currQuestion.term);
     }
-  };
+  }, [userAnswer, currQuestion.term]);
 
   const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
@@ -102,7 +100,17 @@ const LogoQuizGame = () => {
   };
 
   useEffect(() => {
-    setHydrated(true);
+    if (termItems.length > 0 && !hydrated) {
+      const initialQuestion = getOneRandom(termItems);
+      setCurrQuestion(initialQuestion);
+      setAvailableQuestions(
+        termItems.filter(item => item.term !== initialQuestion.term)
+      );
+      setHydrated(true);
+    }
+  }, [termItems, hydrated]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft(prevTime => prevTime - 1);
@@ -114,7 +122,7 @@ const LogoQuizGame = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timerStopped, timeLeft]);
+  }, [timerStopped, timeLeft, currQuestion.term, formSubmitted, handleSubmit]);
 
   if (!hydrated) {
     return null;

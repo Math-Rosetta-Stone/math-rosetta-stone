@@ -7,10 +7,7 @@ interface ResponseProps {
   variant: "correct" | "incorrect" | "timeout";
 }
 
-export const Response = ({
-  correctAnswer,
-  variant,
-}: ResponseProps) => {
+export const Response = ({ correctAnswer, variant }: ResponseProps) => {
   return (
     <AnimatePresence>
       <motion.div
@@ -19,14 +16,13 @@ export const Response = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className={cn("rounded p-3 w-full\
+        className={cn(
+          "rounded p-3 w-full\
           text-wrap text-sm",
-          (variant === "correct") && "bg-green-50 text-green-600",
-          (variant === "incorrect") && "bg-red-50 text-red-600",
-          (variant === "timeout") && "bg-orange-50 text-orange-500"
-        )}
-      >
-
+          variant === "correct" && "bg-green-50 text-green-600",
+          variant === "incorrect" && "bg-red-50 text-red-600",
+          variant === "timeout" && "bg-orange-50 text-orange-500"
+        )}>
         {variant === "correct" && (
           <div className="flex flex-col gap-1">
             <div className="flex flex-row justify-start items-center gap-1 font-bold">

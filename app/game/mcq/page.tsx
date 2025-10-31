@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTerms } from "@/app/hooks/useTerms";
 import { useUserData } from "@/app/hooks/userdata";
 
@@ -51,10 +51,10 @@ const McqGame = () => {
   };
   const [currGameType, setCurrGameType] = useState<PromptType[]>(getGameType()); // [question type, choice type]
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     setTimerStopped(true);
     setFormSubmitted(true);
-  };
+  }, []);
 
   const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
@@ -119,7 +119,7 @@ const McqGame = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timerStopped, timeLeft]);
+  }, [timerStopped, timeLeft, formSubmitted, handleSubmit]);
 
   if (!hydrated) {
     return null;

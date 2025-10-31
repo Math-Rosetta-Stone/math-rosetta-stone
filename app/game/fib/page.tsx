@@ -106,7 +106,7 @@ const FibGame: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timerStopped, timeLeft]);
+  }, [timerStopped, timeLeft, formSubmitted]);
 
   if (!hydrated) {
     return null;
