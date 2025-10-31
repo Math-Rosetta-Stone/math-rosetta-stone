@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import json
 import re
+import random
 
 # Get the root directory (one level up from the script's directory)
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -87,15 +88,38 @@ def insert_branches():
         (9, 10, "Statistics and Probability"),
         (10, 8, "CS")
     ]
+    games = [
+        "hangman",
+        "matching",
+        "mcq",
+        "logo",
+        "fib",
+        "listen",
+        "random"
+    ]
     for branch in branches:
         insert_branch_query = """
         INSERT INTO branch (branch_no, no_of_chapters, map_name)
         VALUES (%s, %s, %s)
         """
         cursor.execute(insert_branch_query, branch)
+        for i in range(1, branch[1] + 1):
+            insert_chapter_query = """
+            INSERT INTO chapter (chapter_no, branch_no, no_of_minigames)
+            VALUES (%s, %s, %s)
+            """
+            cursor.execute(insert_chapter_query, (i, branch[0], 7))
+            for j in range(1, 8):
+                x = random.randint(1, 1000)
+                y = random.randint(1, 1000)
+                insert_level_query = """
+                INSERT INTO level (level_no, chapter_no, branch_no, minigame_name, x, y)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(insert_level_query, (j, i, branch[0], games[random.randint(0, 6)], x, y))
     conn.commit()
     print("Successfully inserted branches...\n")
-    
+
 # Insert classes into the `classes` table
 def insert_classes():
     classes = [
@@ -213,7 +237,7 @@ def insert_excel_data_into_sql_tables():
         # example = escape_special_characters(example)
 
         # Print term details for debugging
-        print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
+        print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term.rstrip()}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
 
         # Insert into `terms` table
         insert_term_query = """
@@ -362,8 +386,7 @@ def recreate_tables():
             curr_branch_no INT NOT NULL,
             curr_chapter_no INT NOT NULL,
             curr_level_no INT NOT NULL,
-            PRIMARY KEY (user_id, curr_branch_no),
-            FOREIGN KEY (curr_branch_no, curr_chapter_no, curr_level_no) REFERENCES level(branch_no, chapter_no, level_no)
+            PRIMARY KEY (user_id, curr_branch_no)
         )
         """
     ]
@@ -387,7 +410,6 @@ def main():
     
     # Insert branches
     insert_branches()
-
     # Insert data from Excel into MySQL tables
     try:
         insert_excel_data_into_sql_tables()

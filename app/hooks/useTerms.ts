@@ -5,7 +5,7 @@ import { GamePositionContext } from "../contexts/gamepositionproviders";
 import { usePermission } from "./usePermission";
 
 export const useTerms = () => {
-  const { gamePosition, currBranch } = useContext(GamePositionContext);
+  const { currBranch } = useContext(GamePositionContext);
   const { permissions } = usePermission();
 
   const getUnlockedTerms = async () => {
@@ -16,16 +16,20 @@ export const useTerms = () => {
         break;
       }
     }
-    const response = await fetch(`/api/terms?branch=${currBranch}&level=${currLevel}`);
+    const response = await fetch(
+      `/api/terms?branch=${currBranch}&level=${currLevel}`
+    );
+    console.log(response);
     return (await response.json()).data;
   };
 
-  const {data, isPending} = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["unlockedTerms"],
     queryFn: getUnlockedTerms,
     enabled: currBranch > 0,
   });
 
+  console.log(data);
   return {
     data: data ? parseTerms(data) : [],
     isPending,

@@ -5,7 +5,7 @@ import { verify } from "argon2";
 import { cookies } from "next/headers";
 import { lucia } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { user } from "../db/schema";
+import { user, permission } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { ActionResult } from "@/lib/form";
 import { hash } from "argon2";
@@ -44,6 +44,16 @@ export async function signup(formData: FormData): Promise<ActionResult> {
     password_hash: hashedPassword,
     is_admin: isAdmin,
   });
+  await Promise.all(
+    Array.from({ length: 10 }, (_, i) => i + 1).map(async branchNo => {
+      await db.insert(permission).values({
+        curr_branch_no: branchNo,
+        curr_chapter_no: 1,
+        curr_level_no: 1,
+        user_id: userId,
+      });
+    })
+  );
 
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
