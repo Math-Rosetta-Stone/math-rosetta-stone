@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Marker } from "react-leaflet";
 import { LatLngExpression } from "leaflet";
-import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
+import { useRouter } from "next/navigation";
 import { branchIcon } from "../../_helpers/icon";
 
 interface BranchMarkerProps {
@@ -19,16 +19,12 @@ export const BranchMarker: React.FC<BranchMarkerProps> = ({
   setImageOverlayKey,
   isAdmin,
 }) => {
-  const { setGamePosition, setCurrBranch } = useContext(GamePositionContext);
+  const router = useRouter();
   const position: LatLngExpression = [location.y, location.x];
   const handleClick = () => {
     setImageOverlayKey(targetBranch);
-    setCurrBranch(targetBranch);
-    setGamePosition({
-      branch_no: targetBranch,
-      chapter_no: targetChapter,
-      level_no: 0,
-    });
+    // Navigate to the branch map which shows chapters
+    router.push(`/map/${targetBranch}`);
   };
 
   return (

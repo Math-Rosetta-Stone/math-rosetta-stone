@@ -10,9 +10,9 @@ import {
 import "./css/map.css";
 import Dictionary from "./_components/dictionary";
 import PracticeModal from "./_components/practicemode/practicemodal";
-import { GamePositionContext } from "../contexts/gamepositionproviders";
+import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { withAuth } from "@/lib/withAuth";
-import { SelectLevel, SelectUser } from "../db/schema";
+import { SelectLevel, SelectUser } from "@/app/db/schema";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
@@ -30,10 +30,6 @@ const Map: React.FC<MapProps> = ({ user }) => {
   );
 
   const [levels, setLevels] = useState<SelectLevel[]>([]);
-
-  useEffect(() => {
-    console.log("admin", user.is_admin);
-  }, [user.is_admin]);
 
   return (
     <div className="relative h-screen p-4 bg-gradient-to-br from-slate-100 to-slate-200">
@@ -78,7 +74,7 @@ const Map: React.FC<MapProps> = ({ user }) => {
 
         <div className="flex-1 rounded-lg overflow-hidden bg-white shadow-lg">
           {currScreen === "map" && (
-            <GameMap levels={levels} setLevels={setLevels} />
+            <GameMap levels={levels} setLevels={setLevels} currBranchOverride={0} />
           )}
           {currScreen === "dict" && <Dictionary />}
           {currScreen === "practice" && <PracticeModal />}

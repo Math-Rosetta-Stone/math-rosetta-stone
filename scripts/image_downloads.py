@@ -26,7 +26,7 @@ term_col_idx = headers[TERM_COLUMN]
 field_col_idx = headers[FIELD_COLUMN]
 
 # Process each row
-for row_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
+for row_idx, row in enumerate(ws.iter_rows(min_row=2, max_row=10), start=2):
     image_cell = row[image_col_idx - 1]  # Convert Excel 1-based index to 0-based
     term = row[term_col_idx - 1].value
     field = row[field_col_idx - 1].value
@@ -35,6 +35,7 @@ for row_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
     image_url = None
     if image_cell.hyperlink:
         image_url = image_cell.hyperlink.target
+        print(image_url)
 
     if not image_url or not term or not field:
         print(f"Skipping row {row_idx} due to missing data.")

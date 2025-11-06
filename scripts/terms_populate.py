@@ -237,7 +237,7 @@ def insert_excel_data_into_sql_tables():
         # example = escape_special_characters(example)
 
         # Print term details for debugging
-        print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term.rstrip()}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
+        print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term.strip().strip('"')}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
 
         # Insert into `terms` table
         insert_term_query = """
@@ -306,7 +306,9 @@ def recreate_tables():
         "DROP TABLE IF EXISTS terms",
         "DROP TABLE IF EXISTS languages",
         "DROP TABLE IF EXISTS classes",
-        "DROP TABLE IF EXISTS branch"
+        "DROP TABLE IF EXISTS branch",
+        "DROP TABLE IF EXISTS session",
+        "DROP TABLE IF EXISTS user"
     ]
     create_tables = [
         """
@@ -388,6 +390,27 @@ def recreate_tables():
             curr_level_no INT NOT NULL,
             PRIMARY KEY (user_id, curr_branch_no)
         )
+        """,
+        """
+        CREATE TABLE `user` (
+            id varchar(255) NOT NULL,
+            username varchar(50) NOT NULL,
+            password_hash varchar(100) NOT NULL,
+            is_admin boolean NOT NULL DEFAULT false,
+            created_at timestamp NOT NULL DEFAULT (now()),
+            updated_at timestamp NOT NULL DEFAULT (now()),
+            CONSTRAINT `user_id` PRIMARY KEY(`id`),
+            CONSTRAINT `user_username_unique` UNIQUE(`username`),
+            CONSTRAINT `username_idx` UNIQUE(`username`)
+        );
+        """,
+        """
+        CREATE TABLE `session` (
+            id varchar(255) NOT NULL,
+            user_id varchar(255) NOT NULL,
+            expires_at datetime NOT NULL,
+            CONSTRAINT `session_id` PRIMARY KEY(`id`)
+        );
         """
     ]
 

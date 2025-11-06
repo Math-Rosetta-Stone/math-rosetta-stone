@@ -2,12 +2,10 @@
 
 import {
   createContext,
-  Dispatch,
   ReactNode,
-  SetStateAction,
-  useState,
-  useEffect,
+  useMemo,
 } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { GamePosition } from "@/types/db";
 import { useGameData } from "@/app/hooks/useGameData";
 
@@ -16,11 +14,9 @@ interface GamePositionContextProps {
   setGamePosition: (position: GamePosition) => void;
   incrementGamePosition: (branch_no: number) => void;
   currBranch: number;
-  setCurrBranch: Dispatch<SetStateAction<number>>;
+  setCurrBranch: (branch: number) => void;
+  currentPosition: GamePosition | null;
 }
-
-const GAME_POS_KEY = "game_position";
-const CUR_BRANCH_KEY = "curr_branch";
 
 const INITIAL_GAME_POSITION: GamePosition[] = [
   { branch_no: 0, chapter_no: 0, level_no: 0 },
@@ -33,84 +29,97 @@ const INITIAL_GAME_POSITION: GamePosition[] = [
   { branch_no: 7, chapter_no: 1, level_no: 1 },
 ];
 
-// Retrieve initial state from localStorage or use default
-const getInitialGamePosition = (): GamePosition[] => {
-  if (typeof window !== "undefined") {
-    const storedData = localStorage.getItem(GAME_POS_KEY);
-    return storedData ? JSON.parse(storedData) : INITIAL_GAME_POSITION;
-  }
-  return INITIAL_GAME_POSITION;
-};
-
-// Retrieve initial current branch from localStorage or use default
-const getInitialCurrBranch = (): number => {
-  if (typeof window !== "undefined") {
-    const storedBranch = localStorage.getItem(CUR_BRANCH_KEY);
-    return storedBranch ? JSON.parse(storedBranch) : 0;
-  }
-  return 0;
-};
-
 const GamePositionContext = createContext<GamePositionContextProps>({
-  gamePosition: [],
+  gamePosition: INITIAL_GAME_POSITION,
   setGamePosition: () => {},
   incrementGamePosition: () => {},
-  currBranch: 0,
+  currBranch: 1,
   setCurrBranch: () => {},
+  currentPosition: null,
 });
 
 function GamePositionProvider({ children }: { children: ReactNode }) {
-  const [gamePosition, setGamePositionState] = useState<GamePosition[]>(
-    getInitialGamePosition
-  );
-  const [currBranch, setCurrBranch] = useState<number>(getInitialCurrBranch);
+  const params = useParams();
+  const router = useRouter();
   const { branches, chapters } = useGameData();
 
-  // Sync state to localStorage whenever gamePosition changes
-  useEffect(() => {
-    localStorage.setItem(GAME_POS_KEY, JSON.stringify(gamePosition));
-  }, [gamePosition]);
+  // Read current position from URL params if on /map/[branch]/[chapter]/[level] route
+  const currentPosition = useMemo<GamePosition | null>(() => {
+    if (params?.branch && params?.chapter && params?.level) {
+      const branch = parseInt(params.branch as string, 10);
+      const chapter = parseInt(params.chapter as string, 10);
+      const level = parseInt(params.level as string, 10);
+      if (!isNaN(branch) && !isNaN(chapter) && !isNaN(level)) {
+        return { branch_no: branch, chapter_no: chapter, level_no: level };
+      }
+    }
+    return null;
+  }, [params]);
 
-  // Sync state to localStorage whenever currBranch changes
-  useEffect(() => {
-    localStorage.setItem(CUR_BRANCH_KEY, JSON.stringify(currBranch));
-  }, [currBranch]);
+  // Current branch from URL params or default to 1
+  const currBranch = useMemo(() => {
+    if (params?.branch) {
+      const branch = parseInt(params.branch as string, 10);
+      if (!isNaN(branch)) return branch;
+    }
+    return 1;
+  }, [params]);
+
+  // Build gamePosition array from URL params (for backward compatibility)
+  const gamePosition = useMemo<GamePosition[]>(() => {
+    const positions = [...INITIAL_GAME_POSITION];
+    if (currentPosition) {
+      const index = positions.findIndex(
+        pos => pos.branch_no === currentPosition.branch_no
+      );
+      if (index !== -1) {
+        positions[index] = currentPosition;
+      }
+    }
+    return positions;
+  }, [currentPosition]);
 
   const setGamePosition = (newPosition: GamePosition) => {
-    setGamePositionState(prev =>
-      prev.map(pos =>
-        pos.branch_no === newPosition.branch_no ? newPosition : pos
-      )
-    );
+    // Navigate to the new position URL
+    router.push(`/map/${newPosition.branch_no}/${newPosition.chapter_no}/${newPosition.level_no}`);
+  };
+
+  const setCurrBranch = (branch: number) => {
+    // Navigate to first chapter and level of the branch
+    router.push(`/map/${branch}/1/1`);
   };
 
   const incrementGamePosition = (branch_no: number) => {
-    setGamePositionState(prevGamePos => {
-      const newGamePos = [...prevGamePos];
-      const positionIndex = newGamePos.findIndex(
-        pos => pos.branch_no === branch_no
-      );
-      if (positionIndex === -1) return prevGamePos;
+    const currentPos = currentPosition || { branch_no, chapter_no: 1, level_no: 1 };
+    
+    // Find the current position for this branch
+    const branchPos = currentPos.branch_no === branch_no ? currentPos : 
+      gamePosition.find(pos => pos.branch_no === branch_no) || 
+      { branch_no, chapter_no: 1, level_no: 1 };
 
-      const newPosition = { ...newGamePos[positionIndex] };
+    const newPosition = { ...branchPos };
 
-      const isLastChapter =
-        branches?.[newPosition.branch_no]?.no_of_chapters ===
-        newPosition.chapter_no;
-      const isLastLevel =
-        chapters?.[newPosition.chapter_no]?.no_of_minigames ===
-        newPosition.level_no;
+    // Calculate next position
+    const branchData = branches?.find(b => b.branch_no === branch_no);
+    const chapterData = chapters?.find(c => c.chapter_no === branchPos.chapter_no);
 
-      newPosition.level_no =
-        isLastLevel && !isLastChapter ? 1 : newPosition.level_no + 1;
-      newPosition.chapter_no =
-        isLastLevel && !isLastChapter ? 1 : newPosition.chapter_no + 1;
+    const isLastChapter = branchData?.no_of_chapters === branchPos.chapter_no;
+    const isLastLevel = chapterData?.no_of_minigames === branchPos.level_no;
 
-      newGamePos[positionIndex] = newPosition;
+    if (isLastLevel && !isLastChapter) {
+      // Move to next chapter, level 1
+      newPosition.chapter_no = branchPos.chapter_no + 1;
+      newPosition.level_no = 1;
+    } else if (isLastLevel && isLastChapter) {
+      // Already at the end, don't increment
+      return;
+    } else {
+      // Increment level
+      newPosition.level_no = branchPos.level_no + 1;
+    }
 
-      localStorage.setItem(GAME_POS_KEY, JSON.stringify(newGamePos)); // Sync to localStorage
-      return newGamePos;
-    });
+    // Navigate to the next position
+    router.push(`/map/${newPosition.branch_no}/${newPosition.chapter_no}/${newPosition.level_no}`);
   };
 
   return (
@@ -121,6 +130,7 @@ function GamePositionProvider({ children }: { children: ReactNode }) {
         currBranch,
         setCurrBranch,
         incrementGamePosition,
+        currentPosition,
       }}>
       {children}
     </GamePositionContext.Provider>

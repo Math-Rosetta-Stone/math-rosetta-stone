@@ -1,63 +1,77 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTerms } from "@/app/hooks/useTerms";
 import { useUserData } from "@/app/hooks/userdata";
 
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { Mcq } from "./_components/Mcq";
 import { Button } from "@/components/ui/button";
 import LoadingAnimation from "@/components/ui/loadinganimation";
 import NextButton from "../_components/next-button";
 
-import { cn, getOneRandom } from "@/lib/utils";
-import { TermItem } from "@/types/game";
-import Image from "next/image";
+import { cn, getOneRandom, shuffle } from "@/lib/utils";
+import { PromptType, TermItem } from "@/types/game";
+import { getSpeechService } from "@/lib/speech";
 
 const TIME_LIMIT = 10; // in seconds
 
-const LogoQuizGame = () => {
-  const { data: termItems } = useTerms();
+const ListeningGame: React.FC<{ termItems: TermItem[] }> = ({ termItems }) => {
 
   const [hydrated, setHydrated] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timerStopped, setTimerStopped] = useState(false);
-  const [currQuestion, setCurrQuestion] = useState<TermItem>(
-    termItems[0] || { term: "", definition: "", image: { url: "", title: "" } }
-  );
-  const [availableQuestions, setAvailableQuestions] = useState<TermItem[]>([]);
+  const [currQuestion, setCurrQuestion] = useState(termItems[0] || { term: "", definition: "", image: { url: "", title: "" } });
+  const [availableQuestions, setAvailableQuestions] = useState<typeof termItems>([]);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [score, setScore] = useState(0);
-  const [userAnswer, setUserAnswer] = useState<string>("");
-  const [inputColor, setInputColor] = useState<string>("");
-  const [showCorrectAnswer, setShowCorrectAnswer] = useState<string>("");
 
   const { isLoading } = useUserData();
 
-  const handleSubmit = useCallback(() => {
+  const getRandomPromptType = () => {
+    return Math.random() > 0.5 ? PromptType.TERM : PromptType.DEF;
+  };
+
+  const [currPromptType, setCurrPromptType] = useState(PromptType.TERM);
+
+  const getChoices = (
+    question: { term: string; definition: any },
+    choiceType: PromptType
+  ) => {
+    const wrongChoices = shuffle(
+      termItems.filter(item => item.term !== question.term)
+    ).slice(0, 3);
+    const choices = shuffle([
+      {
+        term: choiceType === PromptType.TERM ? question.term : undefined,
+        definition:
+          choiceType === PromptType.DEF ? question.definition : undefined,
+      },
+      ...wrongChoices.map(item => ({
+        term: choiceType === PromptType.TERM ? item.term : undefined,
+        definition: choiceType === PromptType.DEF ? item.definition : undefined,
+      })),
+    ]);
+    return choices;
+  };
+  const [currChoices, setCurrChoices] = useState<any[]>([]);
+
+  const handleSubmit = () => {
     setTimerStopped(true);
     setFormSubmitted(true);
-    if (
-      userAnswer.trim().toLowerCase() === currQuestion.term.trim().toLowerCase()
-    ) {
-      setScore(s => s + 1);
-      setInputColor("green");
-      setShowCorrectAnswer("");
-    } else {
-      setInputColor("red");
-      setShowCorrectAnswer(currQuestion.term);
-    }
-  }, [userAnswer, currQuestion.term]);
+  };
 
   const handleResetTimer = () => {
     setTimeLeft(TIME_LIMIT);
     setTimerStopped(false);
-    setInputColor("");
-    setShowCorrectAnswer("");
   };
 
   const handleNext = () => {
+    const speech = getSpeechService();
+    speech?.cancel(); // clear speech utterance queue
+
     if (availableQuestions.length === 0) {
       // if no more questions, stop the game
       // to mark no more questions left
@@ -71,9 +85,15 @@ const LogoQuizGame = () => {
       const newQuestion = getOneRandom(availableQuestions);
       setCurrQuestion(newQuestion);
 
+      const newPromptType = getRandomPromptType();
+      setCurrPromptType(newPromptType);
+
+      // get new choices for the new question
+      setCurrChoices(getChoices(newQuestion, newPromptType));
+
       // update available questions
-      setAvailableQuestions(prevAvailableQuestions =>
-        prevAvailableQuestions.filter(item => item.term !== newQuestion.term)
+      setAvailableQuestions(
+        availableQuestions.filter(item => item.term !== newQuestion.term)
       );
 
       // reset timer
@@ -82,30 +102,33 @@ const LogoQuizGame = () => {
 
     // reset form submitted
     setFormSubmitted(false);
-    // reset user answer
-    setUserAnswer("");
   };
 
   const handleRestart = () => {
     // reset all states
     handleResetTimer();
     const newQuestion = getOneRandom(termItems);
+    const newPromptType = getRandomPromptType();
     setCurrQuestion(newQuestion);
     setAvailableQuestions(
       termItems.filter(item => item.term !== newQuestion.term)
     );
     setFormSubmitted(false);
     setScore(0);
-    setUserAnswer("");
+    setCurrChoices(getChoices(newQuestion, newPromptType));
+    setCurrPromptType(newPromptType);
   };
 
   useEffect(() => {
     if (termItems.length > 0 && !hydrated) {
       const initialQuestion = getOneRandom(termItems);
+      const initialPromptType = getRandomPromptType();
       setCurrQuestion(initialQuestion);
       setAvailableQuestions(
         termItems.filter(item => item.term !== initialQuestion.term)
       );
+      setCurrPromptType(initialPromptType);
+      setCurrChoices(getChoices(initialQuestion, initialPromptType));
       setHydrated(true);
     }
   }, [termItems, hydrated]);
@@ -114,46 +137,28 @@ const LogoQuizGame = () => {
     const interval = setInterval(() => {
       if (timeLeft > 0 && !timerStopped) {
         setTimeLeft(prevTime => prevTime - 1);
-      } else if (timeLeft === 0 && !formSubmitted && !timerStopped) {
+      } else if (timeLeft === 0 && !formSubmitted) {
         handleSubmit(); // Automatically submit when the timer reaches 0
-        setInputColor("orange");
-        setShowCorrectAnswer(currQuestion.term);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timerStopped, timeLeft, currQuestion.term, formSubmitted, handleSubmit]);
+  }, [timerStopped, timeLeft, formSubmitted]);
 
-  if (!hydrated) {
-    return null;
-  }
-
-  if (isLoading) {
-    return <LoadingAnimation />;
-  }
+  if (!hydrated) return null;
+  if (isLoading) return <LoadingAnimation />;
 
   return (
-    <div className="flex flex-col items-center justify-start gap-2 min-h-screen mt-[8vh]">
-      <div className="text-4xl font-black">Logo Quiz Game</div>
-
-      <div
-        className="flex flex-col
-        rounded-lg shadow-md border border-neutral-200 w-1/3 pb-2">
-        <div
-          className="flex flex-row rounded-t-lg justify-between w-full
-          border-b border-neutral-200 py-2 px-3 bg-slate-100
-          text-xl font-medium">
+    <div className="flex flex-col items-center justify-start mt-2 gap-2 min-h-screen">
+      <div className="text-4xl font-black">Listening Game</div>
+      <div className="flex flex-col rounded-lg shadow-md border border-neutral-200 w-1/3 pb-2">
+        <div className="flex flex-row rounded-t-lg justify-between w-full border-b border-neutral-200 py-2 px-3 bg-slate-50 text-xl font-medium">
           <div>Level #</div>
           <div>{new Date(timeLeft * 1000).toISOString().substring(14, 19)}</div>
         </div>
-
-        <div
-          className="flex flex-row justify-between w-full
-          py-2 px-3 bg-slate-100
-          text-sm font-medium">
-          Identify the term corresponding to the image.
+        <div className="flex flex-row justify-between w-full py-2 px-3 bg-slate-50 text-sm font-medium">
+          Match the term/definition corresponding to the term spoken.
         </div>
-
         {currQuestion.term !== "" && (
           <div className="flex flex-row justify-between w-full pt-2 px-5">
             <div className="flex flex-row justify-start gap-2">
@@ -162,7 +167,6 @@ const LogoQuizGame = () => {
               }`}</div>
               <div>{`Score: ${score}`}</div>
             </div>
-
             <ArrowRight
               className={cn(
                 "text-slate-300 ease-in duration-150",
@@ -176,7 +180,6 @@ const LogoQuizGame = () => {
             />
           </div>
         )}
-
         <AnimatePresence mode="wait">
           {currQuestion.term !== "" ? (
             <motion.div
@@ -185,46 +188,15 @@ const LogoQuizGame = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}>
-              <div className="flex flex-col items-center justify-center w-full p-5">
-                <div className="flex flex-col items-center justify-center w-full">
-                  <Image
-                    src={currQuestion.image.url}
-                    alt={currQuestion.image.title}
-                    className="w-1/2 h-auto"
-                  />
-                </div>
-                <div className="mt-5 w-full">
-                  <input
-                    type="text"
-                    value={userAnswer}
-                    onChange={e => setUserAnswer(e.target.value)}
-                    className={cn(
-                      "w-full px-3 py-2 border rounded-lg",
-                      inputColor === "red" && "border-red-500",
-                      inputColor === "green" && "border-green-500",
-                      inputColor === "orange" && "border-orange-500"
-                    )}
-                    placeholder="Type your answer here"
-                  />
-                </div>
-                {formSubmitted && showCorrectAnswer && (
-                  <div
-                    className={cn(
-                      "mt-2",
-                      inputColor === "red" && "text-red-500",
-                      inputColor === "orange" && "text-orange-500"
-                    )}>
-                    Correct Answer: {showCorrectAnswer}
-                  </div>
-                )}
-                <Button
-                  className="mt-5"
-                  variant="default"
-                  onClick={handleSubmit}
-                  disabled={formSubmitted}>
-                  Submit
-                </Button>
-              </div>
+              <Mcq
+                key={availableQuestions.length % 2 === 0 ? 0 : 1} // In order to reset selected choice state after each round
+                question={currQuestion}
+                choices={currChoices}
+                choiceType={currPromptType} // Choices are terms or definitions
+                handleSubmit={handleSubmit}
+                formSubmitted={formSubmitted}
+                updateScore={() => setScore(score + 1)}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -256,4 +228,4 @@ const LogoQuizGame = () => {
   );
 };
 
-export default LogoQuizGame;
+export default ListeningGame;

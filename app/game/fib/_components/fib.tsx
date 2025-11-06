@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { PromptType, TermItem } from "@/types/game";
 
 import { BlankInput } from "./blank-input";
@@ -29,6 +29,7 @@ export const Fib = ({
   const [beforeBlank, setBeforeBlank] = useState<string>("");
   const [afterBlank, setAfterBlank] = useState<string>("");
   const [correctAnswer, setCorrectAnswer] = useState<string>("");
+  const [correctAnswerWithPunct, setCorrectAnswerWithPunct] = useState<string>("");
 
   const getQuestionContent = () => {
     switch (questionType) {
@@ -47,29 +48,55 @@ export const Fib = ({
     }
   };
 
-  const getParsedDefinition = () => {
-    const words = question.definition.split(" ");
+  // Parse definition into words and randomly select one to blank out
+  const parsedDefinition = useMemo(() => {
+    if (!question.definition) return null;
+    
+    // Split definition into words, preserving punctuation
+    // Split by spaces but keep punctuation attached to words
+    const words = question.definition.trim().split(/\s+/).filter(word => word.length > 0);
+    
+    if (words.length === 0) return null;
+    
+    // Randomly select one word index to blank out
+    const blankIndex = Math.floor(Math.random() * words.length);
+    const selectedWordWithPunct = words[blankIndex];
+    
+    // Remove punctuation from the selected word for comparison
+    // This allows players to answer without worrying about punctuation
+    const cleanWord = selectedWordWithPunct.replace(/[.,!?;:]/g, '').trim();
+    
+    return {
+      words,
+      blankIndex,
+      selectedWord: cleanWord,
+      selectedWordWithPunct, // Keep original for display context
+      beforeWords: words.slice(0, blankIndex),
+      afterWords: words.slice(blankIndex + 1),
+    };
+  }, [question.definition]);
 
-    // Assume definition doesn't contain period at the end
-    for (let i = 0; i < words.length; i++) {
-      if (words[i][0] == "$" && words[i][words[i].length - 1] == "$") {
-        setBeforeBlank(words.slice(0, i).join(" "));
-        setAfterBlank(words.slice(i + 1).join(" "));
-        setCorrectAnswer(words[i].slice(1, words[i].length - 1));
-        return;
-      }
+  useEffect(() => {
+    if (parsedDefinition) {
+      setBeforeBlank(parsedDefinition.beforeWords.join(" "));
+      setAfterBlank(parsedDefinition.afterWords.join(" "));
+      setCorrectAnswer(parsedDefinition.selectedWord);
+      setCorrectAnswerWithPunct(parsedDefinition.selectedWordWithPunct);
+      setFilledAnswer(""); // Reset answer when question changes
     }
-  };
+  }, [parsedDefinition]);
 
   const handleFill = () => {
-    if (filledAnswer.toLowerCase() === correctAnswer.toLowerCase()) updateScore();
+    // Trim whitespace and compare case-insensitively
+    const userAnswer = filledAnswer.trim().toLowerCase();
+    const correct = correctAnswer.trim().toLowerCase();
+    
+    if (userAnswer === correct) {
+      updateScore();
+    }
 
     handleSubmit();
   };
-
-  useEffect(() => {
-    getParsedDefinition();
-  });
 
   return (
     <div className="flex flex-col items-center gap-5 p-5">
@@ -87,7 +114,7 @@ export const Fib = ({
 
         <span className="font-semibold underline underline-offset-2">
           Definition
-        </span>: {beforeBlank}
+        </span>: {beforeBlank ? `${beforeBlank} ` : ''}
 
         <BlankInput
           value={filledAnswer}
@@ -95,14 +122,18 @@ export const Fib = ({
           variant={formSubmitted ? "submitted" : "unsubmitted"}
         />
 
-        {afterBlank}.
+        {afterBlank ? ` ${afterBlank}` : ''}
       </div>
 
       {formSubmitted && (
         <Response
-          correctAnswer={beforeBlank.charAt(0).toUpperCase() + beforeBlank.slice(1) + " " + correctAnswer + " " + afterBlank + "."}
-          variant={filledAnswer.length > 0 ? (
-            filledAnswer.toLowerCase() === correctAnswer.toLowerCase() ? ("correct") : ("incorrect")
+          correctAnswer={[
+            ...(beforeBlank ? [beforeBlank] : []),
+            correctAnswerWithPunct,
+            ...(afterBlank ? [afterBlank] : [])
+          ].join(" ")}
+          variant={filledAnswer.trim().length > 0 ? (
+            filledAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase() ? ("correct") : ("incorrect")
           ) : (
             "timeout"
           )}
@@ -113,7 +144,7 @@ export const Fib = ({
         className="border hover:bg-slate-100 hover:text-slate-900
         hover:border-slate-300 ease-in duration-150
         disabled:bg-slate-300 disabled:text-slate-900"
-        disabled={formSubmitted || filledAnswer.length <= 0}
+        disabled={formSubmitted || filledAnswer.trim().length <= 0}
         variant="default"
         onClick={handleFill}
       >

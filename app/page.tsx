@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import MainMap from "@/app/map/_components/MainMap";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { signout } from "./actions";
 
@@ -15,6 +16,7 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [animationKey, setAnimationKey] = useState(0);
+  const router = useRouter();
 
   const handleSignout = async () => {
     try {
@@ -98,16 +100,19 @@ export default function Home() {
 
             <MainMap />
 
-            <Link
-              href="/map"
+            <button
+              onClick={() => {
+                router.push("/map");
+              }}
               className="ease-in-out duration-200
             text-slate-900 hover:text-slate-200
             hover:drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]
             underline underline-offset-2 decoration-dashed decoration-1
             hover:no-underline
-            text-2xl font-black">
+            text-2xl font-black
+            bg-transparent border-none cursor-pointer">
               Go to game
-            </Link>
+            </button>
 
             <button
               onClick={handleSignout}

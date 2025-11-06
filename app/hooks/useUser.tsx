@@ -27,8 +27,8 @@ export const useUser = () => {
     queryKey: ["user"],
     queryFn: fetchUserData,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    // Don't refetch if we already have data
-    refetchOnMount: false,
+    // Refetch on mount to ensure fresh data after registration/login
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
 

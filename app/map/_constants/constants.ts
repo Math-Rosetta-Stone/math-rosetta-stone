@@ -77,13 +77,16 @@ type BranchMapsPaths = {
 
 export const BRANCH_MAPS_PATHS: BranchMapsPaths = [
   "intermap.png",
-  "map.png",
-  "map1.png",
   "land/land1.png",
   "land/land2.png",
   "land/land3.png",
   "land/land4.png",
-  "untitled.png",
+  "land/land5.png",
+  "land/land6.png",
+  "land/land7.png",
+  "land/land8.png",
+  "land/land9.png",
+  "land/land10.png",
 ];
 
 export const Land_to_branch_no = {

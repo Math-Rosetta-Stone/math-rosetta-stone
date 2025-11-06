@@ -19,23 +19,25 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
   setLevels,
 }) => {
   const router = useRouter();
-  const { currBranch, setGamePosition } = useContext(GamePositionContext);
+  const { currBranch } = useContext(GamePositionContext);
   const { permissions } = usePermission();
   const [locked, setLocked] = useState(true);
   const [current, setCurrent] = useState(false);
 
   const handleClick = () => {
-    setGamePosition({
-      level_no: level.level_no,
-      branch_no: level.branch_no,
-      chapter_no: level.chapter_no,
-    });
-    if (level.minigame_name === "random") {
-      const gameName = selectRandomGame();
-      router.push(`/game/${gameName}`);
-    } else {
-      router.push(`/game/${level.minigame_name}`);
-    }
+    // Navigate to map URL with position first using replace to avoid history clutter
+    const mapUrl = `/map/${level.branch_no}/${level.chapter_no}/${level.level_no}`;
+    router.replace(mapUrl);
+    
+    // Then navigate to game - use a small timeout to ensure URL is updated
+    setTimeout(() => {
+      if (level.minigame_name === "random") {
+        const gameName = selectRandomGame();
+        router.push(`/game/${gameName}`);
+      } else {
+        router.push(`/game/${level.minigame_name}`);
+      }
+    }, 0);
   };
 
   const isLevelLocked = useCallback(() => {

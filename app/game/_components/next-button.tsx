@@ -1,18 +1,18 @@
 "use client";
 
 import { useContext } from "react";
-import { useRouter } from "next/navigation";
 import { GamePositionContext } from "@/app/contexts/gamepositionproviders";
 import { usePermission } from "@/app/hooks/usePermission";
 import { Button } from "@/components/ui/button";
 import { FaStairs } from "react-icons/fa6";
 
 const NextButton = () => {
-  const { gamePosition, incrementGamePosition, currBranch } = useContext(GamePositionContext);
+  const { currentPosition, incrementGamePosition, currBranch } = useContext(GamePositionContext);
   const { permissions, updatePermission } = usePermission();
-  const router = useRouter();
 
   const handleNextLevel = () => {
+    if (!currentPosition) return;
+
     for (let perm of permissions) {
       if (perm.branch_no === currBranch) {
         /* TODO: add logic to:
@@ -20,7 +20,7 @@ const NextButton = () => {
         * 2. handle level overflow (incrementing more than )
         */
 
-        const currentLevel = gamePosition[currBranch].level_no;
+        const currentLevel = currentPosition.level_no;
         const highestUnlockedLevel = perm.level_no;
         let updatedPerm = {
           ...perm,
@@ -37,8 +37,8 @@ const NextButton = () => {
         break;
       }
     }
+    // incrementGamePosition now navigates to the new URL automatically
     incrementGamePosition(currBranch);
-    router.push("/map");
   };
 
   return (

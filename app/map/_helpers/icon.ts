@@ -108,3 +108,18 @@ export const branchIcon = (branch: number) => {
     iconAnchor: [25, 25],
   });
 };
+
+export const chapterIcon = (chapter: number) => {
+  const svgString = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+      <circle cx="25" cy="25" r="23" fill="#9C27B0" stroke="white" stroke-width="2"/>
+      <text x="25" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="white">${chapter}</text>
+    </svg>
+  `;
+  return L.divIcon({
+    html: svgString,
+    className: "custom-svg-icon",
+    iconSize: [50, 50],
+    iconAnchor: [25, 25],
+  });
+};
