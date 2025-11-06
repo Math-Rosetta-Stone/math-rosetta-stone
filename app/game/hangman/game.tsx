@@ -72,31 +72,34 @@ const Hangman: React.FC<{ termItems: TermItem[] }> = ({ termItems }) => {
     setWrongLetters([]);
 
     // reset all states
-    const newQuestion = getOneRandom(termItems);
-    setCurrQuestion(newQuestion);
-    setAvailableQuestions(
-      termItems.filter(item => item?.term !== newQuestion?.term)
-    );
+    if (termItems && termItems.length > 0) {
+      const newQuestion = getOneRandom(termItems);
+      setCurrQuestion(newQuestion);
+      setAvailableQuestions(
+        termItems.filter(item => item?.term !== newQuestion?.term)
+      );
+    }
     setScore(0);
     setGameMessage("");
   };
 
   useEffect(() => {
-    console.log(termItems);
-    const newQuestion = getOneRandom(termItems);
-    setCurrQuestion(newQuestion);
-    setAvailableQuestions(
-      termItems.filter(item => item?.term !== newQuestion?.term)
-    );
-  }, []);
+    if (termItems && termItems.length > 0) {
+      const newQuestion = getOneRandom(termItems);
+      setCurrQuestion(newQuestion);
+      setAvailableQuestions(
+        termItems.filter(item => item?.term !== newQuestion?.term)
+      );
+    }
+  }, [termItems]);
 
   useEffect(() => {
     setHydrated(true);
     const handleKeydown = (event: KeyboardEvent) => {
       const { key, keyCode } = event;
-      if (playable && keyCode >= 65 && keyCode <= 90) {
+      if (playable && keyCode >= 65 && keyCode <= 90 && currQuestion?.term) {
         const letter = key.toLowerCase();
-        if (currQuestion?.term.toLowerCase().includes(letter)) {
+        if (currQuestion.term.toLowerCase().includes(letter)) {
           if (!correctLetters.includes(letter)) {
             setCorrectLetters(currentLetters => [...currentLetters, letter]);
           } else {
@@ -129,7 +132,9 @@ const Hangman: React.FC<{ termItems: TermItem[] }> = ({ termItems }) => {
   }, [correctLetters, wrongLetters, playable, currQuestion?.term, score]);
 
   useEffect(() => {
-    const result = checkWin(correctLetters, wrongLetters, currQuestion?.term);
+    if (!currQuestion?.term) return;
+    
+    const result = checkWin(correctLetters, wrongLetters, currQuestion.term);
     if (result === "win") {
       setPlayable(false);
       setFormSubmitted(true);
@@ -139,7 +144,7 @@ const Hangman: React.FC<{ termItems: TermItem[] }> = ({ termItems }) => {
       setPlayable(false);
       setFormSubmitted(true);
       setGameMessage(
-        `Unfortunately you lost. 😕 The word was: ${currQuestion?.term}`
+        `Unfortunately you lost. 😕 The word was: ${currQuestion.term}`
       );
     }
   }, [correctLetters, wrongLetters, currQuestion?.term]);
@@ -227,7 +232,7 @@ const Hangman: React.FC<{ termItems: TermItem[] }> = ({ termItems }) => {
               className="flex flex-col items-center justify-center">
               <div className="text-center text-xl font-semibold p-3">
                 Congratulations! You have completed the game.
-                {` You scored ${score - 1}/${termItems.length}`}
+                {` You scored ${score}/${termItems.length}`}
               </div>
               <Button
                 className="border hover:bg-slate-100 hover:text-slate-900 hover:border-slate-300

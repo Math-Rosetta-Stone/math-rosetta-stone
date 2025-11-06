@@ -29,15 +29,7 @@ const MiniGameMarker: React.FC<MiniGameMarkerProps> = ({
     const mapUrl = `/map/${level.branch_no}/${level.chapter_no}/${level.level_no}`;
     router.replace(mapUrl);
     
-    // Then navigate to game - use a small timeout to ensure URL is updated
-    setTimeout(() => {
-      if (level.minigame_name === "random") {
-        const gameName = selectRandomGame();
-        router.push(`/game/${gameName}`);
-      } else {
-        router.push(`/game/${level.minigame_name}`);
-      }
-    }, 0);
+    
   };
 
   const isLevelLocked = useCallback(() => {

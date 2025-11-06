@@ -16,7 +16,7 @@ const GameMap: React.FC<GameMapProps> = ({
   isAdmin = false,
   levels,
   setLevels,
-  currBranchOverride,
+  currBranchOverride
 }) => {
   const { currBranch: contextBranch } = useContext(GamePositionContext);
   const currBranch = currBranchOverride !== undefined ? currBranchOverride : contextBranch;

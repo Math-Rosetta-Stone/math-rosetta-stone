@@ -41,6 +41,9 @@ const BranchMap: React.FC<BranchMapProps> = ({
           bounds={MAP_BOUNDS}
         />
         {universal_data.branches[branchNo - 1]?.locations?.map((location, index) => {
+          if(universal_data.branches[branchNo - 1].no_of_chapters < index + 1) {
+            return null;
+          }
           const chapterNo = index + 1;
           return (
             <ChapterMarker

@@ -6,17 +6,20 @@ export function showNotification(setter: (value: boolean) => void): void {
   }
   
   export function checkWin(correct: string[], wrong: string[], word: string): 'win' | 'lose' | '' {
+    if (!word) return '';
+    
     let status: 'win' | 'lose' | '' = 'win';
+    const wordLower = word.toLowerCase();
   
-    // Check for win
-    word.split('').forEach(letter => {
-      if (!correct.includes(letter)) {
+    // Check for win - compare case-insensitively
+    wordLower.split('').forEach(letter => {
+      if (letter !== ' ' && !correct.includes(letter)) {
         status = '';
       }
     });
   
     // Check for lose
-    if (wrong.length === 6) {
+    if (wrong.length >= 6) {
       status = 'lose';
     }
   
