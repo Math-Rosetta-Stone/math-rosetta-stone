@@ -1,10 +1,7 @@
-import mysql.connector
-from mysql.connector import errorcode
+import pymysql
 from openpyxl import load_workbook
 from dotenv import load_dotenv
 import os
-import json
-import re
 import random
 
 # Get the root directory (one level up from the script's directory)
@@ -19,25 +16,26 @@ print(f"DB_NAME: {os.getenv('DB_NAME')}")
 
 # Configs for MySQL connection
 config = {
-    'user': os.getenv('DB_USER'), 
-    'password': os.getenv('DB_PASSWORD'),  # Replace with your MySQL password
-    'host': os.getenv('DB_HOST'),  # Replace with your MySQL host (e.g., 'localhost')
-    'database': os.getenv('DB_NAME'),  # Replace with your MySQL database name
-    'port': 3306,  # Replace with your MySQL port (default is 3306)
-    'charset': 'utf8mb4',  # Provides support for a larger range of characters
-    'use_unicode': True,  # Prevents conversion of Unicode characters to escape sequences
-    'ssl_disabled': True  # Disable SSL to avoid compatibility issues with Python 3.12+
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'host': os.getenv('DB_HOST'),
+    'database': os.getenv('DB_NAME'),
+    'port': 3306,
+    'charset': 'utf8mb4',
+    'use_unicode': True,
+    'ssl': False,  # Disable SSL for local/simple setups
 }
 
 # Connect to MySQL server
 try:
-    conn = mysql.connector.connect(**config)
+    conn = pymysql.connect(**config)
     cursor = conn.cursor()
     print("Successfully connected to MySQL server...\n")
-except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+except pymysql.Error as err:
+    errno = err.args[0] if err.args else None
+    if errno == 1045:  # ER_ACCESS_DENIED_ERROR
         print("Something is wrong with your username or password")
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
+    elif errno == 1049:  # ER_BAD_DB_ERROR
         print("Database does not exist")
     else:
         print(err)
@@ -237,7 +235,7 @@ def insert_excel_data_into_sql_tables():
         # example = escape_special_characters(example)
 
         # Print term details for debugging
-        print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term.strip().strip('"')}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
+        print(f"Inserting row {row}: term_id={row - ROW_START + 1}, term={term.strip().strip(chr(34))}, branch_no={branch_number}, rank={level}, definition={definition}, example={example}")
 
         # Insert into `terms` table
         insert_term_query = """
@@ -437,7 +435,7 @@ def main():
     try:
         insert_excel_data_into_sql_tables()
         print("\nSuccessfully inserted data from Excel into MySQL tables...\n")
-    except mysql.connector.Error as err:
+    except pymysql.Error as err:
         print(f"Error: {err}")
         conn.rollback()
     finally:
