@@ -1,9 +1,11 @@
 # rosseta-stone-math
 
-# scripts
+## scripts
 
-```
-pip install pymysql openpyxl dotenv os random
+```bash
+pip3 install pymysql openpyxl dotenv
+cd scripts
+python3 terms_populate.py
 ```
 
 ## Domain
@@ -12,6 +14,21 @@ Install the school vpn first https://security.utoronto.ca/services/vpn/usage-gui
 
 Connect the vpn with utorid
 
-```sh
-ssh kielstra-vm.utsc.utoronto.ca
+```bash
+ssh your_utorid@kielstra-vm.utsc.utoronto.ca
+```
+
+## Process Manager (PM2)
+
+```bash
+pnpm build
+pm2 start npx --name "my-nextjs-app" -- next start
+pm2 save
+pm2 startup
+```
+
+## Reverse Proxy
+
+```bash
+sudo systemctl status nginx
 ```
